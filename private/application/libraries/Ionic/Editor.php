@@ -27,6 +27,7 @@ class Editor {
         document_base_url: '".\URL::base()."/',\n
         resize: 'both',\n
         height: 400,\n
+        entity_encoding: 'raw',\n
         remove_script_host: false,\n
         relative_urls: false,\n
         theme_advanced_font_sizes: \"10px,12px,13px,14px,16px,18px,20px\",\n
