@@ -11,7 +11,7 @@ class Admin_Players_Controller extends Admin_Controller {
 
         if (!Request::forged() and Request::method() == 'POST')
         {
-            $raw_data = array('name'        => '', 'number'      => '', 'position'    => '', 'team_id'     => '', 'date'        => '', 'height'      => '', 'weight'      => '', 'cost'        => '', 'prev_club'   => '', 'birthplace'  => '', 'country'     => '', 'is_on_loan'  => '', 'description' => '');
+            $raw_data = array('name'        => '', 'number'      => '', 'position'    => '', 'team_id'     => '', 'date'        => '0000-00-00', 'height'      => '', 'weight'      => '', 'cost'        => '', 'prev_club'   => '', 'birthplace'  => '', 'country'     => '', 'is_on_loan'  => '', 'description' => '');
             $raw_data = array_merge($raw_data, Input::only(array('name', 'number', 'position', 'team_id', 'date', 'height', 'weight', 'cost', 'prev_club', 'birthplace', 'country', 'is_on_loan', 'description')));
             $raw_data['image'] = Input::file('image');
 
@@ -171,7 +171,7 @@ class Admin_Players_Controller extends Admin_Controller {
 
         if (!Request::forged() and Request::method() == 'POST')
         {
-            $raw_data = array('name'        => '', 'slug'        => '', 'number'      => '', 'position'    => '', 'team_id'     => '', 'date'        => '', 'height'      => '', 'weight'      => '', 'cost'        => '', 'prev_club'   => '', 'birthplace'  => '', 'country'     => '', 'is_on_loan'  => '', 'description' => '');
+            $raw_data = array('name'        => '', 'slug'        => '', 'number'      => '', 'position'    => '', 'team_id'     => '', 'date'        => '0000-00-00', 'height'      => '', 'weight'      => '', 'cost'        => '', 'prev_club'   => '', 'birthplace'  => '', 'country'     => '', 'is_on_loan'  => '', 'description' => '');
             $raw_data = array_merge($raw_data, Input::only(array('name', 'slug', 'number', 'position', 'team_id', 'date', 'height', 'weight', 'cost', 'prev_club', 'birthplace', 'country', 'is_on_loan', 'description')));
             $raw_data['image'] = Input::file('image');
 
