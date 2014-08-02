@@ -562,7 +562,7 @@ function render_each($partial, array $data, $iterator, $empty = 'raw|')
  */
 function yield_content($section)
 {
-	return Laravel\Section::yield_content($section);
+	return '';
 }
 
 /**
