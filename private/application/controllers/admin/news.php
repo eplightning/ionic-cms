@@ -7,6 +7,9 @@ class Admin_News_Controller extends Admin_Controller {
         if (!Auth::can('admin_news_add'))
             return Response::error(403);
 
+        Asset::add('select2', 'public/css/select2.css');
+        Asset::add('select2', 'public/js/select2.min.js', 'jquery');
+
         if (!Request::forged() and Request::method() == 'POST')
         {
             $raw_data = array('title'        => '', 'source'       => '', 'image_text'   => '', 'news_content' => '', 'news_short'   => '', 'big_image'    => '', 'small_image'  => '', 'tags'         => '', 'publish_at'   => '');
@@ -365,6 +368,9 @@ class Admin_News_Controller extends Admin_Controller {
 
         if ($id->user_id != $this->user->id and !Auth::can('admin_news_all'))
             return Response::error(403);
+
+        Asset::add('select2', 'public/css/select2.css');
+        Asset::add('select2', 'public/js/select2.min.js', 'jquery');
 
         $current_tags = array();
 

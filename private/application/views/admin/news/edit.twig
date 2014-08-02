@@ -136,7 +136,7 @@
 				{% if errors.has('big_image') %}
 					<div class="error">{{ errors.first('big_image') }}</div>
 				{% endif %}
-				<select id="big_image" name="big_image">
+				<select id="big_image" name="big_image" style="width: 80%">
 				{% for imgk, imgv in image_list %}
 				<option value="{{ imgk }}"{% if imgv == object.big_image %} selected="selected"{% endif %}>{{ imgv }}</option>
 				{% endfor %}
@@ -152,7 +152,7 @@
 				{% if errors.has('small_image') %}
 					<div class="error">{{ errors.first('small_image') }}</div>
 				{% endif %}
-				<select id="small_image" name="small_image">
+				<select id="small_image" name="small_image" style="width: 80%">
 				{% for imgk, imgv in image_list %}
 				<option value="{{ imgk }}"{% if imgv == object.small_image %} selected="selected"{% endif %}>{{ imgv }}</option>
 				{% endfor %}
@@ -168,7 +168,7 @@
 				{% if errors.has('tags') %}
 					<div class="error">{{ errors.first('tags') }}</div>
 				{% endif %}
-				<select id="tags" name="tags[]" multiple="multiple">
+				<select id="tags" name="tags[]" multiple="multiple" style="width: 80%">
 				{% for tagk, tagv in tags %}
 					<option value="{{ tagk }}"{% if tagk in current_tags %} selected="selected"{% endif %}>{{ tagv }}</option>
 				{% endfor %}
@@ -196,6 +196,8 @@ $(function(){
 		source: IONIC_BASE_URL+"admin/news/autocomplete/display_name"
 	});
 	{% endif %}
+	$('#big_image, #small_image').select2({closeOnSelect: true, placeholderOption: 'first'});
+	$('#tags').select2({closeOnSelect: false});
 	$('.big-preview').click(function(){
 		if ($('#big-preview-container').css('display') != 'none')
 		{
