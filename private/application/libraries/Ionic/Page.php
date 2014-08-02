@@ -36,7 +36,7 @@ class Page {
      */
     public function autodetect_mobile()
     {
-        $detection = new Mobile_Detect;
+        $detection = new \Mobile_Detect;
 
         $this->is_mobile = $detection->isMobile();
     }
@@ -227,6 +227,12 @@ class Page {
      */
     public function set_title($section, $ignore_global = false)
     {
+        if (is_null($section))
+        {
+            $section = trim(sprintf(\Config::get('meta.title'), ''), ' -');
+            $ignore_global = true;
+        }
+
         $this->section_title = $section;
         $this->title = $ignore_global ? $section : sprintf(\Config::get('meta.title'), $section);
 

@@ -132,7 +132,6 @@ class News_Controller extends Base_Controller {
     {
         // Setup page display
         $this->online('Strona główna', 'news/index');
-        $this->page->set_title('Strona główna');
         $this->layout = View::make('layouts.index');
 
         // Cache

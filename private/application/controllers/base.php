@@ -149,7 +149,7 @@ abstract class Base_Controller extends Controller {
         }
 
         // Set META stuff
-        $this->page->set_title('Strona');
+        $this->page->set_title(null);
         $this->page->set_meta('description', Config::get('meta.description'));
         $this->page->set_meta('keywords', Config::get('meta.keywords'));
         $this->page->set_meta('csrf-token', Session::token());
@@ -159,7 +159,7 @@ abstract class Base_Controller extends Controller {
         $this->page->set_property('og:type', 'website');
         $this->page->set_property('og:image', URL::base().'/'.Config::get('advanced.og_defaultimage', 'opengraph.png'));
         $this->page->set_property('og:url', URL::current());
-        $this->page->set_property('og:site_name', str_replace('%s', '', Config::get('meta.title')));
+        $this->page->set_property('og:site_name', $this->page->title);
         $this->page->set_property('og:description', Config::get('meta.description'));
         $this->page->set_property('og:locale', 'pl_PL');
 
