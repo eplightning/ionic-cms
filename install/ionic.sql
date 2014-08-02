@@ -1049,8 +1049,8 @@ CREATE TABLE IF NOT EXISTS `{dbp}table_positions` (
   `wins` smallint(5) unsigned NOT NULL DEFAULT '0',
   `losses` smallint(5) unsigned NOT NULL DEFAULT '0',
   `draws` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `goals_shot` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `goals_lost` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `goals_shot` smallint(5) NOT NULL DEFAULT '0',
+  `goals_lost` smallint(5) NOT NULL DEFAULT '0',
   `position` smallint(5) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`team_id`,`table_id`),
   KEY `table_id` (`table_id`)

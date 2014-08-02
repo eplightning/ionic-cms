@@ -79,7 +79,7 @@ class Sport_Package extends \Ionic\Package {
      */
     public function get_version()
     {
-        return '1.2';
+        return '1.2.1';
     }
 
     /**
@@ -214,6 +214,21 @@ class Sport_Package extends \Ionic\Package {
      */
     public function upgrade_package(\Ionic\Package\API $api, $version)
     {
+        // 1.2 -> 1.2.1
+        if ($version == '1.2')
+        {
+            $api->execute_queries(array(
+                "ALTER TABLE ".DB::prefix()."table_positions
+                 CHANGE `goals_lost` `goals_lost` SMALLINT(5) NOT NULL DEFAULT '0'",
+                "ALTER TABLE ".DB::prefix()."table_positions
+                 CHANGE `goals_shot` `goals_shot` SMALLINT(5) NOT NULL DEFAULT '0'"
+            ), true);
+
+            $version = '1.2.1';
+        }
+
+        $api->update_package('sport', $this->get_version());
+
         return true;
     }
 

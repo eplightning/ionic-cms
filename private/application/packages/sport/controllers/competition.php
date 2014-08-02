@@ -240,7 +240,7 @@ class Competition_Controller extends Base_Controller {
 
         $positions = DB::table('table_positions')->where('table_id', '=', $table->id)
                 ->join('teams', 'teams.id', '=', 'table_positions.team_id')
-                ->order_by($sort_by == 'goals_shot' ? DB::raw('CAST(goals_shot - goals_lost AS SIGNED)') : $sort_by, $sort_by == 'position' ? 'asc' : 'desc')
+                ->order_by($sort_by == 'goals_shot' ? DB::raw('goals_shot - goals_lost') : $sort_by, $sort_by == 'position' ? 'asc' : 'desc')
                 ->get(array('table_positions.*', 'teams.name', 'teams.slug', 'teams.image', 'teams.is_distinct'));
 
 
