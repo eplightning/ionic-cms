@@ -565,7 +565,7 @@ ul.filter-list li a { border: none; color: #aaa }
 	border: 1px solid #eaeaea;
 	display: none;
 	width: auto;
-    z-index: 9000;
+	z-index: 9000;
 }
 
 #big-preview-container-close, #small-preview-container-close {
