@@ -13,7 +13,14 @@ class Error {
 	{
 		static::log($exception);
 
-		ob_get_level() and ob_end_clean();
+		if (!ini_get('zlib.output_compression'))
+		{
+			ob_get_level() and ob_end_clean();
+		}
+		else
+		{
+			ob_get_level() and ob_clean();
+		}
 
 		// If detailed errors are enabled, we'll just format the exception into
 		// a simple error message and display it on the screen. We don't use a
