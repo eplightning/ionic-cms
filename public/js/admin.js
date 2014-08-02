@@ -55,7 +55,7 @@ var IonicAdmin = {
 };
 
 $(document).ready(function() {
-	IonicAdmin.csrfToken = $('meta[name="csrf_token"]').attr('content');
+	IonicAdmin.csrfToken = $('meta[name="csrf-token"]').attr('content');
 	
 	if ($.fn.lightBox != undefined && $.fn.lightBox)
 	{

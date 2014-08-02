@@ -157,7 +157,7 @@ var IonicPage = {
 };
 
 $(function() {
-	IonicPage.csrfToken = $('meta[name="csrf_token"]').attr('content');
+	IonicPage.csrfToken = $('meta[name="csrf-token"]').attr('content');
 	
 	$('.shoutbox-refresh').click(function(){
 		if (!$(this).prop('disabled'))

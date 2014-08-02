@@ -152,7 +152,7 @@ abstract class Base_Controller extends Controller {
         $this->page->set_title('Strona');
         $this->page->set_meta('description', Config::get('meta.description'));
         $this->page->set_meta('keywords', Config::get('meta.keywords'));
-        $this->page->set_meta('csrf_token', Session::token());
+        $this->page->set_meta('csrf-token', Session::token());
 
         // Open graph
         $this->page->set_property('og:title', 'Strona');

@@ -130,7 +130,7 @@ class Admin_Controller extends Controller {
         $this->page->set_title('Panel administracyjny', true);
 
         // CSRF token
-        $this->page->set_meta('csrf_token', Session::token());
+        $this->page->set_meta('csrf-token', Session::token());
 
         // Javascript
         Asset::add('jquery', 'public/js/jquery.min.js');
