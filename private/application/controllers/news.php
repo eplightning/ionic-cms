@@ -262,11 +262,11 @@ class News_Controller extends Base_Controller {
                 ->where('news.publish_at', '<>', '0000-00-00 00:00:00')
                 ->take(10)->get(array('news.title', 'news.slug', 'news.external_url', 'news.created_at', 'news.content_intro', 'news.content')) as $n)
         {
-            $intro = trim(str_replace('&nbsp;', ' ', $n->content_intro));
+            $intro = trim(html_entity_decode($n->content_intro));
 
             if (empty($intro))
             {
-                $intro = trim(str_replace('&nbsp;', ' ', Str::limit(strip_tags($n->content), 200)));
+                $intro = trim(html_entity_decode(Str::limit(strip_tags($n->content), 200)));
             }
 
             $rss .= "\t\t<item>\n";
