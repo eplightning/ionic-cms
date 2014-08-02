@@ -1,0 +1,72 @@
+<div class="section">
+	<div class="theader">
+		<div class="theader2">
+			Ustawienia widżetu
+		</div>
+	</div>
+	<div class="section-content">
+		<form action="{{ action }}" method="post">
+			<div class="elem">
+				<label for="season">Sezon:</label>
+				<div class="right">
+					<select name="season" id="season">
+					{% for k,v in seasons %}
+					<option value="{{ k }}"{% if k == options.season %} selected="selected"{% endif %}>{{ v }}</option>
+					{% endfor %}
+					</select>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="competition">Rozgrywki:</label>
+				<div class="right">
+					<select name="competition" id="competition">
+					<option value="0"{% if options.competition == 0 %} selected="selected"{% endif %}>Wszystkie</option>
+					{% for c in competitions %}
+					<option value="{{ c.id }}"{% if c.id == options.competition %} selected="selected"{% endif %}>{{ c.name }}</option>
+					{% endfor %}
+					</select>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="distinct">Wyróżniony:<br /><small>Jeden z klubów musi być wyróżniony</small></label>
+				<div class="right">
+					<input class="checkbox" type="checkbox" name="distinct" id="distinct" value="1"{% if options.distinct %} checked="checked"{% endif %} />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="type">Typ:</label>
+				<div class="right">
+					<select name="type" id="type">
+						<option value="next"{% if options.type == 'next' %} selected="selected"{% endif %}>Następny</option>
+						<option value="prev"{% if options.type == 'prev' %} selected="selected"{% endif %}>Poprzedni</option>\
+					</select>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="type">Sposób pobierania:</label>
+				<div class="right">
+					<select name="type2" id="type2">
+						<option value="standard"{% if options.type2 == 's' %} selected="selected"{% endif %}>Standardowy</option>
+						<option value="fixture"{% if options.type2 == 'f' %} selected="selected"{% endif %}>Kolejka</option>\
+					</select>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="limit">Ilość meczów:</label>
+				<div class="right">
+					<input type="text" name="limit" id="limit" value="{{ options.limit }}" maxlength="10" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="template">Plik wyglądu:<br /><small>Plik znajdujący się w katalogu private/application/views. Zamiast slashów użyj kropek, nie dodawaj rozszerzenia</small></label>
+				<div class="right">
+					<input type="text" name="template" id="template" value="{{ options.template }}" />
+				</div>
+			</div>
+			<div class="toolbar ui-widget-header ui-corner-all">
+				{{ form_token() }}
+				<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+			</div>
+		</form>
+	</div>
+</div>

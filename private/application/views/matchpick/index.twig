@@ -1,0 +1,11 @@
+<div class="ionic-box">
+	<h2>Piłkarz meczu</h2>
+	<ul class="ionic-list">
+		{% for pick in picks.results %}
+		<li>
+			<a href="matchpick/show/{{ pick.id }}">{{ pick.title }}</a>{% if pick.is_active == 1 %} (aktywne) {% endif %}
+		</li>
+		{% endfor %}
+	</ul>
+	{{ picks.links() }}
+</div>

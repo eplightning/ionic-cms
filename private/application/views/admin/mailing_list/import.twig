@@ -1,0 +1,25 @@
+<h2>Importuj adresy e-mail</h2>
+<form action="admin/mailing_list/import" method="post">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Dane</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="emails">Adresy e-mail<br /><small>Jeden adres e-mail na linie. Adresy w złym formacie lub już istniejące w bazie danych zostaną zignorowane.</small></label>
+				<div class="right">
+					<textarea name="emails" id="emails" cols="50" rows="10"></textarea>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Importuj" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	$('input[type="submit"]').button();
+});
+</script>

@@ -1,0 +1,20 @@
+<div class="ionic-box">
+	<h2>Archiwum Shoutboxa</h2>
+	{% for post in posts.results %}
+	<div class="ionic-post">
+		<div class="ionic-post-left">
+			<div class="ionic-post-username">{% if post.user_id %}<a href="{{ make('user', post.slug) }}">{{ post.display_name }}</a>{% else %}Gość{% endif %}</div>
+			<div class="ionic-post-status">{% if online.is_online(post.user_id) %}Użytkownik jest online{% endif %}</div>
+		</div>
+		<div class="ionic-post-right">
+			<div class="ionic-post-info">
+				Dodano: {{ post.created_at|relativedate }}
+			</div>
+			<div class="ionic-post-content">
+				{{ post.content }}
+			</div>
+		</div>
+	</div>
+	{% endfor %}
+	{{ posts.links() }}
+</div>

@@ -1,0 +1,20 @@
+<div class="ionic-box">
+	<h2>Znalezione newsy</h2>
+	<ul class="ionic-list">
+		{% for n in news %}
+		<li>
+			<a href="{{ make('news', n.slug, n.external_url) }}">{{ n.title }}</a>
+		</li>
+		{% endfor %}
+	</ul>
+</div>
+<div class="ionic-box">
+	<h2>Znalezione podstrony</h2>
+	<ul class="ionic-list">
+		{% for p in pages %}
+		<li>
+			<a href="page/show/{{ p.slug }}">{{ p.title }}</a>
+		</li>
+		{% endfor %}
+	</ul>
+</div>

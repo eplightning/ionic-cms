@@ -1,0 +1,30 @@
+<div class="ionic-box">
+	<h2>{{ pick.title }}</h2>
+	<div style="font-size: 0.8em">
+		Utworzono: {{ pick.created_at|date }} ; Głosów: {{ pick.votes }}
+	</div>
+	{% if pick.can_vote() %}
+	<form action="monthpick/vote" method="post">
+		<div style="margin: 5px; padding: 5px">
+			<select name="option">
+				{% for k, opt in pick.options %}
+					<option value="{{ k }}">{{ opt.name }}</option>
+				{% endfor %}
+			</select>
+		</div>
+		<div style="margin: 5px; padding: 5px">
+			{{ form_token() }}
+			<input type="submit" name="submit" value="Głosuj" />
+		</div>
+	</form>
+	{% else %}
+	<ul class="ionic-list">
+		{% for opt in pick.options %}
+		{% if pick.votes == 0 %}{% set percent = 0 %}{% else %}{% set percent = (opt.votes/pick.votes*100) %}{% endif %}
+		<li>
+			<span class="title">{{ opt.name }}:</span> {{ percent|number_format(2, ',') }}% ({{ opt.votes}} oddanych głosów)
+		</li>
+		{% endfor %}
+	</ul>
+	{% endif %}
+</div>

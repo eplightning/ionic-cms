@@ -1,0 +1,170 @@
+<h2>Dodawanie zawodnika</h2>
+<form action="admin/players/add" method="post" enctype="multipart/form-data">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Wymagane</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="name">Imię i nazwisko<br /><small>Imię i nazwisko zawodnika</small></label>
+				<div class="right">
+				{% if errors.has('name') %}
+					<div class="error">{{ errors.first('name') }}</div>
+				{% endif %}
+				<input type="text" id="name" name="name" value="{{ old_data.name|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="number">Numer<br /><small>Numer zawodnika</small></label>
+				<div class="right">
+				{% if errors.has('number') %}
+					<div class="error">{{ errors.first('number') }}</div>
+				{% endif %}
+				<input type="text" id="number" name="number" value="{{ old_data.number|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="position">Pozycja<br /><small>Pozycja na której zwykle ten użytkownik występuje</small></label>
+				<div class="right">
+				{% if errors.has('position') %}
+					<div class="error">{{ errors.first('position') }}</div>
+				{% endif %}
+				<input type="text" id="position" name="position" value="{{ old_data.position|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="team_id">Klub<br /><small>Klub zawodnika</small></label>
+				<div class="right">
+				{% if errors.has('team_id') %}
+					<div class="error">{{ errors.first('team_id') }}</div>
+				{% endif %}
+				<select id="team_id" name="team_id">
+				{% for k, v in related_team_id %}
+					<option value="{{ k }}"{% if old_data.team_id == k %} selected="selected"{% endif %}>{{ v|e }}</option>
+				{% endfor %}
+				</select>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Inne</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="image">Zdjęcie<br /><small>Zdjęcia zawodnika</small></label>
+				<div class="right">
+				{% if errors.has('image') %}
+					<div class="error">{{ errors.first('image') }}</div>
+				{% endif %}
+				<input type="file" id="image" name="image" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="date">Data urodzin<br /><small>RRRR-MM-DD</small></label>
+				<div class="right">
+				{% if errors.has('date') %}
+					<div class="error">{{ errors.first('date') }}</div>
+				{% endif %}
+				<input type="text" class="datepicker" id="date" name="date" value="{{ old_data.date|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="height">Wysokość<br /><small>Wysokość zawodnika w centymetrach</small></label>
+				<div class="right">
+				{% if errors.has('height') %}
+					<div class="error">{{ errors.first('height') }}</div>
+				{% endif %}
+				<input type="text" id="height" name="height" value="{{ old_data.height|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="weight">Waga<br /><small>Waga zawodnika w kilogramach</small></label>
+				<div class="right">
+				{% if errors.has('weight') %}
+					<div class="error">{{ errors.first('weight') }}</div>
+				{% endif %}
+				<input type="text" id="weight" name="weight" value="{{ old_data.weight|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="cost">Koszt<br /><small>Za jakie pieniądze przyszedł do obecnego klubu. Dowolna waluta</small></label>
+				<div class="right">
+				{% if errors.has('cost') %}
+					<div class="error">{{ errors.first('cost') }}</div>
+				{% endif %}
+				<input type="text" id="cost" name="cost" value="{{ old_data.cost|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="prev_club">Poprzedni klub<br /><small>Poprzedni klub, w którym ten zawodnik występował</small></label>
+				<div class="right">
+				{% if errors.has('prev_club') %}
+					<div class="error">{{ errors.first('prev_club') }}</div>
+				{% endif %}
+				<input type="text" id="prev_club" name="prev_club" value="{{ old_data.prev_club|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="birthplace">Miejsce urodzin<br /><small>Gdzie ten zawodnik się urodził</small></label>
+				<div class="right">
+				{% if errors.has('birthplace') %}
+					<div class="error">{{ errors.first('birthplace') }}</div>
+				{% endif %}
+				<input type="text" id="birthplace" name="birthplace" value="{{ old_data.birthplace|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="country">Kraj<br /><small>Z jakiego kraju ten zawodnik pochodzi</small></label>
+				<div class="right">
+				{% if errors.has('country') %}
+					<div class="error">{{ errors.first('country') }}</div>
+				{% endif %}
+				<select name="country" id="country">
+					<option value="">---</option>
+					{% for k,v in countries %}
+					<option value="{{ k }}"{% if k == old_data.country %} selected="selected"{% endif %}>{{ v }}</option>
+					{% endfor %}
+				</select>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="is_on_loan">Wypożyczenie<br /><small>Czy ten zawodnik jest obecnie wypożyczony z innego klubu</small></label>
+				<div class="right">
+				{% if errors.has('is_on_loan') %}
+					<div class="error">{{ errors.first('is_on_loan') }}</div>
+				{% endif %}
+				<input class="checkbox" type="checkbox" id="is_on_loan" name="is_on_loan" value="1"{% if old_data.is_on_loan == '1' %} checked="checked"{% endif %} />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="description">Opis<br /><small>Informacje o zawodniku</small></label>
+				<div class="right">
+				{% if errors.has('description') %}
+					<div class="error">{{ errors.first('description') }}</div>
+				{% endif %}
+				{{ editor('description', old_data.description|e) }}
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	$('input[type="submit"]').button();
+	$('#position').autocomplete({
+		source: [
+			"Bramkarz",
+			"Obrońca",
+			"Pomocnik",
+			"Napastnik"
+		]
+	});
+	$('.datepicker').datepicker({dateFormat: 'yy-mm-dd' });
+});
+</script>

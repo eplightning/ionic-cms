@@ -1,0 +1,49 @@
+<div class="ionic-box">
+	<h2>Zawodnik - {{ player.name }}</h2>
+	<div class="ionic-team-info">
+		{% if player.image %}<img src="{{ thumb('players', player.image, '90x0') }}" alt="" />{% endif %}
+		<ul class="ionic-list">
+			<li><span class="title">Numer:</span>{{ player.number ? player.number : 'b/d' }}</li>
+			<li><span class="title">Narodowość:</span>{{ country }}</li>
+			<li><span class="title">Data urodzenia:</span>{{ player.date ? player.date|date('short') : 'b/d' }}</li>
+			<li><span class="title">Pozycja:</span>{{ player.position ? player.position : 'b/d' }}</li>
+			<li><span class="title">Wzrost:</span>{{ player.height ? player.height : 'b/d' }} cm</li>
+			<li><span class="title">Waga:</span>{{ player.weight ? player.weight : 'b/d' }} kg</li>
+			<li><span class="title">Koszt transferu:</span>{{ player.cost ? player.cost : 'b/d' }}</li>
+			<li><span class="title">Poprzedni klub:</span>{{ player.prev_club ? player.prev_club : 'b/d' }}</li>
+			<li><span class="title">Miejsce urodzenia:</span>{{ player.birthplace ? player.birthplace : 'b/d' }}</li>
+			<li><span class="title">Na wypożyczeniu:</span>{{ player.is_on_loan ? 'Tak' : 'Nie' }}</li>
+		</ul>
+	</div>
+	{% if player.description %}
+	<h3>Biografia</h3>
+	<div class="ionic-box">
+		{{ player.description }}
+	</div>
+	{% endif %}
+	{% if stats|length > 0 %}
+	<h3>Statystyki</h3>
+	<table class="ionic-table">
+		<tr>
+			<th>Rozgrywki</th>
+			<th>Sezon</th>
+			<th style="width: 48px">M. (min.)</th>
+			<th style="width: 48px">B.</th>
+			<th style="width: 48px">Z.k.</th>
+			<th style="width: 48px">C.k.</th>
+			<th style="width: 48px">A.</th>
+		</tr>
+		{% for stat in stats %}
+		<tr>
+			<td>{{ stat.competition_name }}</td>
+			<td>{{ stat.season_year }} / {{ stat.season_year + 1 }}</td>
+			<td class="centered">{{ stat.matches }} ({{ stat.minutes }})</td>
+			<td class="centered">{{ stat.goals }}</td>
+			<td class="centered">{{ stat.yellow_cards }}</td>
+			<td class="centered">{{ stat.red_cards }}</td>
+			<td class="centered">{{ stat.assists }}</td>
+		</tr>
+		{% endfor %}
+	</table>
+	{% endif %}
+</div>

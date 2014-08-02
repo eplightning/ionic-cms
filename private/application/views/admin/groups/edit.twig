@@ -1,0 +1,46 @@
+<h2>Edycja grupy</h2>
+<form action="admin/groups/edit/{{ object.id }}" method="post">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Dane</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="name">Nazwa<br /><small>Nazwa grupy</small></label>
+				<div class="right">
+				{% if errors.has('name') %}
+					<div class="error">{{ errors.first('name') }}</div>
+				{% endif %}
+				<input type="text" id="name" name="name" value="{% if old_data.name != '' %}{{ old_data.name|e }}{% else %}{{ object.name }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="description">Opis<br /><small>Opis grupy</small></label>
+				<div class="right">
+				{% if errors.has('description') %}
+					<div class="error">{{ errors.first('description') }}</div>
+				{% endif %}
+				<textarea id="description" name="description" rows="10" cols="50">{% if old_data.description != '' %}{{ old_data.description|e }}{% else %}{{ object.description }}{% endif %}</textarea>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="name">Styl<br /><small>Styl grupy</small></label>
+				<div class="right">
+				{% if errors.has('style') %}
+					<div class="error">{{ errors.first('style') }}</div>
+				{% endif %}
+				<input type="text" id="style" name="style" value="{% if old_data.style != '' %}{{ old_data.style|e }}{% else %}{{ object.style }}{% endif %}" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	$('input[type="submit"]').button();
+});
+</script>

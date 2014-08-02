@@ -1,0 +1,639 @@
+/**
+ * Basic styling
+ */
+body {
+    background: #D8D8D8;
+    padding: 0px;
+    padding-top: 10px;
+    margin: 0px auto;
+    font-size: 11px;
+    font-family: Verdana, Tahoma, Arial, sans-serif;
+    color: #737373;
+}
+ul.icon-list2 {
+    margin: 5px 0px;
+    padding: 0px;
+    list-style: none;
+    overflow: hidden;
+}
+
+ul.icon-list2 li {
+    padding: 5px;
+    padding-left: 23px;
+    margin-right: 10px;
+    min-height: 16px;
+}
+a {
+    color: #222;
+    text-decoration: none;
+}
+
+a img {
+    border: none;
+}
+
+input, textarea {
+    font-size: 11px;
+    font-family: Verdana, Tahoma, Arial, sans-serif;
+    color: #737373;
+    background: #fff;
+    border: 1px solid #D7D7D7;
+    padding: 5px;
+}
+
+input.submit, input#submit {
+    text-align: center;
+    padding: 6px 15px;
+}
+
+input.captioned {
+    background-image: url(layout_icons/user.png);
+    background-repeat: no-repeat;
+    background-position: 10% 50%;
+    padding-left: 30px;
+}
+
+.left {
+    float: left;
+}
+
+.right {
+    float: right
+}
+
+p {
+    line-height: 17px;
+}
+
+/**
+ * Footer
+ */
+#footer {
+    background: #E9E9E9;
+    width: 100%;
+    clear: both;
+    margin: 0px;
+    border-top: 4px solid #CCC;
+}
+
+#subfooter {
+    padding: 20px;
+    text-align: right;
+    font-size: 1.5em;
+}
+
+/**
+ * Top styling
+ */
+#top { width: 981px; margin: 0px auto; }
+
+#logo {
+    background-image: url(images/logo.png);
+    width: 942px;
+    height: 62px;
+    padding-top: 20px;
+    padding-left: 40px;
+    font-size: 18px;
+}
+
+/**
+ * Top menu styling
+ */
+#menu {
+    padding: 0px;
+    margin: 0px;
+    background-image: url(images/menu.png);
+    width: 980px;
+    height: 43px;
+    border: 1px solid #424B5A;
+    list-style: none;
+}
+
+#menu li {
+    float: left;
+    height: 43px;
+    background-image: url(images/menu.png);
+}
+
+#menu li.active {
+    background-image: url(images/menu_on.png);
+}
+
+#menu li a {
+    display: block;
+    padding: 13px 10px;
+    color: #fff;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+/**
+ * Submenu styling
+ */
+#submenu {
+    border: 1px solid #CDCDCD;
+    height: 32px;
+    background-image: url(images/submenu.png);
+    width: 980px;
+    display: none;
+}
+
+#submenu ul {
+    padding: 0px;
+    margin: 0px;
+    list-style: none;
+    display: none;
+}
+
+#submenu li {
+    float: left;
+}
+
+#submenu a {
+    display: block;
+    padding: 9px;
+    font-weight: normal;
+    color: #737373;
+}
+
+/**
+ * Content basic
+ */
+#page-container {
+    width: 981px;
+    overflow: hidden;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10px;
+}
+
+#left-side {
+    width: 671px;
+    float: left;
+    overflow: hidden;
+}
+
+#right-side {
+    width: 300px;
+    float: right;
+    overflow: hidden;
+}
+
+/**
+ * Content left
+ */
+.wrexbox {
+    width: 95.3%;
+    border: 1px solid #CBCBCB;
+    background: #EDEDED;
+    padding: 15px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.news-small {
+    width: 671px;
+    margin: 10px 0px;
+    overflow: hidden
+}
+
+.news-small div {
+    width: 314px;
+    border: 1px solid #CBCBCB;
+    background: #EDEDED;
+    padding: 7px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    margin-left: 10px;
+    float: left;
+}
+
+.news-small .clr {
+    margin-left: 0px;
+    clear: both;
+}
+
+.news-small img {
+    float: left;
+    margin-right: 10px;
+    padding: 2px;
+    border: 1px solid #C2C2C2;
+}
+
+.news-image {
+    margin-top: 10px;
+    margin-right: 10px;
+    float: left;
+    padding: 10px;
+    background: #DFDFDF;
+    border: 1px solid #A2A2A2;
+    text-align: center;
+    max-width: 200px;
+}
+
+.news-image img {
+    padding: 2px;
+    border: 1px solid #C2C2C2;
+}
+
+.news-image div {
+    margin-top: 10px;
+}
+
+/**
+ * Global content
+ */
+ul.list {
+    list-style: none;
+    padding: 0px;
+}
+
+ul.list li {
+    padding: 5px;
+}
+
+.row2 {
+    background: #E6E6E6;
+}
+
+.highlight {
+    background: #365A7E;
+    color: #fff;
+}
+
+.highlight a {
+    color: #fff;
+}
+
+ul.list li:hover {
+    background: #365A7E;
+    color: #fff;
+}
+
+ul.list li:hover a {
+    color: #fff;
+}
+
+ul.list li a {
+    font-size: 12px;
+    color: #737373;
+}
+
+ul.list li small {
+    display: block;
+    font-size: 11px;
+    padding-top: 5px;
+}
+
+ul.list li small a {
+    font-size: 11px;
+}
+
+ul.icon-list {
+    margin: 5px 0px;
+    padding: 0px;
+    list-style: none;
+    overflow: hidden;
+}
+
+ul.icon-list li {
+    float: left;
+    padding-left: 23px;
+    margin-right: 10px;
+    background-image: url(layout_icons/user.png);
+    background-position: 0% 50%;
+    background-repeat: no-repeat;
+    min-height: 16px;
+}
+
+.wrexbox h1, .rightbox h1, .news-small h1 {
+    font-size: 14px;
+    margin-top: 0px;
+}
+
+.wrexbox h2 {
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 0px;
+}
+
+/**
+ * Content right
+ */
+.wrexblock {
+    margin-bottom: 10px;
+}
+
+.rightbox {
+    width: 278px;
+    border: 1px solid #CBCBCB;
+    background: #EDEDED;
+    padding: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.left-tab-content, .right-tab-content {
+    width: 278px;
+    border: 1px solid #CBCBCB;
+    background: #EDEDED;
+    padding: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    border-top: none;
+}
+
+.tabs {
+    overflow: hidden;
+    width: 300px;
+}
+
+.left-tab {
+    width: 120px;
+    float: left;
+    background-image: url(images/block.png);
+    color: #fff;
+    margin-left: 1px;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.right-tab {
+    width: 120px;
+    float: right;
+    background-image: url(images/block.png);
+    color: #fff;
+    margin-right: 1px;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.tabs .active {
+    background-image: none;
+    background-color: #EDEDED;
+    color: #737373;
+}
+
+.login-form div {
+    margin-bottom: 10px;
+}
+
+.login-form div label {
+    width: 45px;
+    float: left;
+}
+
+.login-name {
+    background-repeat: no-repeat;
+    background-position: 2% 40%;
+    background-image: url(layout_icons/user.png);
+    padding-left: 25px;
+}
+
+.login-pass {
+    background-repeat: no-repeat;
+    background-position: 2% 40%;
+    background-image: url(layout_icons/password.png);
+    padding-left: 25px;
+}
+
+#right-side table {
+    width: 100%;
+    border: none;
+    border-collapse:collapse;
+}
+
+#right-side table td {
+    padding: 5px;
+}
+
+table td.center {
+    text-align: center;
+}
+
+ul.shoutbox {
+    height: 200px;
+    overflow: auto;
+    padding: 0px;
+    list-style: none;
+}
+
+ul.shoutbox li {
+    padding: 5px;
+}
+
+ul.shoutbox small {
+    display: block;
+    padding-bottom: 5px;
+    color: #365A7E;
+    font-size: 11px;
+}
+
+.buttons img {
+    float: left;
+    margin-right: 12px;
+    margin-bottom: 10px;
+    width: 80px;
+    height: 40px;
+    opacity: 0.7;
+    -moz-opacity: 0.7;
+    filter: alpha(opacity=70);
+}
+
+.buttons img:hover {
+    opacity: 1;
+    -moz-opacity: 1;
+    filter: alpha(opacity=100);
+}
+
+.poll div {
+    padding: 5px;
+}
+
+.match-header {
+    margin-bottom: 5px;
+    color: #365A7E;
+    overflow: hidden;
+}
+
+.match-header img {
+    float: left;
+    margin-right: 10px;
+}
+
+.match-header div {
+    padding-top: 7px;
+    line-height: 18px;
+}
+
+.group {
+    width: 100%;
+    overflow: hidden;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+
+.group .title {
+    background: #B5B5B5;
+    height: 23px;
+    padding-top: 9px;
+    color: #fff;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.group .content2 {
+    padding: 10px;
+    background: #EFEFEF;
+    border: 1px solid #B5B5B5;
+    border-top: 0px;
+    overflow: hidden;
+}
+
+.group .content2 .left {
+    float: left;
+    margin-right: 15px;
+}
+
+.group .content2 .left img {
+    width: 120px;
+    height: 90px;
+    padding: 2px;
+    border: 1px solid #C2C2C2;
+}
+
+.group .content2 .left div {
+    padding: 5px;
+}
+
+.group .content {
+    padding: 10px;
+    background: #EFEFEF;
+    border: 1px solid #B5B5B5;
+    border-top: 0px;
+    overflow: hidden;
+}
+
+.group .content div {
+    padding-bottom: 10px;
+    border-bottom: 1px solid #CCC;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.group .content div div {
+    padding: 0px;
+    border: none;
+    margin: none;
+}
+
+.group .content label {
+    float: left;
+    font-weight: bold;
+    font-size: 12px;
+    width: 200px;
+    margin-right: 5px;
+}
+
+.group .content input, textarea {
+    width: 50%;
+    font-size: 12px;
+    padding: 5px;
+    background: #fff;
+    font-family: Verdana, Tahoma, sans-serif;
+    border: 1px solid #ADAAAA;
+}
+
+.group .content select {
+    font-size: 12px;
+    padding: 5px;
+    background: #fff;
+    font-family: Verdana, Tahoma, sans-serif;
+    border: 1px solid #ADAAAA;
+}
+
+.group .content input#submit, .group .content input.submit, .group .content input.checkbox {
+    width: auto;
+}
+
+.group .content .msg {
+    display: block;
+    margin-top: 10px;
+    min-height: 16px;
+    margin-left: 205px;
+}
+
+.wrexcomment {
+    border-top: 1px solid #CCC;
+    padding: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.wrexcomment .avatar {
+    float: left;
+    margin-right: 10px;
+    padding: 5px;
+    border: 1px solid #CCC;
+}
+
+.wrexcomment .comment-info {
+    font-size: 0.9em;
+    overflow: hidden;
+}
+
+.wrexcomment .comment-info a {
+    font-weight: 700;
+}
+
+.wrexcomment .comment-info .left {
+    float: left;
+}
+
+.wrexcomment .comment-info .right {
+    float: right;
+}
+
+.pagination,.notice{overflow:hidden;margin-bottom:10px;clear:both;border:1px solid #B1B1B1;background:#F8F8F8;padding:10px}
+
+.wrextable {
+    width: 100%;
+    margin: 10px auto;
+    border-spacing: 1px;
+    background: #D5DDE5;
+    border-bottom: 2px solid #D5DDE5;
+}
+
+.wrextable thead {
+    border-spacing: 1px;
+}
+
+.wrextable .ico {
+    width: 16px;
+}
+
+.wrextable thead td {
+    height: 32px;
+    background-image: url(group.png);
+    color: #fff;
+    padding-left: 10px;
+}
+
+.wrextable tbody td {
+    background: #EEF3F8;
+    padding: 10px;
+}
+
+.not-bold * {
+    font-weight: normal;
+}
+
+a.button {
+	padding: 5px;
+	border: 1px solid #999;
+	background: #eee;
+	font-weight: bold;
+}

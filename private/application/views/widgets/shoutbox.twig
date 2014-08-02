@@ -1,0 +1,17 @@
+<ul id="shoutbox-container">
+	{{ list }}
+</ul>
+<div id="shoutbox-links">
+	{% if can_add %}
+	<textarea id="shoutbox-user-input" cols="20" rows="2"></textarea>
+	{% endif %}
+	<button class="shoutbox-refresh">Odśwież</button>
+	{% if can_add %}
+	<button class="shoutbox-submit">Wyślij</button>
+	{% endif %}
+</div>
+{% if auto_refresh %}
+<script type="text/javascript">
+	IonicPage.setShoutboxAutoRefresh({{ auto_refresh }});
+</script>
+{% endif %}

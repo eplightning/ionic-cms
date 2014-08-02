@@ -1,0 +1,51 @@
+<div class="ionic-box">
+	<h2>{{ table.title }}</h2>
+	<table class="ionic-table">
+		<tr>
+			<th{% if sort_by == 'position' %} class="active"{% endif %} style="width: 48px">
+				<a href="competition/table/{{ table.slug }}/position">Poz</a>
+			</th>
+			<th style="width: 36px"></th>
+			<th>
+				Klub
+			</th>
+			<th{% if sort_by == 'wins' %} class="active"{% endif %} style="width: 48px">
+				<a href="competition/table/{{ table.slug }}/wins">W</a>
+			</th>
+			<th{% if sort_by == 'draws' %} class="active"{% endif %} style="width: 48px">
+				<a href="competition/table/{{ table.slug }}/draws">R</a>
+			</th>
+			<th{% if sort_by == 'losses' %} class="active"{% endif %} style="width: 48px">
+				<a href="competition/table/{{ table.slug }}/losses">P</a>
+			</th>
+			<th{% if sort_by == 'goals_shot' %} class="active"{% endif %}>
+				<a href="competition/table/{{ table.slug }}/goals_shot">Bramki</a>
+			</th>
+			<th{% if sort_by == 'matches' %} class="active"{% endif %} style="width: 48px">
+				<a href="competition/table/{{ table.slug }}/matches">M</a>
+			</th>
+			<th{% if sort_by == 'points' %} class="active"{% endif %} style="width: 48px">
+				<a href="competition/table/{{ table.slug }}/points">Pkt.</a>
+			</th>
+		</tr>
+		{% for pos in positions %}
+		<tr>
+			<td>{{ pos.position }}.</td>
+			<td class="centered"><img src="{{ thumb('teams', pos.image, '16x0') }}" alt="" /></td>
+			<td>
+				{% if pos.is_distinct == 1 %}
+					<a href="team/show/{{ pos.slug }}"><strong>{{ pos.name }}</strong></a>
+				{% else %}
+					<a href="team/show/{{ pos.slug }}">{{ pos.name }}</a>
+				{% endif %}
+			</td>
+			<td class="centered">{{ pos.wins }}</td>
+			<td class="centered">{{ pos.draws }}</td>
+			<td class="centered">{{ pos.losses }}</td>
+			<td class="centered">{{ pos.goals_shot }} - {{ pos.goals_lost }}</td>
+			<td class="centered">{{ pos.matches }}</td>
+			<td class="centered">{{ pos.points }}</td>
+		</tr>
+		{% endfor %}
+	</table>
+</div>

@@ -1,0 +1,32 @@
+{% if current_user %}
+<p>Witaj, {{ current_user.display_name }}!</p>
+<ul class="ionic-list">
+	{% if can('admin_access') %}<li><a href="admin">Panel administracyjny</a></li>{% endif %}
+	<li><a href="blog/user/{{ current_user.slug }}">Twój blog</a></li>
+	<li><a href="users/panel">Panel kontrolny</a></li>
+	<li><a href="friends">Lista znajomych</a></li>
+	<li><a href="conversations">Prywatne dyskusje</a></li>
+	<li><a href="users/list">Użytkownicy</a></li>
+	<li><a href="users/online">Kto jest online</a></li>
+	<li><a href="login/logout">Wyloguj</a></li>
+</ul>
+{% else %}
+<form action="login/index" method="post" class="login-box">
+	<div>
+		<input type="text" name="username" />
+	</div>
+	<div>
+		<input type="password" name="password" />
+	</div>
+	<div>
+		<input type="checkbox" name="anonymous" value="1" /> Zaloguj anonimowo
+	</div>
+	<div>
+		<input type="checkbox" name="remember" value="1" checked="checked" /> Zapamiętaj mnie
+	</div>
+	<div>
+		{{ form_token() }}
+		<input type="submit" name="submit" value="Zaloguj" />
+	</div>
+</form>
+{% endif %}

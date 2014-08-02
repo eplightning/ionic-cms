@@ -1,0 +1,19 @@
+<div class="ionic-box">
+	<h2>Wysyłanie wiadomości</h2>
+	<form action="users/email/{{ user.slug }}" method="post">
+	<div class="ionic-form">
+		<div class="ionic-form-legend">Wiadomość</div>
+		<div class="ionic-form-elem">
+			<label>Użytkownik:</label>
+			{{ user.display_name }}
+		</div>
+		<div class="ionic-form-elem">
+			<label for="message">Wiadomość:</label>
+			<textarea name="message" id="message" rows="10"></textarea>
+		</div>
+		<div class="ionic-form-elem">
+			{{ form_token() }}
+			<input type="submit" name="submit" class="submit" value="Wyślij" />
+		</div>
+	</div>
+</div>

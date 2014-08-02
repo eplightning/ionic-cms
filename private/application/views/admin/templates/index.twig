@@ -1,0 +1,31 @@
+<h2 class="with-icon" style="background-image: url(public/img/admin/item/templates.png)">Szablony</h2>
+<div class="section">
+	<div class="theader">
+		<div class="theader2">
+			Lista szablonów
+		</div>
+	</div>
+	<table class="itable">
+		<tr>
+			<th style="width: 16px"></th>
+			<th style="width:50px">ID</th>
+			<th>Nazwa</th>
+			<th style="width: 45px">Zapisywalne</th>
+			<th style="width: 40px">Akcje</th>
+		</tr>
+		{% for tpl in list %}
+		<tr>
+			<td><img src="public/img/admin/item/templates.png" alt="" /></td>
+			<td class="centered">{{ tpl.id }}</td>
+			<td>{{ tpl.name }}</td>
+			<td class="centered">{% if tpl.writable %}<img src="public/img/icons/accept.png" alt="" /> {% endif %}</td>
+			<td class="centered"><a class="edit" href="admin/templates/edit/{{ tpl.id }}">Edytuj</a></td>
+		</tr>
+		{% endfor %}
+	</table>
+</div>
+<script type="text/javascript">
+$(function() {
+	$('a.edit').button({ text: false, icons: { primary: 'ui-icon-pencil' } });
+});
+</script>

@@ -1,0 +1,29 @@
+<h2>Uprawnienia</h2>
+<form action="admin/groups/roles/{{ object.id }}" method="post">
+	{% for section, role_list in roles %}
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">{{ section }}</div>
+		</div>
+		<div class="section-content">
+			{% for role in role_list %}
+			<div class="elem">
+				<label for="role-{{ role.data.id }}">{{ role.data.title }}</label>
+				<div class="right">
+				<input type="checkbox" id="role-{{ role.data.id }}" class="checkbox" name="roles[{{ role.data.name }}]" value="1"{% if role.has %} checked="checked"{% endif %} />
+				</div>
+			</div>
+			{% endfor %}
+		</div>
+	</div>
+	{% endfor %}
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	$('input[type="submit"]').button();
+});
+</script>

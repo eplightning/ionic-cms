@@ -1,0 +1,53 @@
+<h2>Edycja komentarza</h2>
+<form action="admin/comments/edit/{{ object.id }}" method="post">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Treśc</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="comment_raw">Treść<br /><small>Treść komentarza</small></label>
+				<div class="right">
+				{% if errors.has('comment_raw') %}
+					<div class="error">{{ errors.first('comment_raw') }}</div>
+				{% endif %}
+				<textarea id="comment_raw" name="comment_raw" rows="10" cols="50">{% if old_data.comment_raw != '' %}{{ old_data.comment_raw|e }}{% else %}{{ object.comment_raw }}{% endif %}</textarea>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Inne</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="karma">Karma<br /><small>Ilość punktów</small></label>
+				<div class="right">
+				{% if errors.has('karma') %}
+					<div class="error">{{ errors.first('karma') }}</div>
+				{% endif %}
+				<input type="text" id="karma" name="karma" value="{% if old_data.karma != '' %}{{ old_data.karma|e }}{% else %}{{ object.karma|e }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="guest_name">Nazwa gościa<br /><small>Dotyczy tylko komentarzy gości</small></label>
+				<div class="right">
+				{% if errors.has('guest_name') %}
+					<div class="error">{{ errors.first('guest_name') }}</div>
+				{% endif %}
+				<input type="text" id="guest_name" name="guest_name" value="{% if old_data.guest_name != '' %}{{ old_data.guest_name|e }}{% else %}{{ object.guest_name|e }}{% endif %}" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	$('input[type="submit"]').button();
+});
+</script>

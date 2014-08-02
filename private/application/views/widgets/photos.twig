@@ -1,0 +1,6 @@
+{% for photo in photos %}
+<div class="file">
+	<img src="{{ thumb('photos', photo.image, '250x120') }}" alt="" />
+	<a href="gallery/category/{{ photo.slug }}">{{ photo.title }}</a>
+</div>
+{% endfor %}

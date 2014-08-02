@@ -1,0 +1,51 @@
+<h2>Dodawanie kontuzji</h2>
+<form action="admin/player_injuries/add" method="post">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Dane</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="player_id">Zawodnik<br /><small>Imię i nazwisko zawodnika. Musi już istnieć w bazie danych</small></label>
+				<div class="right">
+				{% if errors.has('player_id') %}
+					<div class="error">{{ errors.first('player_id') }}</div>
+				{% endif %}
+				<input type="text" id="player_id" name="player_id" value="{{ old_data.player_id|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="injury">Krótki opis<br /><small>Krótki opis kontuzji</small></label>
+				<div class="right">
+				{% if errors.has('injury') %}
+					<div class="error">{{ errors.first('injury') }}</div>
+				{% endif %}
+				<input type="text" id="injury" name="injury" value="{{ old_data.injury|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="recovery_date">Data wygaśnięcia<br /><small>Data powrotu zawodnika do zdrowia. Zostaw puste jeśli nieznana</small></label>
+				<div class="right">
+				{% if errors.has('recovery_date') %}
+					<div class="error">{{ errors.first('recovery_date') }}</div>
+				{% endif %}
+				<input class="datepicker" type="text" id="recovery_date" name="recovery_date" value="{{ old_data.recovery_date|e }}" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	$('input[type="submit"]').button();
+	$('#player_id').autocomplete({
+		minLength: 2,
+		source: IONIC_BASE_URL+'admin/player_injuries/autocomplete/name'
+	});
+	$('.datepicker').datepicker({dateFormat: 'yy-mm-dd' });
+});
+</script>

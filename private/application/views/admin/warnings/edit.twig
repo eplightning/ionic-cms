@@ -1,0 +1,28 @@
+<h2>Edycja ostrzeżenia</h2>
+<form action="admin/warnings/edit/{{ object.id }}" method="post">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Dane</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="reason">Powód<br /><small>Powód ostrzeżenia</small></label>
+				<div class="right">
+				{% if errors.has('reason') %}
+					<div class="error">{{ errors.first('reason') }}</div>
+				{% endif %}
+				<input type="text" id="reason" name="reason" value="{% if old_data.reason != '' %}{{ old_data.reason|e }}{% else %}{{ object.reason }}{% endif %}" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	$('input[type="submit"]').button();
+});
+</script>

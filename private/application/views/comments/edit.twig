@@ -1,0 +1,16 @@
+<div class="ionic-box">
+	<h2>Edycja komentarza</h2>
+	<form action="comments/edit/{{ comment.id }}" method="post">
+	<div class="ionic-form">
+		<div class="ionic-form-legend">Edycja komentarza</div>
+		<div class="ionic-form-elem">
+			<label for="reason">Treść:</label>
+			<textarea name="comment" id="comment" rows="10" cols="50">{{ comment.comment_raw|e }}</textarea>
+		</div>
+		<div class="ionic-form-elem">
+			{{ form_token() }}
+			<input type="submit" name="submit" class="submit" value="Edytuj" />
+		</div>
+	</div>
+	</form>
+</div>

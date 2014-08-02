@@ -1,0 +1,283 @@
+<h2 class="with-icon" style="background-image: url(public/img/admin/item/dashboard.png)">Dashboard</h2>
+<div style="width: 40%; float: left;">
+	{% if can('admin_news_add') %}
+	<div class="toolbar ui-widget-header ui-corner-all" style="text-align: left">
+		<a href="admin/news/add" class="add-news">Dodaj news</a>
+	</div>
+	{% endif %}
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Statystyki</div>
+		</div>
+		<table class="itable">
+			<tr>
+				<th style="width: 16px"></th>
+				<th>Co?</th>
+				<th style="width: 70px">Twoich</th>
+				<th style="width: 70px">Ogółem</th>
+			</tr>
+			{% for name, stat in stats %}
+			<tr>
+				<td><img src="public/img/icons/{{ name }}.png" alt="" /></td>
+				<td>{{ stat.title }}</td>
+				<td class="centered">{{ stat.your }}</td>
+				<td class="centered">{{ stat.total }}</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</div>
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Redaktorzy</div>
+		</div>
+		<table class="itable">
+			<tr>
+				<th style="width: 16px"></th>
+				<th>Kto?</th>
+				<th style="width: 45px">Online</th>
+				<th style="width: 70px">Newsów</th>
+			</tr>
+			{% for user in admins %}
+			<tr>
+				<td><img src="public/img/icons/users.png" alt="" /></td>
+				<td>{{ user.display_name }} <small>({{ user.group_name }})</small></td>
+				<td class="centered">
+				{% if online.is_online(user.id) %}
+					<img src="public/img/icons/accept.png" alt="" />
+				{% endif %}
+				</td>
+				<td class="centered">{{ user.news_count }}</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</div>
+	{% if can('admin_logs') %}
+	<div class="section">
+		<div class="theader">
+			<div class="theader2"><a href="admin/logs/index">10 ostatnich akcji</a></div>
+		</div>
+		<table class="itable">
+			<tr>
+				<th style="width: 16px"></th>
+				<th>Kto?</th>
+				<th>Kiedy?</th>
+				<th>Co?</th>
+			</tr>
+			{% for action in logs %}
+			<tr>
+				<td><img src="public/img/icons/log.png" alt="" /></td>
+				<td>{{ action.display_name }}</td>
+				<td><small>{{ action.created_at|relativedate }}</small></td>
+				<td>{{ action.title|limit(30) }}</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</div>
+	{% endif %}
+	{% if can('admin_submitted_content') %}
+	<div class="section">
+		<div class="theader">
+			<div class="theader2"><a href="admin/submitted_content/index">10 ostatnich podesłanych materiałów</a></div>
+		</div>
+		<table class="itable">
+			<tr>
+				<th style="width: 16px"></th>
+				<th>Kto?</th>
+				<th>Kiedy?</th>
+				<th>Co?</th>
+			</tr>
+			{% for item in submitted %}
+			<tr>
+				<td><img src="public/img/icons/{{ item.type }}.png" alt="" /></td>
+				<td>{{ item.display_name }}</td>
+				<td><small>{{ item.created_at|relativedate }}</small></td>
+				<td>{{ item.title|limit(30) }}</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</div>
+	{% endif %}
+	<div class="section">
+		<div class="theader">
+			<div class="theader2"><a href="admin/shoutbox/index">Shoutbox adminów</a></div>
+		</div>
+		<div class="section-content">
+			<ul id="shoutbox-container">
+				{{ list }}
+			</ul>
+			<div id="shoutbox-links">
+				<textarea id="shoutbox-user-input" cols="20" rows="2"></textarea>
+				<button class="shoutbox-refresh">Odśwież</button>
+				<button class="shoutbox-submit">Wyślij</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div style="width: 50%; float: right">
+	{% if can('admin_dashboard_add') %}
+	<div class="toolbar ui-widget-header ui-corner-all">
+		<button id="add_admin_note">Dodaj nową informację</button>
+	</div>
+	{% endif %}
+	{% for note in notes %}
+	<div class="section">
+		<div class="theader">
+			<div class="theader2 note-title" id="note-title-{{ note.id }}">{{ note.title }}</div>
+		</div>
+		<div class="section-content">
+			<div id="note-{{ note.id }}" class="note-content">{{ note.note|nl2br_noescape }}</div>
+			<div style="margin: 10px; clear: both; overflow: hidden">
+				<div style="float: left">
+					<small>Dodane przez: {{ note.display_name }}</small>
+				</div>
+				<div style="float: right; text-align: right">
+					<small>{{ note.created_at|relativedate }}</small>
+				</div>
+			</div>
+			{% if can('admin_dashboard_delete') %}
+			<div class="toolbar ui-widget-header ui-corner-all">
+				<a href="admin/dashboard/delete/{{ note.id }}" class="delete-button">Usuń</a>
+			</div>
+			{% endif %}
+		</div>
+	</div>
+	{% endfor %}
+</div>
+<div id="dialog-add-info" style="display: none">
+	<form action="admin/dashboard/add" method="post" id="dialog_form">
+		<fieldset>
+			<div>
+				<label for="note_title">Tytuł:</label>
+				<input type="text" name="title" id="note_title" maxlength="127" />
+			</div>
+			<div>
+				<label for="note_content">Treść:</label>
+				<textarea name="message" id="note_content" rows="20"></textarea>
+				{{ form_token() }}
+			</div>
+		</fieldset>
+	</form>
+</div>
+<script type="text/javascript">
+$(function(){
+	$('#dialog-add-info').dialog({
+		autoOpen: false,
+		width: 600,
+		height: 600,
+		modal: true,
+		buttons: {
+			'Dodaj': function() { $("#dialog_form").submit(); },
+			'Anuluj': function() { $(this).dialog('close'); }
+		},
+		title: 'Dodaj nową informację'
+	});
+
+	$('.add-news').button({icons: { primary: 'ui-icon-plus' }});
+	$('#add_admin_note').button({icons: { primary: 'ui-icon-plus' }}).click(function() { $('#dialog-add-info').dialog('open'); });
+	{% if can('admin_dashboard_delete') %}
+	$('.delete-button').button({icons: {primary: 'ui-icon-trash'}});
+	{% endif %}
+
+	{% if can('admin_dashboard_edit') %}
+
+	$('.note-title').editable(IONIC_BASE_URL+'admin/dashboard/edit_title', {
+		tooltip: 'Kliknij, aby edytować',
+		submitdata: { {{ csrf_key }}: IonicAdmin.csrfToken },
+		onblur: 'submit',
+		loadurl: IONIC_BASE_URL+'admin/dashboard/load_title',
+		loadtype: 'POST',
+	});
+
+	$('.note-content').editable(IONIC_BASE_URL+'admin/dashboard/edit_content', {
+		tooltip: 'Kliknij, aby edytować',
+		type: 'textarea',
+		loadurl: IONIC_BASE_URL+'admin/dashboard/load_content',
+		loadtype: 'POST',
+		rows: 10,
+		onblur: 'submit',
+		submitdata: { {{ csrf_key }}: IonicAdmin.csrfToken }
+	});
+
+	{% endif %}
+	$('.shoutbox-refresh').button().click(function(){
+		if (!$(this).prop('disabled'))
+		{
+			$('.shoutbox-refresh').prop('disabled', true);
+			$('.shoutbox-submit').prop('disabled', true);
+
+			$.get(IONIC_BASE_URL+'shoutbox/refresh/admin', function(response) {
+				$('#shoutbox-container').html(response);
+
+				$('.shoutbox-delete').click(function(){
+					var id = $(this).prop('id').replace('shoutbox-delete-', '');
+
+					$.post(IONIC_BASE_URL+'shoutbox/delete/'+id, {csrf_token: IonicAdmin.csrfToken}, function(response) {
+						if (response.status == true)
+						{
+							$('#shoutbox-post-'+id).hide('slow', function() { $('#shoutbox-post-'+id).remove(); });
+						}
+					}, 'json');
+				});
+
+				$('.shoutbox-refresh').prop('disabled', false);
+				$('.shoutbox-submit').prop('disabled', false);
+			});
+		}
+	});
+
+	$('.shoutbox-delete').click(function(){
+		var id = $(this).prop('id').replace('shoutbox-delete-', '');
+
+		$.post(IONIC_BASE_URL+'shoutbox/delete/'+id, {csrf_token: IonicAdmin.csrfToken}, function(response) {
+			if (response.status == true)
+			{
+				$('#shoutbox-post-'+id).hide('slow', function() { $('#shoutbox-post-'+id).remove(); });
+			}
+		}, 'json');
+	});
+
+	$('.shoutbox-submit').button().click(function(){
+		if ($(this).prop('disabled')) return;
+
+		var post = $('#shoutbox-user-input').val();
+		$('#shoutbox-user-input').val('');
+
+		if (post)
+		{
+			$('.shoutbox-refresh').prop('disabled', true);
+			$('.shoutbox-submit').prop('disabled', true);
+
+			$.post(IONIC_BASE_URL+'shoutbox/post/admin', {csrf_token: IonicAdmin.csrfToken, 'post': post}, function(response) {
+				if (response.status == true)
+				{
+					$('.shoutbox-refresh').prop('disabled', true);
+					$('.shoutbox-submit').prop('disabled', true);
+
+					$.get(IONIC_BASE_URL+'shoutbox/refresh/admin', function(response) {
+						$('#shoutbox-container').html(response);
+
+						$('.shoutbox-delete').click(function(){
+							var id = $(this).prop('id').replace('shoutbox-delete-', '');
+
+							$.post(IONIC_BASE_URL+'shoutbox/delete/'+id, {csrf_token: IonicAdmin.csrfToken}, function(response) {
+								if (response.status == true)
+								{
+									$('#shoutbox-post-'+id).hide('slow', function() { $('#shoutbox-post-'+id).remove(); });
+								}
+							}, 'json');
+						});
+
+						$('.shoutbox-refresh').prop('disabled', false);
+						$('.shoutbox-submit').prop('disabled', false);
+					});
+				}
+				else
+				{
+					$('.shoutbox-refresh').prop('disabled', false);
+					$('.shoutbox-submit').prop('disabled', false);
+				}
+			}, 'json');
+		}
+	});
+});
+</script>

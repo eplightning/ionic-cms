@@ -1,0 +1,700 @@
+a img {
+	border: none;
+}
+
+.ionic-important {
+	font-size: 1.1em;
+	font-weight: bold;
+	padding: 5px;
+}
+
+.ionic-delete-user {
+	cursor: pointer;
+}
+
+.ionic-delete-user img {
+	vertical-align: -2px;
+}
+
+.ionic-notice, .pagination {
+	padding: 15px;
+	margin: 10px 0px;
+	border: 1px solid #CAD7E1;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-khtml-border-radius: 5px;
+	overflow: hidden;
+}
+
+.ionic-left {
+	text-align: left;
+	float: left;
+}
+
+img.ionic-left {
+	margin-right: 10px;
+}
+
+.ionic-right {
+	text-align: right;
+	float: right;
+}
+
+img.ionic-right {
+	margin-left: 10px;
+}
+
+.ionic-block {
+	margin-bottom: 15px;
+	overflow: hidden;
+}
+
+.ionic-form {
+	margin: 10px 0px;
+	overflow: hidden;
+	border: 1px solid #CAD7E1;
+}
+
+.ionic-form-legend {
+	border-bottom: 1px solid #CAD7E1;
+	background: #EBF1F5;
+	padding: 10px;
+	font-size: 1.1em;
+}
+
+.ionic-form-elem {
+	margin-bottom: 5px;
+	clear: both;
+	padding: 15px;
+}
+
+.ionic-form-elem .error {
+	background: #FFF0F0;
+	border: 1px solid #DEABAB;
+	padding: 5px;
+	margin-bottom: 10px;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-khtml-border-radius: 5px;
+	width: 95%;
+}
+
+.ionic-form-elem input, .ionic-form-elem select, .ionic-form-elem textarea {
+	width: 70%;
+	padding: 5px;
+	border: 1px solid #CAD7E1;
+	color: #333;
+	font-family: inherit;
+}
+
+.ionic-form-elem input.checkbox {
+	width: auto;
+	padding: none;
+	border: none;
+}
+
+.ionic-form-elem input.submit {
+	width: auto;
+}
+
+.ionic-form-elem label {
+	float: left;
+	width: 20%;
+}
+
+.ionic-block-title {
+	background: #EBF1F5;
+	border: 1px solid #CAD7E1;
+	padding: 10px;
+}
+
+.ionic-block-content {
+	border: 1px solid #CAD7E1;
+	padding: 10px;
+	border-top: 0px;
+}
+
+.ionic-list {
+	list-style: none;
+	margin: 10px 0px;
+	padding: 0px;
+	overflow: hidden;
+}
+
+.ionic-list li {
+	background: #fff;
+	margin-bottom: 5px;
+	border: 1px solid #CAD7E1;
+	padding: 5px;
+	border-left-width: 3px;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-khtml-border-radius: 5px;
+}
+
+.ionic-list li .title {
+	width: 200px;
+	margin-right: 10px;
+	font-style: italic;
+	display: inline-block;
+}
+
+.ionic-list li:hover {
+	border-left-color: #96a7b5;
+}
+
+.ionic-list li a {
+	text-decoration: none;
+}
+
+.ionic-box {
+	padding: 10px;
+	margin-bottom: 10px;
+	overflow: hidden;
+	clear: both;
+	border: 1px solid #CAD7E1;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-khtml-border-radius: 5px;
+}
+
+.ionic-karma {
+	clear: both;
+	overflow: hidden;
+	font-size: 0.8em;
+}
+
+#karma-add, #karma-minus, .post-karma-add, .post-karma-minus {
+	cursor: pointer;
+}
+
+#karma-add, .post-karma-add {
+	color: green;
+}
+
+#karma-minus, .post-karma-minus {
+	color: red;
+}
+
+.ionic-box h2, .ionic-notice h2 {
+	font-size: 1.3em;
+}
+
+.ionic-box h3, .ionic-notice h3 {
+	font-size: 1.15em;
+}
+
+.ionic-toolbar {
+	padding: 10px;
+	margin: 10px;
+	text-align: right;
+}
+
+.ionic-toolbar a {
+	background: #fafafa;
+	padding: 10px;
+	color: #555;
+	border: 1px solid #eaeaea;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-khtml-border-radius: 5px;
+	text-decoration: none;
+	font-weight: bold;
+	font-size: 1.1em;
+	font-family: Helvetica, Arial, sans-serif;
+}
+
+.ionic-toolbar a:hover {
+	border: 1px solid #bbb;
+}
+
+.ionic-post {
+	clear: both;
+	overflow: hidden;
+	margin-bottom: 10px;
+	overflow: hidden;
+	clear: both;
+	border: 1px solid #CAD7E1;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-khtml-border-radius: 5px;
+	height: 100%;
+	width: 100%;
+	background: url(../img/post_bg.png) no-repeat;
+}
+
+.ionic-post-nobg {
+	background: #fff;
+}
+
+.ionic-post-left {
+	border-right: 1px solid #CAD7E1;
+	float: left;
+	width: 140px;
+	padding: 15px;
+}
+
+.ionic-post-right {
+	overflow: hidden;
+}
+
+.ionic-post-info {
+	background: url(../img/admin/login_bg.gif) repeat-x;
+	padding-right: 10px;
+	overflow: hidden;
+	padding-left: 15px;
+	padding-top: 11px;
+	padding-bottom: 9px;
+}
+
+.ionic-post-content {
+	padding: 15px;
+	clear: both;
+}
+
+.ionic-post-status {
+	font-size: 0.8em;
+}
+
+.ionic-post-statusblock {
+	font-size: 0.8em;
+	padding: 5px 15px;
+}
+
+.ionic-post-avatar {
+	padding: 10px;
+	text-align: center;
+}
+
+.ionic-table {
+	width: 100%;
+	margin-bottom: 10px;
+	clear: both;
+	border: 1px solid #CAD7E1;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-khtml-border-radius: 5px;
+	border-spacing: 1px;
+}
+
+.ionic-table th {
+	height: 21px;
+	background: #fff url(../img/admin/th_bg.gif) repeat-x;
+	border-bottom: 1px solid #92a5bc;
+	font-weight: normal;
+	text-align: center;
+}
+
+.ionic-table th:hover, .ionic-table th.active {
+	background: #fff url(../img/admin/th_bg2.gif) repeat-x;
+	border-bottom: 1px solid #5f6c7c;
+}
+
+.ionic-table td {
+	padding: 5px;
+	background: #fafdff;
+}
+
+.ionic-table td.centered {
+	text-align: center;
+}
+
+.ionic-table tr:nth-child(even) td {
+	background: #f0f4f9;
+}
+
+.tab-view-top {
+	list-style: none;
+	padding: 0px;
+}
+
+.tab-view-top li {
+	float: left;
+	margin-right: 15px;
+	-moz-border-radius-topleft: 5px;
+	-webkit-border-top-left-radius: 5px;
+	-khtml-border-top-left-radius: 5px;
+	border-top-left-radius: 5px;
+	-moz-border-radius-topright: 5px;
+	-webkit-border-top-right-radius: 5px;
+	-khtml-border-top-right-radius: 5px;
+	border-top-right-radius: 5px;
+	height: 24px;
+	background: #fff;
+	padding: 1px;
+	border: 1px solid #92a5bc;
+	border-bottom: none;
+}
+
+.tab-view-top li a {
+	border: none;
+	height: 20px;
+	padding-top: 4px;
+	padding-left: 10px;
+	padding-right: 10px;
+	display: block;
+	cursor: pointer;
+	background: url(../img/admin/login_bg.gif);
+}
+
+.tab-view-top li.active a {
+	border: none;
+	-moz-border-radius-topleft: 5px;
+	-webkit-border-top-left-radius: 5px;
+	-khtml-border-top-left-radius: 5px;
+	border-top-left-radius: 5px;
+	-moz-border-radius-topright: 5px;
+	-webkit-border-top-right-radius: 5px;
+	-khtml-border-top-right-radius: 5px;
+	border-top-right-radius: 5px;
+	background: #1b3559 url(../img/admin/table_bg.gif) repeat-x;
+	color: #fff;
+	height: 20px;
+	padding-top: 4px;
+	padding-left: 10px;
+	padding-right: 10px;
+	display: block;
+}
+
+.tab-view-content {
+	padding: 20px;
+	-moz-border-radius-bottomleft: 5px;
+	-webkit-border-bottom-left-radius: 5px;
+	-khtml-border-bottom-left-radius: 5px;
+	border-bottom-left-radius: 5px;
+	-moz-border-radius-bottomright: 5px;
+	-webkit-border-bottom-right-radius: 5px;
+	-khtml-border-bottom-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+	border: 1px solid #92a5bc;
+	overflow: hidden;
+	clear: both;
+}
+
+#ionic-notifications {
+	position: absolute;
+	right: 10px;
+	top: 10px;
+	width: 400px;
+	background: #fff;
+	border: 2px solid #aaa;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-khtml-border-radius: 5px;
+	z-index: 700;
+}
+
+#ionic-notifications span {
+	display: block;
+	background: url(../img/admin/login_bg.gif) repeat-x;
+	padding: 10px;
+	-moz-border-radius-topleft: 5px;
+	-webkit-border-top-left-radius: 5px;
+	-khtml-border-top-left-radius: 5px;
+	border-top-left-radius: 5px;
+	-moz-border-radius-topright: 5px;
+	-webkit-border-top-right-radius: 5px;
+	-khtml-border-top-right-radius: 5px;
+	border-top-right-radius: 5px;
+	cursor: pointer;
+}
+
+#ionic-notifications-list {
+	list-style: none;
+	padding: 0px;
+	margin: 0px;
+	display: none;
+}
+
+#ionic-notifications-list li {
+	padding: 10px;
+	background-color: #fcfcfc;
+	background-repeat: no-repeat;
+	background-position: 3% 50%;
+	padding-left: 40px;
+	border-top: 1px solid #aaa;
+}
+
+#ionic-notifications-list li a {
+	text-decoration: none;
+}
+
+#ionic-notifications-list li img {
+	float: right;
+	display: block;
+	margin-left: 10px;
+	cursor: pointer;
+}
+
+.ionic-news-panels {
+	margin: 10px auto;
+	clear: both;
+	overflow: hidden;
+}
+
+.ionic-news-panel {
+	padding: 10px;
+	width: 40%;
+	margin-right: 10px;
+	overflow: hidden;
+	float: left;
+	border: 1px solid #CAD7E1;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-khtml-border-radius: 5px;
+}
+
+.ionic-news-panel h3 {
+	font-size: 1.1em;
+	font-weight: bold;
+	margin: 0px 0px 5px 5px;
+}
+
+.ionic-news-panel-right {
+	margin-left: 10px;
+    margin-right: 0px;
+	float: right;
+}
+
+.ionic-load-comments {
+	padding: 5px;
+	background: #eee;
+	border: 1px solid #ccc;
+	font-size: 1.2em;
+	cursor: pointer;
+	display: block;
+	margin: auto;
+	text-align: center;
+}
+
+.ionic-gallery {
+	clear: both;
+	overflow: hidden;
+}
+
+.ionic-team-info {
+	overflow: hidden;
+	clear: both;
+}
+
+.ionic-team-info img {
+	float: left;
+	margin-right: 15px;
+	margin-bottom: 10px;
+	padding: 10px;
+}
+
+.ionic-gallery a {
+	padding: 10px;
+}
+
+.ionic-match-score {
+	text-align: center;
+	vertical-align: middle;
+	clear: both;
+	padding: 10px;
+	border: 1px solid #CAD7E1;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-khtml-border-radius: 5px;
+	overflow: hidden;
+	margin: 0px auto;
+	width: 318px;
+}
+
+.ionic-match-score img {
+	float: left;
+	width: 64px;
+}
+
+.ionic-match-score div {
+	padding: 20px;
+	font-size: 2.5em;
+	font-weight: bold;
+	float: left;
+	width: 150px;
+}
+
+.ionic-relation-details {
+	clear: both;
+	overflow: hidden;
+	margin: 10px 0px;
+}
+
+.ionic-relation-home {
+	float: left;
+	padding: 10px;
+	margin-bottom: 10px;
+	overflow: hidden;
+	border: 1px solid #CAD7E1;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-khtml-border-radius: 5px;
+	width: 40%;
+}
+
+.ionic-relation-away {
+	float: right;
+	padding: 10px;
+	margin-bottom: 10px;
+	overflow: hidden;
+	border: 1px solid #CAD7E1;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-khtml-border-radius: 5px;
+	width: 40%;
+	text-align: right;
+}
+
+.ionic-relation-home h3, .ionic-relation-away h3 {
+	font-size: 1.1em;
+	font-weight: bold;
+}
+
+.bbcode .markItUpButton1 a {
+	background-image:url(../img/set/bold.png);
+}
+.bbcode .markItUpButton2 a {
+	background-image:url(../img/set/italic.png);
+}
+.bbcode .markItUpButton3 a {
+	background-image:url(../img/set/underline.png);
+}
+.bbcode .markItUpButton4 a {
+	background-image:url(../img/set/stroke.png);
+}
+.bbcode .markItUpButton5 a {
+	background-image:url(../img/set/subscript.png);
+}
+.bbcode .markItUpButton6 a {
+	background-image:url(../img/set/superscript.png);
+}
+.bbcode .markItUpButton7 a {
+	background-image:url(../img/set/text_align_left.png);
+}
+.bbcode .markItUpButton8 a {
+	background-image:url(../img/set/text_align_center.png);
+}
+.bbcode .markItUpButton9 a {
+	background-image:url(../img/set/text_align_right.png);
+}
+.bbcode .markItUpButton10 a {
+	background-image:url(../img/set/list-bullet.png);
+}
+.bbcode .markItUpButton11 a {
+	background-image:url(../img/set/list-numeric.png);
+}
+.bbcode .markItUpButton12 a {
+	background-image:url(../img/set/list-item.png);
+}
+.bbcode .markItUpButton13 a {
+	background-image:url(../img/set/colors.png);
+}
+.bbcode .markItUpButton13 ul {
+	width:81px;
+	padding:1px;
+}
+.bbcode .markItUpButton13  li {
+	border:1px solid white;
+	width:25px;	height:25px;
+	overflow:hidden;
+	padding:0px; margin:0px;
+	float:left;
+}
+.bbcode .markItUpButton13 ul a {
+	width:25px;	height:25px;
+}
+.bbcode .markItUpButton13 ul a:hover {
+	background-color:none;
+}
+
+.bbcode .markItUpButton13 .col1-1 a {
+	background:yellow;
+}
+.bbcode .markItUpButton13 .col1-2 a {
+	background:orange;
+}
+.bbcode .markItUpButton13 .col1-3 a {
+	background:red;
+}
+
+.bbcode .markItUpButton13 .col2-1 a {
+	background:blue;
+}
+.bbcode .markItUpButton13 .col2-2 a {
+	background:purple;
+}
+.bbcode .markItUpButton13 .col2-3 a {
+	background:green;
+}
+
+.bbcode .markItUpButton13 .col3-1 a {
+	background:white;
+}
+.bbcode .markItUpButton13 .col3-2 a {
+	background:gray;
+}
+.bbcode .markItUpButton13 .col3-3 a {
+	background:black;
+}
+.bbcode .markItUpButton14 a	{
+	background-image:url(../img/set/fonts.png);
+}
+.bbcode .markItUpButton15 a {
+	background-image:url(../img/set/picture.png);
+}
+.bbcode .markItUpButton16 a {
+	background-image:url(../img/set/link.png);
+}
+
+.bbcode .markItUpButton17 a	{
+	background-image:url(../img/set/quotes.png);
+}
+.bbcode .markItUpButton18 a	{
+	background-image:url(../img/set/code.png);
+}
+
+/* Add a dashed underline to acronyms. */
+span.acronym { border-bottom:1px dashed green; }
+span.acronym:hover { color: green; border-bottom:1px dashed lightgreen; }
+
+/* Make spoilers invisible, so that you need to select them with the mouse. */
+span.spoiler { background-color: black; color: black; }
+
+/* Align columns to the top, and add some space between them. */
+table.bbcode_columns { border-collapse: collapse;
+    margin-top: 1em; margin-bottom: 1em; }
+table.bbcode_columns td.bbcode_column { padding: 0 1em; vertical-align: top;}
+table.bbcode_columns td.bbcode_firstcolumn { border-left: 0; padding-left: 0; }
+
+/* Wrap quotes in a big blue box. */
+div.bbcode_quote { border: 1px solid #68C; margin: 0.5em 0; }
+div.bbcode_quote_head { background-color: #68C; color: white;
+    font-weight: bold; padding: 0.25em 0.5em; }
+div.bbcode_quote_head a:link { color: yellow; }
+div.bbcode_quote_head a:visited { color: yellow; }
+div.bbcode_quote_head a:hover { color: white; text-decoration: underline; }
+div.bbcode_quote_head a:active { color: white; text-decoration: underline; }
+div.bbcode_quote_body { background-color: aliceblue;
+    color: black; padding: 0.5em 1em; }
+
+.bbcode_smiley {vertical-align: -2px;}
+.bbcode_img {max-width: 400px; max-height: 400px; }
+/* Wrap code in a big blue box. */
+div.bbcode_code { border: 1px solid #68C; margin: 0.5em 0; }
+div.bbcode_code_head { background-color: #68C; color: white;
+    font-weight: bold; padding: 0.25em 0.5em; }
+div.bbcode_code_body { background-color: aliceblue; color: black;
+    font-size: 10pt; font-family: Consolas, Monaco, monospace; padding: 0.5em 1em; }

@@ -1,0 +1,137 @@
+<h2>Edycja użytkownika</h2>
+<form action="admin/users/edit/{{ object.id }}" method="post">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Podstawowe dane</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="username">Login<br /><small>Używane wyłącznie do logowania</small></label>
+				<div class="right">
+				{% if errors.has('username') %}
+					<div class="error">{{ errors.first('username') }}</div>
+				{% endif %}
+				<input type="text" id="username" name="username" value="{% if old_data.username != '' %}{{ old_data.username|e }}{% else %}{{ object.username }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="slug">Slug<br /><small>Slug widoczny w linkach</small></label>
+				<div class="right">
+				{% if errors.has('slug') %}
+					<div class="error">{{ errors.first('slug') }}</div>
+				{% endif %}
+				<input type="text" id="slug" name="slug" value="{% if old_data.slug != '' %}{{ old_data.slug|e }}{% else %}{{ object.slug }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="display_name">Nazwa wyświetlana<br /><small>Nazwa widoczna dla innych użytkowników</small></label>
+				<div class="right">
+				{% if errors.has('display_name') %}
+					<div class="error">{{ errors.first('display_name') }}</div>
+				{% endif %}
+				<input type="text" id="display_name" name="display_name" value="{% if old_data.display_name != '' %}{{ old_data.display_name|e }}{% else %}{{ object.display_name }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="email">E-mail<br /><small>E-mail użytkownika</small></label>
+				<div class="right">
+				{% if errors.has('email') %}
+					<div class="error">{{ errors.first('email') }}</div>
+				{% endif %}
+				<input type="text" id="email" name="email" value="{% if old_data.email != '' %}{{ old_data.email|e }}{% else %}{{ object.email }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="password">Hasło<br /><small>Hasło potrzebne do logowania<br /><small>Zostaw puste jeśli bez zmian</small></small></label>
+				<div class="right">
+				{% if errors.has('password') %}
+					<div class="error">{{ errors.first('password') }}</div>
+				{% endif %}
+				<input type="password" id="password" name="password" value="{{ old_data.password|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="group_id">Grupa<br /><small>Grupa użytkowników</small></label>
+				<div class="right">
+				{% if errors.has('group_id') %}
+					<div class="error">{{ errors.first('group_id') }}</div>
+				{% endif %}
+				<select id="group_id" name="group_id">
+				{% for k, v in related_group_id %}
+					<option value="{{ k }}"{% if (old_data.group_id == k) or (object.group_id == k and old_data.group_id == '') %} selected="selected"{% endif %}>{{ v|e }}</option>
+				{% endfor %}
+				</select>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Profil</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="points">Punkty w typerze<br /><small>Punkt w systemie typowania</small></label>
+				<div class="right">
+				{% if errors.has('bet_points') %}
+					<div class="error">{{ errors.first('bet_points') }}</div>
+				{% endif %}
+				<input type="text" id="bet_points" name="bet_points" value="{% if old_data.bet_points != '' %}{{ old_data.bet_points|e }}{% else %}{{ object.bet_points }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="points">Liczba punktów<br /><small>Ranking</small></label>
+				<div class="right">
+				{% if errors.has('points') %}
+					<div class="error">{{ errors.first('points') }}</div>
+				{% endif %}
+				<input type="text" id="points" name="points" value="{% if old_data.points != '' %}{{ old_data.points|e }}{% else %}{{ object.points }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="real_name">Imię i nazwisko<br /><small>Prawdziwe</small></label>
+				<div class="right">
+				{% if errors.has('real_name') %}
+					<div class="error">{{ errors.first('real_name') }}</div>
+				{% endif %}
+				<input type="text" id="real_name" name="real_name" value="{% if old_data.real_name != '' %}{{ old_data.real_name|e }}{% else %}{{ object.real_name }}{% endif %}" />
+				</div>
+			</div>
+			{% if object.avatar %}
+			<div class="elem">
+				<label for="avatar">Usuń avatar<br /><small>Zaznacz jeśli chcesz usunąć avatar tego użytkownika</small></label>
+				<div class="right">
+				<input type="checkbox" id="avatar" class="checkbox" name="avatar" value="1" />
+				</div>
+			</div>
+			{% endif %}
+		</div>
+	</div>
+	{% if custom_fields|length > 0 %}
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Dodatkowe pola</div>
+		</div>
+		<div class="section-content">
+			{% for field in custom_fields %}
+			<div class="elem">
+				<label for="field-{{ field.id }}">{{ field.title }}<br /><small>{{ field.description }}</small></label>
+				<div class="right">
+					{{ field.html }}
+				</div>
+			</div>
+			{% endfor %}
+		</div>
+	</div>
+	{% endif %}
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	$('input[type="submit"]').button();
+	$('.datepicker').datepicker({dateFormat: 'yy-mm-dd' });
+});
+</script>

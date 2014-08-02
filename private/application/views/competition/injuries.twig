@@ -1,0 +1,20 @@
+<div class="ionic-box">
+	<h2>Kontuzje</h2>
+	<ul class="players">
+		{% for player in injuries.results %}
+		<li>
+			<img src="{{ thumb('players', player.image, '100x0') }}" alt="Zawodnik" />
+			<div class="player-info">
+				<strong>{{ player.name }}</strong>
+			</div>
+			<div class="player-info">
+				<span>Opis: {{ player.injury }}</span>
+			</div>
+			<div class="player-info">
+				<span>Data wyzdrowienia: {{ (player.recovery_date == '0000-00-00' ? 'Nieznana' : player.recovery_date|date('short')) }}</span>
+			</div>
+		</li>
+		{% endfor %}
+	</ul>
+</div>
+{{ injuries.links() }}

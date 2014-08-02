@@ -1,0 +1,64 @@
+<h2>Aktualizacja statystyk</h2>
+<form action="admin/player_stats/update" method="post">
+    <div class="section">
+        <div class="theader">
+            <div class="theader2">Wybierz statystyki do aktualizacji</div>
+        </div>
+        <div class="section-content">
+            <div class="elem">
+                <label for="competition">Rozgrywki<br /><small>Jakie rozgrywki</small></label>
+                <div class="right">
+                <select id="competition" name="competition">
+                {% for k, v in related_competition_id %}
+                    <option value="{{ k }}">{{ v|e }}</option>
+                {% endfor %}
+                </select>
+                </div>
+            </div>
+            <div class="elem">
+                <label for="season">Sezon<br /><small>Jaki sezon</small></label>
+                <div class="right">
+                <select id="season" name="season">
+                {% for k, v in related_season_id %}
+                    <option value="{{ k }}">{{ v|e }}</option>
+                {% endfor %}
+                </select>
+                </div>
+            </div>
+            <div class="elem">
+                <label for="team">Klub<br /><small>Zawodnicy którego klubu</small></label>
+                <div class="right">
+                <select id="team" name="team">
+                {% for k, v in related_team_id %}
+                    <option value="{{ k }}">{{ v|e }}</option>
+                {% endfor %}
+                </select>
+                </div>
+            </div>
+            <div class="toolbar ui-widget-header ui-corner-all">
+                <a id="updater-download">Pobierz statystyki</a>
+            </div>
+        </div>
+    </div>
+    <div id="updater-contents">
+    </div>
+</form>
+<script type="text/javascript">
+$(function(){
+    $('#updater-download').button().click(function(){
+        $('#updater-contents').html('');
+        $.post('{{ "admin/player_stats/update_ajax"|url }}',
+            {
+                competition: $('#competition').val(),
+                season: $('#season').val(),
+                team: $('#team').val()
+            }, function(response) {
+                if (response.status)
+                {
+                    $('#updater-contents').html(response.content);
+                    $('#submit').button();
+                }
+            });
+    });
+});
+</script>

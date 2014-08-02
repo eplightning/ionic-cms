@@ -1,0 +1,139 @@
+<h2>Dodawanie statystyk</h2>
+<form action="admin/player_stats/add" method="post">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Zawodnik</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="player_id">Zawodnik<br /><small>Imię i nazwisko zawodnika. Jeśli nie istnieje zostanie utworzony (i przypisany do klubu wybranego poniżej)</small></label>
+				<div class="right">
+				{% if errors.has('player_id') %}
+					<div class="error">{{ errors.first('player_id') }}</div>
+				{% endif %}
+				<input type="text" id="player_id" name="player_id" value="{{ old_data.player_id|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="team_id">Klub<br /><small>Wymagany tylko w sytuacji, gdy podany powyżej zawodnik nie istnieje</small></label>
+				<div class="right">
+				{% if errors.has('team_id') %}
+					<div class="error">{{ errors.first('team_id') }}</div>
+				{% endif %}
+				<select id="team_id" name="team_id">
+				{% for k, v in related_team_id %}
+					<option value="{{ k }}"{% if old_data.team_id == k %} selected="selected"{% endif %}>{{ v|e }}</option>
+				{% endfor %}
+				</select>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Rozgrywki</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="competition_id">Rozgrywki<br /><small>Rozgrywki których dotyczą te statystyki</small></label>
+				<div class="right">
+				{% if errors.has('competition_id') %}
+					<div class="error">{{ errors.first('competition_id') }}</div>
+				{% endif %}
+				<select id="competition_id" name="competition_id">
+				{% for k, v in related_competition_id %}
+					<option value="{{ k }}"{% if old_data.competition_id == k %} selected="selected"{% endif %}>{{ v|e }}</option>
+				{% endfor %}
+				</select>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="season_id">Sezon<br /><small>Sezon którego dotyczą te statystyki</small></label>
+				<div class="right">
+				{% if errors.has('season_id') %}
+					<div class="error">{{ errors.first('season_id') }}</div>
+				{% endif %}
+				<select id="season_id" name="season_id">
+				{% for k, v in related_season_id %}
+					<option value="{{ k }}"{% if old_data.season_id == k %} selected="selected"{% endif %}>{{ v|e }}</option>
+				{% endfor %}
+				</select>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Statystyki</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="goals">Bramek<br /><small>Ilość zdobytych goli</small></label>
+				<div class="right">
+				{% if errors.has('goals') %}
+					<div class="error">{{ errors.first('goals') }}</div>
+				{% endif %}
+				<input type="text" id="goals" name="goals" value="{{ old_data.goals|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="yellow_cards">Żółtych kartek<br /><small>Ilość otrzymanych żółtych kartek przez tego zawodnika</small></label>
+				<div class="right">
+				{% if errors.has('yellow_cards') %}
+					<div class="error">{{ errors.first('yellow_cards') }}</div>
+				{% endif %}
+				<input type="text" id="yellow_cards" name="yellow_cards" value="{{ old_data.yellow_cards|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="red_cards">Czerwonych kartek<br /><small>Ilość otrzymanych czerwonych kartek przez tego zawodnika</small></label>
+				<div class="right">
+				{% if errors.has('red_cards') %}
+					<div class="error">{{ errors.first('red_cards') }}</div>
+				{% endif %}
+				<input type="text" id="red_cards" name="red_cards" value="{{ old_data.red_cards|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="matches">Występy<br /><small>Ilość występów tego zawodnika</small></label>
+				<div class="right">
+				{% if errors.has('matches') %}
+					<div class="error">{{ errors.first('matches') }}</div>
+				{% endif %}
+				<input type="text" id="matches" name="matches" value="{{ old_data.matches|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="assists">Asyst<br /><small>Ilość asyst tego zawodnika</small></label>
+				<div class="right">
+				{% if errors.has('assists') %}
+					<div class="error">{{ errors.first('assists') }}</div>
+				{% endif %}
+				<input type="text" id="assists" name="assists" value="{{ old_data.assists|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="minutes">Minut<br /><small>Minut spędzonych przez tego zawodnika na boisku</small></label>
+				<div class="right">
+				{% if errors.has('minutes') %}
+					<div class="error">{{ errors.first('minutes') }}</div>
+				{% endif %}
+				<input type="text" id="minutes" name="minutes" value="{{ old_data.minutes|e }}" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	$('input[type="submit"]').button();
+	$('#player_id').autocomplete({
+		minLength: 2,
+		source: IONIC_BASE_URL+'admin/player_stats/autocomplete/name'
+	});
+});
+</script>

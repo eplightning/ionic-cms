@@ -1,0 +1,9 @@
+{% if item.content_link %}
+<div style="padding: 10px">
+	<label>Link:</label>
+	<a href="{{ item.content_link|url }}#comment-id-{{ item.id }}">{{ item.content_link|url }}#comment-id-{{ item.id }}</a>
+</div>
+{% endif %}
+<div style="margin: 10px; padding: 10px">
+{{ item.comment }}
+</div>

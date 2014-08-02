@@ -1,0 +1,16 @@
+<table class="ionic-table">
+	<tr>
+		<th></th>
+		<th>Klub</th>
+		<th>M</th>
+		<th>P</th>
+	</tr>
+	{% for team in table %}
+	<tr>
+		<td class="centered"><img src="{{ thumb('teams', team.image, '16x0') }}" alt="" /></td>
+		<td>{{ team.position }}. {% if team.is_distinct %}<strong>{{ team.name }}</strong>{% else %}{{ team.name }}{% endif %}</td>
+		<td>{{ team.matches }}</td>
+		<td>{{ team.points }}</td>
+	</tr>
+	{% endfor %}
+</table>

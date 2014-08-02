@@ -1,0 +1,20 @@
+<h2>Wyniki</h2>
+<div class="section">
+	<div class="theader">
+		<div class="theader2">Wyniki</div>
+	</div>
+	<div class="section-content">
+		{% for opt in options %}
+		<div class="elem">
+			<label>{{ opt.name }}</label>
+			<div class="right">
+				{% if opt.votes <= 0 or pick.votes <= 0 %}
+				0% ({{ opt.votes }})
+				{% else %}
+				{{ (opt.votes / pick.votes * 100) }}% ({{ opt.votes }})
+				{% endif %}
+			</div>
+		</div>
+		{% endfor %}
+	</div>
+</div>

@@ -1,0 +1,114 @@
+<h2>Dodawanie podstrony</h2>
+<form action="admin/pages/add" method="post">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Podstawowe</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="title">Tytuł<br /><small>Tytuł podstrony</small></label>
+				<div class="right">
+				{% if errors.has('title') %}
+					<div class="error">{{ errors.first('title') }}</div>
+				{% endif %}
+				<input type="text" id="title" name="title" value="{{ old_data.title|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="page_content">Zawartość<br /><small>Zawartość podstrony</small></label>
+				<div class="right">
+				{% if errors.has('page_content') %}
+					<div class="error">{{ errors.first('page_content') }}</div>
+				{% endif %}
+				{{ editor('page_content', old_data.page_content|e ) }}
+				</div>
+			</div>
+			<div class="elem">
+				<label for="layout">Layout<br /><small>Layout używany do wyświetlenia, domyślnie &quot;main&quot;</small></label>
+				<div class="right">
+				{% if errors.has('layout') %}
+					<div class="error">{{ errors.first('layout') }}</div>
+				{% endif %}
+				<select name="layout" id="layout">
+					{% for layout in layouts %}
+					{% if old_data.layout == '' %}
+					<option value="{{ layout }}"{% if layout == 'main' %} selected="selected"{% endif %}>{{ layout }}</option>
+					{% else %}
+					<option value="{{ layout }}"{% if old_data.layout == layout %} selected="selected"{% endif %}>{{ layout }}</option>
+					{% endif %}
+					{% endfor %}
+				</select>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="menu_id">Dodaj do menu<br /><small>Opcjonalne</small></label>
+				<div class="right">
+					<select name="menu_id" id="menu_id">
+					{% for k, v in menu %}
+					<option value="{{ k }}"{% if k == 0 %} selected="selected"{% endif %}>{{ v }}</option>
+					{% endfor %}
+					</select>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">SEO</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="meta_title">META title<br /><small>Zawartość tagu title. Domyślnie tytuł strony</small></label>
+				<div class="right">
+				{% if errors.has('meta_title') %}
+					<div class="error">{{ errors.first('meta_title') }}</div>
+				{% endif %}
+				<input type="text" id="meta_title" name="meta_title" value="{{ old_data.meta_title|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="meta_keys">META keywords<br /><small>Zawartość meta tagu keywords</small></label>
+				<div class="right">
+				{% if errors.has('meta_keys') %}
+					<div class="error">{{ errors.first('meta_keys') }}</div>
+				{% endif %}
+				<textarea id="meta_keys" name="meta_keys" rows="10" cols="50">{{ old_data.meta_keys|e }}</textarea>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="meta_description">META description<br /><small>Zawartość meta tagu description</small></label>
+				<div class="right">
+				{% if errors.has('meta_description') %}
+					<div class="error">{{ errors.first('meta_description') }}</div>
+				{% endif %}
+				<textarea id="meta_description" name="meta_description" rows="10" cols="50">{{ old_data.meta_description|e }}</textarea>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	var formsubmitted = false;
+
+	function ionic_is_not_safe()
+	{
+		if (tinymce != undefined)
+		{
+			return tinymce.get('page_content').getContent().length > 0;
+		}
+		else
+		{
+			return $('#page_content').text().length > 0;
+		}
+	}
+
+	window.onbeforeunload = function() { if (!formsubmitted && ionic_is_not_safe()) { return 'Zmiany nie zostały zapisane.'; } else { return null; } };
+
+	$('input[type="submit"]').button().click(function() { formsubmitted = true });
+});
+</script>

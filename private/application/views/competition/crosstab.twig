@@ -1,0 +1,19 @@
+<div class="ionic-box">
+	<h2>Tabela krzyżowa - {{ competition.name }} - {{ season.year }} / {{ season.year+1 }}</h2>
+	<table class="ionic-table">
+		<tr>
+			<td style="width: 48px"></td>
+			{% for t in teams %}
+			<td class="centered"><img src="{{ thumb('teams', t.image, '16x0') }}" alt="{{ t.name }}" title="{{ t.name }}" /></td>
+			{% endfor %}
+		</tr>
+		{% for t in teams %}
+		<tr>
+			<td class="centered"><img src="{{ thumb('teams', t.image, '16x0') }}" alt="{{ t.name }}" title="{{ t.name }}" /></td>
+			{% for t2 in teams %}
+			<td class="centered">{% if t.id != t2.id %}{{ score_info[t.id][t2.id] }}{% endif %}</td>
+			{% endfor %}
+		</tr>
+		{% endfor %}
+	</table>
+</div>

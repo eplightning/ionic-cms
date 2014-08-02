@@ -1,0 +1,81 @@
+<h2>Dodawanie pliku</h2>
+<form action="admin/files/add" method="post" enctype="multipart/form-data">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Podstawowe</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="title">Tytuł<br /><small>Tytuł pliku</small></label>
+				<div class="right">
+				{% if errors.has('title') %}
+					<div class="error">{{ errors.first('title') }}</div>
+				{% endif %}
+				<input type="text" id="title" name="title" value="{{ old_data.title|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="description">Opis<br /><small>Opis pliku</small></label>
+				<div class="right">
+				{% if errors.has('description') %}
+					<div class="error">{{ errors.first('description') }}</div>
+				{% endif %}
+				<textarea id="description" name="description" rows="10" cols="50">{{ old_data.description|e }}</textarea>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="filename">Nazwa pliku<br /><small>Nazwa pliku z rozszerzeniem. Domyślnie zostanie użyta nazwa wrzuconego pliku.</small></label>
+				<div class="right">
+				{% if errors.has('filename') %}
+					<div class="error">{{ errors.first('filename') }}</div>
+				{% endif %}
+				<input type="text" id="filename" name="filename" value="{{ old_data.filename|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="category_id">Kategoria<br /><small>Kategoria pliku</small></label>
+				<div class="right">
+					<select name="category_id" id="category_id">
+					{% for k, v in categories %}
+					<option value="{{ k }}"{% if current_cat and k == current_cat %} selected="selected"{% endif %}>{{ v }}</option>
+					{% endfor %}
+					</select>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Upload</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="filelocation">Plik<br /><small>Właściwy plik. Maksymalny rozmiar zależy od ustawień serwera</small></label>
+				<div class="right">
+				{% if errors.has('filelocation') %}
+					<div class="error">{{ errors.first('filelocation') }}</div>
+				{% endif %}
+				<input type="file" id="filelocation" name="filelocation" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="image">Screenshot<br /><small>Obrazek do tego pliku</small></label>
+				<div class="right">
+				{% if errors.has('image') %}
+					<div class="error">{{ errors.first('image') }}</div>
+				{% endif %}
+				<input type="file" id="image" name="image" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	$('input[type="submit"]').button();
+});
+</script>

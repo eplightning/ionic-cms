@@ -1,0 +1,84 @@
+<h2 class="with-icon" style="background-image: url(public/img/admin/item/tables.png)">Tabela</h2>
+<div class="toolbar ui-widget-header ui-corner-all">
+	<a class="clear-table" href="admin/tables/show_tools/{{ table.id }}/clear">Wyczyść</a>
+	<a class="generate-table" href="admin/tables/show_tools/{{ table.id }}/generate">Generuj</a>
+	<a class="reload-teams" href="admin/tables/show_tools/{{ table.id }}/reload">Przeładuj kluby</a>
+	<a class="add-team">Dodaj klub</a>
+</div>
+<div class="section">
+	<div class="theader">
+		<div class="theader2">
+			Tabela
+		</div>
+	</div>
+	<table class="itable">
+		<tr>
+			<th style="width:50px">Poz</th>
+			<th>Drużyna</th>
+			<th>Meczów</th>
+			<th>Wygranych</th>
+			<th>Przegranych</th>
+			<th>Remisów</th>
+			<th>Zdobyte</th>
+			<th>Stracone</th>
+			<th>Punkty</th>
+			<th style="width: 40px">Akcje</th>
+		</tr>
+		{% for pos in positions %}
+		<tr>
+			<td class="centered editable" id="pos-team-{{ pos.team_id }}">{{ pos.position }}</td>
+			<td>{{ pos.name }}</td>
+			<td class="centered editable" id="mat-team-{{ pos.team_id }}">{{ pos.matches }}</td>
+			<td class="centered editable" id="win-team-{{ pos.team_id }}">{{ pos.wins }}</td>
+			<td class="centered editable" id="los-team-{{ pos.team_id }}">{{ pos.losses }}</td>
+			<td class="centered editable" id="dra-team-{{ pos.team_id }}">{{ pos.draws }}</td>
+			<td class="centered editable" id="gsh-team-{{ pos.team_id }}">{{ pos.goals_shot }}</td>
+			<td class="centered editable" id="glo-team-{{ pos.team_id }}">{{ pos.goals_lost }}</td>
+			<td class="centered editable" id="pts-team-{{ pos.team_id }}">{{ pos.points }}</td>
+			<td class="centered"><a class="delete" href="admin/tables/show_delete/{{ table.id }}/{{ pos.team_id }}">Usuń</a></td>
+		</tr>
+		{% endfor %}
+	</table>
+</div>
+<div id="dialog-add-team" style="display: none">
+	<form action="admin/tables/show_add/{{ table.id }}" method="post" id="dialog_form">
+		<fieldset>
+			<div>
+				<label for="team_name">Klub:</label>
+				<select name="team_name" id="team_name">
+					{% for k,v in teams %}
+					<option value="{{ k }}">{{ v }}</option>
+					{% endfor %}
+				</select>
+				{{ form_token() }}
+			</div>
+		</fieldset>
+	</form>
+</div>
+<script type="text/javascript">
+$(function() {
+	$('a.delete').button({ text: false, icons: { primary: 'ui-icon-trash' } });
+	$('a.clear-table').button({ icons: { primary: 'ui-icon-trash' } });
+	$('a.generate-table').button({ icons: { primary: 'ui-icon-calculator' } });
+	$('a.reload-teams').button({ icons: { primary: 'ui-icon-refresh' } });
+	$('a.add-team').button({ icons: { primary: 'ui-icon-plus' } }).click(function() { $('#dialog-add-team').dialog('open'); });
+
+	$('.editable').editable(IONIC_BASE_URL+'admin/tables/show_edit/{{ table.id }}', {
+		tooltip: 'Kliknij, aby edytować',
+		onblur: 'submit',
+		submitdata: { {{ csrf_key }}: IonicAdmin.csrfToken }
+	});
+
+	$('#dialog-add-team').dialog({
+		autoOpen: false,
+		width: 600,
+		height: 200,
+		modal: true,
+		buttons: {
+			'Dodaj': function() { $("#dialog_form").submit(); },
+			'Anuluj': function() { $(this).dialog('close'); }
+		},
+		title: 'Dodaj nowy klub do tabeli'
+	});
+});
+</script>

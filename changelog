@@ -1,0 +1,138 @@
+- Naprawiono wyświetlanie złego sezonu i rozgrywek podczas edycji meczu
+- Naprawiono błąd podczas edycji statystyk
+- Dodano opcje do przeliczania liczników w System / Czyszczenie
+
+1.0.2:
+- Poprawione sortowanie tabeli według bramek
+- Poprawki w tekstach
+- Drobne zmiany w ionic.css (głównie dot. BBCode)
+- Poprawione usuwanie starych wiadomości
+
+1.0.3:
+- Poprawki w SQL instalatora
+- Zmiana konfiguracji obsługi błędów (błędy są teraz logowane do katalogu private/storage/logs zamiast straszyć użytkownika brzydkimi komunikatami)
+- Wygląd shoutboxa w panelu jest teraz niezależny od tego na stronie
+- Poprawki w widżetach:
+	- Tabela
+		- Poprawione domyślne sortowanie (rosnąca pozycja zamiast malejącej)
+		- Drobne optymalizacje
+	- Terminarz
+		- Opcja wyświetlania meczy ze wszystkich rozgrywek
+	- Zdjęcia
+		- Pobierana jest nazwa kategorii jako pole category_name
+	- Następny/poprzedni mecz
+		- Zawiera teraz pola match.score_home, match.score_away
+		- Zawiera teraz pola match.opponent_name, match.opponent_image, match.opponent_slug (które odpowiadają danym drużyny przeciwnej do wyróżnionej)
+- Optymalizacje w obsłudze czasu
+- Częściowe wsparcie dla Open Graph (używany przez Facebooka do określania obrazka strony, chyba)
+- Pobieranie ostatnich filmów/plików/zdjęć w podkategoriach
+- Raport pomeczowy jest teraz również dostępny jeśli przypiszemy newsa ,a nie uzupełnimy danych
+- Poprawki wyglądu tabeli krzyżowej
+- Poprawki wyświetlania procentów w sondzie i piłkarzu miesiąca
+- Poprawki w CSS-ie
+- Usprawniony instalator
+	- Optymalizacje
+	- Poprawione wyświetlanie postępu (dla bazy danych)
+	- Instalator teraz wyłącza natywne "prepared statements" dla serwerów MySQL starszych niż 5.1.21
+	- Po instalacji dane sesji zostają teraz wyczyszczone
+	- Adres e-mail administratora jest teraz sprawdzany
+	- Naprawiono wsparcie dla prefixów
+
+IonicCMS 1.1
+	- Optymalizacje
+		- Newsy na stronie głównej są teraz cachowane na 6 minut (głównie pomoże to serwisom z dużym ruchem na słabym serwerze)
+		- Dodano pare brakujących indeksów dla pola user_id w tabelach MyISAM (sessions, news, page_content)
+		- Optymalizacje systemu widżetów
+		- Zoptymalizowany menedżer obrazków
+		- Drobne optymalizacje frameworka
+	- Poprawki i usprawnienia
+		- Poprawiono błąd z karmą
+		- Poprawki z github'a framework'a
+		- Lepsza obsługa błędów w szablonach
+		- Lekkie modyfikacje w implementacji powiadomień (są teraz pobierane po wykonaniu akcji)
+		- Lepsze sortowanie w kadrze
+		- Automatycznie skracanie newsa teraz usuwa tagi HTML we wszystkich wypadkach
+		- Przepisana lista rozgrywek/sezonów. Puste i zbędne wpisy nie powinny być teraz widoczne.
+		- Możliwość umieszczania niebezpiecznego kodu w zawartości podstron/newsów/newslettera/widżetów zależy teraz od nowo dodanego uprawnienia
+	- Zmiany w konfiguracji
+		- Dodano możliwość zmiany ilości komentarzy na stronę
+		- Możliwość wyłączenia automatycznego wykrywania wersji mobilnej (domyślnie wyłączone)
+		- Domyślny sposób wysyłki poczty zmieniony na PHP mail() - nadal oczywiście można ustawić połączenie z zew. skrzynką co jest zalecane
+	- Obsługa wersji mobilnej (layout musi zostać użyty własny. Możliwe ,że kiedyś dodam jakiś domyślny)
+		- Jeśli system wykryje telefon/smartfon to będzie używał szablonów z katalogu views_mobile w pierwszej kolejności
+		- http://adres-strony.pl/page/switch_version do ręcznego przełączania wersji
+	- System paczek częściowo gotowy (narazie tylko włączanie/wyłączanie dostępne w panelu)
+		- Łatwa aktualizacja przyszłych wersji CMS-a
+		- Moduł sportowy oddzielony od podstawowego systemu
+		- Dużo zmian w kodzie robiących CMS bardziej modularny
+		- Zarządzanie paczkami w panelu admina (instalacja/usuwanie/aktualizacja/wył/wł)
+	- Nowe pola
+		- Kraj w klubach
+		- Minuty w statystykach
+	- Usprawnienia relacji live
+		- Obsługa asyst przy bramkach (jest też liczone do statystyk)
+		- Czas występu zawodników jest teraz liczony i po zakończeniu relacji zapisywany do statystyk (uwzględnia zmiany, czas zakończenia meczu)
+	- Możliwość importu meczów ze zwykłego terminarza do typera
+	- Opcja szybkiej aktualizacji statystyk dla zawodników danego klubu w danych rozgrywkach i sezonie
+	- Widok kadry osobny od widoku klubu (jak w WxSport): team/show i team/players
+	- Zmiany w widżetach:
+		- Galeria/Video/Pliki:
+			- Dostępne jest teraz pole description (dla galerii jest to opis kategorii zdjęcia)
+		- Galeria:
+			- Nowy argument `type` - możliwe wartości photos i categories
+				- Pierwsza opcja działa jak obecnie - pobiera ostatnie zdjęcia
+				- Druga opcja pobiera kategorie do, których ostatnio dodano jakieś zdjęcia
+		- Piłkarz miesiąca
+			- Pobieranie statystyk
+
+IonicCMS 1.2
+	- Aktualizacje komponentów:
+		- Jcrop 0.9.12
+		- MarkitUp! 1.1.14
+		- Select2 3.4.1
+		- jQuery 1.10.2
+		- CodeMirror 3.14
+		- jQuery UI 1.10.3
+		- jQuery Timepicker 1.3.1
+		- Minify 3.1.6
+		- htmLawed 1.1.14
+	- Edytor WYSYWIG:
+		- CKEditor zamieniony na nowego TinyMCE 4.0.1
+		- Lista obrazków
+	- Dodatkowe pola:
+		- Styl grupy (narazie bez efektu)
+		- Layout podstrony
+	- Poprawki:
+		- System online teraz liczy jedynie sesje mające maksymalnie 10 minut nieaktywności (tak jak w WxSport)
+		- Poprawione narzędzie do przeliczania liczników newsów/komentarzy
+		- Naprawiony błąd z stronnicowaniem komentarzy w przypadku, gdy odwiedzający jest niezalogowany a karma została wyłączona dla gości
+		- Naprawiony błąd z shoutboxem w panelu administracyjnym - Nie działał jesli nie byłeś zalogowany na stronie (jest osobna sesja)
+		- Zoptymalizowany system przeliczania w typerze (głównie zauważalne w przypadku używania "Prostego" typera)
+		- Naprawiono błąd przy edycji głosowania na piłkarza meczu
+		- Naprawiono sortowanie/przenoszenie drzewek (menu, kategorie)
+		- Poprawiono wsparcie dla serwerów z wyłączonym rozszerzeniem PHP Fileinfo
+		- Naprawiona błąd z karmą na blogach użytkowników
+		- Poprawione wyświetlanie ostrzeżeń
+		- Poprawione filtrowanie w terminarzu (w przypadku gdy wybraliśmy tylko kolejke)
+		- Całkowita ilość głosów jest teraz przeliczana w przypadku edycji sondy
+		- Poprawione filtrowanie w zarządzaniu zawodnikami
+		- Poprawione usuwanie kategorii zdjęć
+		- Wsparcie dla PHP 5.5
+		- Poprawione sortowanie zawodników
+		- Poprawiona wersja mobilna
+	- Konfiguracja:
+		- Możliwość włączenia licznika odsłon newsa w ustawieniach
+		- Dodano opcje włączenia stałego połączenia z bazą danych podczas instalacji
+		- Możliwość podania parametrów do strony głównej (przykładowo page@show@podstrona jako odpowiednik page/show/podstrona)
+	- Panel administracyjny:
+		- Opcja podmiany obrazków w panelu admina
+		- Opcja pokazania różnic pomiędzy wybraną wersją podstrony a obecną
+	- Transfery
+		- Filtrowanie w transferach (typ, klub, data)
+		- Dodatkowa opcja filtrowania w widżecie transferów (Odeszli/Dołączyli/Wszystkie)
+	- Możliwość przełączenia na edytor WYSYWIG podczas edycji widżetów typu "Statyczny HTML"
+	- Alternatywny sposób pobierania meczy w widżecie terminarza
+	- System paczek
+		- Zaimplementowano usuwanie/aktualizacje/instalacje (chociaż jak narazie komponent sportowy tego nie obsługuje)
+		- Włącz/wyłącz teraz ukrywa nieaktywne moduły w panelu administracyjnym
+	- Lepsze wsparcie tagów Open Graph

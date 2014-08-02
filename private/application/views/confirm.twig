@@ -1,0 +1,15 @@
+<div class="ionic-block">
+	<div class="ionic-block-title">
+		Potwierdzenie
+	</div>
+	<form action="{{ current }}" method="post">
+	<div class="ionic-block-content">
+		Czy jesteś pewien ,że chcesz wykonać tą akcję?
+		<p>
+		{{ form_token() }}
+		<input type="submit" value="Tak" class="yes" name="yes" style="width: auto" />
+		<input type="submit" value="Anuluj" class="no" name="no" style="width: auto" />
+		</p>
+	</div>
+	</form>
+</div>

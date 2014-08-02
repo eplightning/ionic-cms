@@ -1,0 +1,35 @@
+<h2 class="with-icon" style="background-image: url(public/img/admin/item/cache.png)">Zarządzanie cache</h2>
+<div class="toolbar ui-widget-header ui-corner-all">
+	<a class="clear" href="admin/cache/clear">Wyczyść</a>
+</div>
+<div class="section">
+	<div class="theader">
+		<div class="theader2">
+			Lista cache
+		</div>
+	</div>
+	<table class="itable">
+		<tr>
+			<th style="width: 16px"></th>
+			<th>ID</th>
+			<th>Nazwa</th>
+			<th style="width: 150px">Data wygaśnięcia</th>
+			<th style="width: 40px">Akcje</th>
+		</tr>
+		{% for cach in list %}
+		<tr>
+			<td><img src="public/img/admin/item/cache.png" alt="" /></td>
+			<td>{{ cach.cache_name }}</td>
+			<td>{{ cach.name }}</td>
+			<td>{{ cach.expiration|date }}</td>
+			<td><a class="delete" href="admin/cache/delete/{{ cach.cache_name }}">Usuń</a></td>
+		</tr>
+		{% endfor %}
+	</table>
+</div>
+<script type="text/javascript">
+$(function() {
+	$('a.delete').button({ text: false, icons: { primary: 'ui-icon-trash' } });
+	$('a.clear').button({ icons: { primary: 'ui-icon-trash' } });
+});
+</script>

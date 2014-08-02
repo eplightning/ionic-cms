@@ -1,0 +1,450 @@
+<h2 class="with-icon" style="background-image: url(public/img/admin/item/matches.png)">Raport pomeczowy</h2>
+<div class="tab-view">
+	<ul class="tab-view-top">
+		<li class="active" id="tab-view-top-1"><a>Skład</a></li>
+		<li id="tab-view-top-2"><a>Gole</a></li>
+		<li id="tab-view-top-3"><a>Kartki</a></li>
+		<li id="tab-view-top-4"><a>Zmiany</a></li>
+	</ul>
+	<div class="tab-view-content" id="tab-view-content-1">
+		<div style="width: 45%; float: left">
+			<h2>Gospodarz</h2>
+			<div class="section">
+				<div class="theader">
+					<div class="theader2">Skład</div>
+				</div>
+				<form action="admin/matches/report/{{ match.id }}/home" method="post">
+					<div class="section-content">
+						<div class="elem">
+							<label>Pierwszy skład:<br /><small>Jeden zawodnik na linie</small></label>
+							<div class="right">
+								<textarea cols="30" rows="11" name="firstsquad">{% if data.players[0]|length > 0 %}
+{% for p in data.players[0] %}
+{{ p }}
+{% endfor %}
+{% endif %}</textarea>
+							</div>
+						</div>
+						<div class="elem">
+							<label>Rezerwa:<br /><small>Jeden zawodnik na linie</small></label>
+							<div class="right">
+								<textarea cols="30" rows="5" name="secondsquad">{% if data.players[1]|length > 0 %}
+{% for p in data.players[1] %}
+{{ p }}
+{% endfor %}
+{% endif %}</textarea>
+							</div>
+						</div>
+						<div class="toolbar ui-widget-header ui-corner-all">
+							{{ form_token() }}
+							<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+		<div style="width: 45%; float: right">
+			<h2>Gość</h2>
+			<div class="section">
+				<div class="theader">
+					<div class="theader2">Skład</div>
+				</div>
+				<form action="admin/matches/report/{{ match.id }}/away" method="post">
+					<div class="section-content">
+						<div class="elem">
+							<label>Pierwszy skład:<br /><small>Jeden zawodnik na linie</small></label>
+							<div class="right">
+								<textarea cols="30" rows="11" name="firstsquad">{% if data.players[2]|length > 0 %}
+{% for p in data.players[2] %}
+{{ p }}
+{% endfor %}
+{% endif %}</textarea>
+							</div>
+						</div>
+						<div class="elem">
+							<label>Rezerwa:<br /><small>Jeden zawodnik na linie</small></label>
+							<div class="right">
+								<textarea cols="30" rows="5" name="secondsquad">{% if data.players[3]|length > 0 %}
+{% for p in data.players[3] %}
+{{ p }}
+{% endfor %}
+{% endif %}</textarea>
+							</div>
+						</div>
+						<div class="toolbar ui-widget-header ui-corner-all">
+							{{ form_token() }}
+							<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div class="tab-view-content" id="tab-view-content-2" style="display: none">
+		<div style="width: 45%; float: left">
+			<h2>Gospodarz</h2>
+			<div class="section">
+				<div class="theader">
+					<div class="theader2">Dodaj nowy</div>
+				</div>
+				<form action="admin/matches/report_add/{{ match.id }}/goal/home" method="post">
+					<div class="section-content">
+						<div class="elem">
+							<label>Minuta:</label>
+							<input type="text" name="minute" maxlength="3" style="width: 50px" />
+						</div>
+						<div class="elem">
+							<select name="player_id">
+								<optgroup label="Pierwszy skład">
+								{% for v in data.players[0] %}
+									<option value="{{ v }}">{{ v }}</option>
+								{% endfor %}
+								</optgroup>
+								<optgroup label="Rezerwa">
+								{% for v in data.players[1] %}
+									<option value="{{ v }}">{{ v }}</option>
+								{% endfor %}
+								</optgroup>
+							</select>
+						</div>
+						<div class="elem">
+							<select name="goal_type">
+								<option value="standard">Zwykły</option>
+								<option value="penalty">Rzut karny</option>
+								<option value="suicide">Bramka samobójcza</option>
+							</select>
+						</div>
+						<div class="toolbar ui-widget-header ui-corner-all">
+							{{ form_token() }}
+							<input type="submit" name="submit" style="width: auto" value="Dodaj" />
+						</div>
+					</div>
+				</form>
+			</div>
+			<ul class="section-list" style="margin-top: 10px">
+				{% for eid, goal in data.goals[0] %}
+				<li id="event-id-{{ eid }}">
+					<a class="delete-button-home goal">Usuń</a>
+					{{ goal.minute }}. {{ goal.name }} <small>({% if goal.type == 'standard' %}zwykły{% elseif goal.type == 'penalty' %}rzut karny{% else %}samobójczy{% endif %})</small>
+				</li>
+				{% endfor %}
+			</ul>
+		</div>
+		<div style="width: 45%; float: right">
+			<h2>Gość</h2>
+			<div class="section">
+				<div class="theader">
+					<div class="theader2">Dodaj nowy</div>
+				</div>
+				<form action="admin/matches/report_add/{{ match.id }}/goal/away" method="post">
+					<div class="section-content">
+						<div class="elem">
+							<label>Minuta:</label>
+							<input type="text" name="minute" maxlength="3" style="width: 50px" />
+						</div>
+						<div class="elem">
+							<select name="player_id">
+								<optgroup label="Pierwszy skład">
+								{% for v in data.players[2] %}
+									<option value="{{ v }}">{{ v }}</option>
+								{% endfor %}
+								</optgroup>
+								<optgroup label="Rezerwa">
+								{% for v in data.players[3] %}
+									<option value="{{ v }}">{{ v }}</option>
+								{% endfor %}
+								</optgroup>
+							</select>
+						</div>
+						<div class="elem">
+							<select name="goal_type">
+								<option value="standard">Zwykły</option>
+								<option value="penalty">Rzut karny</option>
+								<option value="suicide">Bramka samobójcza</option>
+							</select>
+						</div>
+						<div class="toolbar ui-widget-header ui-corner-all">
+							{{ form_token() }}
+							<input type="submit" name="submit" style="width: auto" value="Dodaj" />
+						</div>
+					</div>
+				</form>
+			</div>
+			<ul class="section-list" style="margin-top: 10px">
+				{% for eid, goal in data.goals[1] %}
+				<li id="event-id-{{ eid }}">
+					<a class="delete-button-away goal">Usuń</a>
+					{{ goal.minute }}. {{ goal.name }} <small>({% if goal.type == 'standard' %}zwykły{% elseif goal.type == 'penalty' %}rzut karny{% else %}samobójczy{% endif %})</small>
+				</li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+	<div class="tab-view-content" id="tab-view-content-3" style="display: none">
+		<div style="width: 45%; float: left">
+			<h2>Gospodarz</h2>
+			<div class="section">
+				<div class="theader">
+					<div class="theader2">Dodaj nową</div>
+				</div>
+				<form action="admin/matches/report_add/{{ match.id }}/card/home" method="post">
+					<div class="section-content">
+						<div class="elem">
+							<label>Minuta:</label>
+							<input type="text" name="minute" maxlength="3" style="width: 50px" />
+						</div>
+						<div class="elem">
+							<select name="player_id">
+								<optgroup label="Pierwszy skład">
+								{% for v in data.players[0] %}
+									<option value="{{ v }}">{{ v }}</option>
+								{% endfor %}
+								</optgroup>
+								<optgroup label="Rezerwa">
+								{% for v in data.players[1] %}
+									<option value="{{ v }}">{{ v }}</option>
+								{% endfor %}
+								</optgroup>
+							</select>
+						</div>
+						<div class="elem">
+							<select name="card_type">
+								<option value="yellow">Żółta</option>
+								<option value="red">Czerwona</option>
+							</select>
+						</div>
+						<div class="toolbar ui-widget-header ui-corner-all">
+							{{ form_token() }}
+							<input type="submit" name="submit" style="width: auto" value="Dodaj" />
+						</div>
+					</div>
+				</form>
+			</div>
+			<ul class="section-list" style="margin-top: 10px">
+				{% for eid, card in data.cards[0] %}
+				<li id="event-id-{{ eid }}">
+					<a class="delete-button-home card">Usuń</a>
+					{{ card.minute }}. {{ card.name }} <small>({% if card.type == 'yellow' %}żółta{% else %}czerwona{% endif %})</small>
+				</li>
+				{% endfor %}
+			</ul>
+		</div>
+		<div style="width: 45%; float: right">
+			<h2>Gość</h2>
+			<div class="section">
+				<div class="theader">
+					<div class="theader2">Dodaj nową</div>
+				</div>
+				<form action="admin/matches/report_add/{{ match.id }}/card/away" method="post">
+					<div class="section-content">
+						<div class="elem">
+							<label>Minuta:</label>
+							<input type="text" name="minute" maxlength="3" style="width: 50px" />
+						</div>
+						<div class="elem">
+							<select name="player_id">
+								<optgroup label="Pierwszy skład">
+								{% for v in data.players[2] %}
+									<option value="{{ v }}">{{ v }}</option>
+								{% endfor %}
+								</optgroup>
+								<optgroup label="Rezerwa">
+								{% for v in data.players[3] %}
+									<option value="{{ v }}">{{ v }}</option>
+								{% endfor %}
+								</optgroup>
+							</select>
+						</div>
+						<div class="elem">
+							<select name="card_type">
+								<option value="yellow">Żółta</option>
+								<option value="red">Czerwona</option>
+							</select>
+						</div>
+						<div class="toolbar ui-widget-header ui-corner-all">
+							{{ form_token() }}
+							<input type="submit" name="submit" style="width: auto" value="Dodaj" />
+						</div>
+					</div>
+				</form>
+			</div>
+			<ul class="section-list" style="margin-top: 10px">
+				{% for eid, card in data.cards[1] %}
+				<li id="event-id-{{ eid }}">
+					<a class="delete-button-away card">Usuń</a>
+					{{ card.minute }}. {{ card.name }} <small>({% if card.type == 'yellow' %}żółta{% else %}czerwona{% endif %})</small>
+				</li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+	<div class="tab-view-content" id="tab-view-content-4" style="display: none">
+		<div style="width: 45%; float: left">
+			<h2>Gospodarz</h2>
+			<div class="section">
+				<div class="theader">
+					<div class="theader2">Dodaj nową</div>
+				</div>
+				<form action="admin/matches/report_add/{{ match.id }}/change/home" method="post">
+					<div class="section-content">
+						<div class="elem">
+							<label>Minuta:</label>
+							<input type="text" name="minute" maxlength="3" style="width: 50px" />
+						</div>
+						<div class="elem">
+							<select name="player_id">
+								<optgroup label="Pierwszy skład">
+								{% for v in data.players[0] %}
+									<option value="{{ v }}">{{ v }}</option>
+								{% endfor %}
+								</optgroup>
+								<optgroup label="Rezerwa">
+								{% for v in data.players[1] %}
+									<option value="{{ v }}">{{ v }}</option>
+								{% endfor %}
+								</optgroup>
+							</select>
+						</div>
+						<div class="elem">
+							<select name="new_player">
+								<optgroup label="Pierwszy skład">
+								{% for v in data.players[0] %}
+									<option value="{{ v }}">{{ v }}</option>
+								{% endfor %}
+								</optgroup>
+								<optgroup label="Rezerwa">
+								{% for v in data.players[1] %}
+									<option value="{{ v }}">{{ v }}</option>
+								{% endfor %}
+								</optgroup>
+							</select>
+						</div>
+						<div class="toolbar ui-widget-header ui-corner-all">
+							{{ form_token() }}
+							<input type="submit" name="submit" style="width: auto" value="Dodaj" />
+						</div>
+					</div>
+				</form>
+			</div>
+			<ul class="section-list" style="margin-top: 10px">
+				{% for eid, change in data.changes[0] %}
+				<li id="event-id-{{ eid }}">
+					<a class="delete-button-home change">Usuń</a>
+					{{ change.minute }}. {{ change.name }} &raquo; {{ change.new_player }}
+				</li>
+				{% endfor %}
+			</ul>
+		</div>
+		<div style="width: 45%; float: right">
+			<h2>Gość</h2>
+			<div class="section">
+				<div class="theader">
+					<div class="theader2">Dodaj nową</div>
+				</div>
+				<form action="admin/matches/report_add/{{ match.id }}/change/away" method="post">
+					<div class="section-content">
+						<div class="elem">
+							<label>Minuta:</label>
+							<input type="text" name="minute" maxlength="3" style="width: 50px" />
+						</div>
+						<div class="elem">
+							<select name="player_id">
+								<optgroup label="Pierwszy skład">
+								{% for v in data.players[2] %}
+									<option value="{{ v }}">{{ v }}</option>
+								{% endfor %}
+								</optgroup>
+								<optgroup label="Rezerwa">
+								{% for v in data.players[3] %}
+									<option value="{{ v }}">{{ v }}</option>
+								{% endfor %}
+								</optgroup>
+							</select>
+						</div>
+						<div class="elem">
+							<select name="new_player">
+								<optgroup label="Pierwszy skład">
+								{% for v in data.players[2] %}
+									<option value="{{ v }}">{{ v }}</option>
+								{% endfor %}
+								</optgroup>
+								<optgroup label="Rezerwa">
+								{% for v in data.players[3] %}
+									<option value="{{ v }}">{{ v }}</option>
+								{% endfor %}
+								</optgroup>
+							</select>
+						</div>
+						<div class="toolbar ui-widget-header ui-corner-all">
+							{{ form_token() }}
+							<input type="submit" name="submit" style="width: auto" value="Dodaj" />
+						</div>
+					</div>
+				</form>
+			</div>
+			<ul class="section-list" style="margin-top: 10px">
+				{% for eid, change in data.changes[1] %}
+				<li id="event-id-{{ eid }}">
+					<a class="delete-button-away change">Usuń</a>
+					{{ change.minute }}. {{ change.name }} &raquo; {{ change.new_player }}
+				</li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+$(function() {
+	var in_progress = false;
+	$('input[type="submit"]').button();
+	$('.tab-view-top li').click(function() {
+		if ($(this).hasClass('active') || in_progress) return;
+		in_progress = true;
+
+		var active = $('.tab-view-top .active').prop('id').replace('tab-view-top-', '');
+		var number = $(this).prop('id').replace('tab-view-top-', '');
+
+		$('#tab-view-content-'+active).slideUp('fast', function() {
+			$('#tab-view-top-'+active).removeClass('active');
+			$('#tab-view-top-'+number).addClass('active');
+			$('#tab-view-content-'+number).slideDown('fast', function() { in_progress = false });
+		});
+	});
+	$('.delete-button-away').button().click(function() {
+		var parent = $(this).parent();
+		var mid = parent.prop('id').replace('event-id-', '');
+		var type = 'goal';
+
+		if ($(this).hasClass('card'))
+		{
+			type = 'card';
+		}
+		else if ($(this).hasClass('change'))
+		{
+			type = 'change';
+		}
+
+		$.post(IONIC_BASE_URL+'admin/matches/report_delete/{{ match.id }}/away', { '{{ csrf_key }}': IonicAdmin.csrfToken, 'id': mid, 'type': type }, function() {
+			parent.remove();
+		});
+	});
+	$('.delete-button-home').button().click(function() {
+		var parent = $(this).parent();
+		var mid = parent.prop('id').replace('event-id-', '');
+		var type = 'goal';
+
+		if ($(this).hasClass('card'))
+		{
+			type = 'card';
+		}
+		else if ($(this).hasClass('change'))
+		{
+			type = 'change';
+		}
+
+		$.post(IONIC_BASE_URL+'admin/matches/report_delete/{{ match.id }}/home', { '{{ csrf_key }}': IonicAdmin.csrfToken, 'id': mid, 'type': type }, function() {
+			parent.remove();
+		});
+	});
+});
+</script>

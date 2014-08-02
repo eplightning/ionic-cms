@@ -1,0 +1,6 @@
+{% for video in videos %}
+<div class="file">
+	<img src="{{ video.thumbnail }}" style="width: 250px; max-height: 120px;" alt="" />
+	<a href="video/show/{{ video.slug }}">{{ video.title }}</a>
+</div>
+{% endfor %}

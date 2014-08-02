@@ -1,0 +1,62 @@
+<div class="ionic-box">
+	<h2>{{ news.title }}</h2>
+	<div style="font-size: 0.8em">
+		<div class="ionic-left">
+			Napisane {{ news.created_at|date }} przez <a href="{{ make('user', news.user_slug) }}">{{ news.display_name }}</a>
+		</div>
+		<div class="ionic-right">
+			Źródło: {{ news.source ? news.source : 'n\\a' }}
+		</div>
+	</div>
+	<div class="ionic-karma">
+		Karma: {% if news.karma >= 0 %}<span id="karma-indicator" style="color: green">+{{ news.karma }}</span>{% else %}<span id="karma-indicator" style="color: red">{{ news.karma }}</span>{% endif %}
+		{% if can_karma %}<span id="karma-options">( <a id="karma-add">[+]</a> / <a id="karma-minus">[-]</a> )</span>{% endif %}
+	</div>
+</div>
+<div class="ionic-box">
+	<div class="ionic-post-content">
+		{% if news.big_image %}
+		<img src="public/upload/images/{{ news.big_image }}" style="margin-right: 10px; float: left" alt="" />
+		{% elseif news.small_image %}
+		<img src="public/upload/images/{{ news.small_image }}" style="margin-right: 10px; float: left" alt="" />
+		{% endif %}
+		{{ news.content }}
+	</div>
+	<div class="ionic-post-statusblock">
+		Tagi:
+		{% for tag in tags %}{% if loop.index0 != 0 %}, {% endif %}
+		<a href="news/tag/{{ tag.slug }}">{{ tag.title }}</a>
+		{% endfor %}
+	</div>
+</div>
+<div class="ionic-news-panels">
+	<div class="ionic-news-panel">
+		<h3>Podobne newsy</h3>
+		<ul class="ionic-list">
+		{% for n in similar %}
+		<li>
+		<a href="{{ make('news', n.slug, n.external_url) }}">{{ n.title }} ({{ n.comments_count }})</a>
+		<br />
+		<small>{{ n.created_at|date }}</small>
+		</li>
+		{% endfor %}
+		</ul>
+	</div>
+	<div class="ionic-news-panel ionic-news-panel-right">
+		<h3>Inne wersje</h3>
+		<ul class="ionic-list">
+			<li>
+				<a href="news/format/{{ news.id }}/printable">Wersja do druku</a>
+			</li>
+			<li>
+				<a href="news/format/{{ news.id }}/pdf">Wersja PDF</a>
+			</li>
+		</ul>
+	</div>
+</div>
+{{ comments }}
+<script type="text/javascript">
+$(function() {
+	IonicPage.initKarma({{ news.id }}, 'news');
+});
+</script>

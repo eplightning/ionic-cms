@@ -1,0 +1,24 @@
+{% if matchpick.player is not null %}
+<strong>{{ matchpick.player.title }}</strong>
+<ul class="players">
+	<li>
+		<div>
+			<img src="{{ thumb('players', matchpick.player.image, '100x0') }}" alt="Zawodnik" />
+			<div class="player-info">
+				<strong>{{ matchpick.player.name }}</strong>
+			</div>
+			<div class="player-info">
+				Ocena: {{ matchpick.player_rating }}
+			</div>
+		</div>
+	</li>
+</ul>
+{% endif %}
+{% if matchpick.active.is_init %}
+<div>
+	<strong>{{ matchpick.active.title }}</strong>
+	<div style="margin: 5px; padding: 5px">
+		<a href="matchpick/show/{{ matchpick.active.id }}">Głosowanie w trakcie</a>
+	</div>
+</div>
+{% endif %}

@@ -1,0 +1,70 @@
+<h2>Edycja kolejki</h2>
+<form action="admin/fixtures/edit/{{ object.id }}" method="post">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Dane</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="name">Nazwa<br /><small>Nazwa kolejki</small></label>
+				<div class="right">
+				{% if errors.has('name') %}
+					<div class="error">{{ errors.first('name') }}</div>
+				{% endif %}
+				<input type="text" id="name" name="name" value="{% if old_data.name != '' %}{{ old_data.name|e }}{% else %}{{ object.name }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="number">Numer<br /><small>Numer kolejki używany podczas sortowania. System spróbuje wygenerować automatycznie jeśli pole jest puste.</small></label>
+				<div class="right">
+				{% if errors.has('number') %}
+					<div class="error">{{ errors.first('number') }}</div>
+				{% endif %}
+				<input type="text" id="number" name="number" value="{% if old_data.number != '' %}{{ old_data.number|e }}{% else %}{{ object.number|e }}{% endif %}" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Powiązane</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="competition_id">Rozgrywki<br /><small>Kolejka jakich rozgrywek</small></label>
+				<div class="right">
+				{% if errors.has('competition_id') %}
+					<div class="error">{{ errors.first('competition_id') }}</div>
+				{% endif %}
+				<select id="competition_id" name="competition_id">
+				{% for k, v in related_competition_id %}
+					<option value="{{ k }}"{% if (old_data.competition_id == k) or (object.competition_id == k and old_data.competition_id == '') %} selected="selected"{% endif %}>{{ v|e }}</option>
+				{% endfor %}
+				</select>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="season_id">Sezon<br /><small>W jakim sezonie</small></label>
+				<div class="right">
+				{% if errors.has('season_id') %}
+					<div class="error">{{ errors.first('season_id') }}</div>
+				{% endif %}
+				<select id="season_id" name="season_id">
+				{% for k, v in related_season_id %}
+					<option value="{{ k }}"{% if (old_data.season_id == k) or (object.season_id == k and old_data.season_id == '') %} selected="selected"{% endif %}>{{ v|e }}</option>
+				{% endfor %}
+				</select>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	$('input[type="submit"]').button();
+});
+</script>

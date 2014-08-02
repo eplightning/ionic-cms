@@ -1,0 +1,57 @@
+<div class="section">
+	<div class="theader">
+		<div class="theader2">
+			Ustawienia widżetu
+		</div>
+	</div>
+	<div class="section-content">
+		<form action="{{ action }}" method="post">
+			<div class="elem">
+				<label for="tag">Tag:</label>
+				<div class="right">
+					<select name="tag" id="tag">
+					<option value="0"{% if 0 == options.tag %} selected="selected"{% endif %}>--- Wszystkie newsy</option>
+					{% for c in tags %}
+					<option value="{{ c.id }}"{% if c.id == options.tag %} selected="selected"{% endif %}>{{ c.title }}</option>
+					{% endfor %}
+					</select>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="sort_item">Sortuj według:</label>
+				<div class="right">
+					<select name="sort_item" id="sort_item">
+						{% for k,v in items %}
+						<option value="{{ k }}"{% if options.sort_item == k %} selected="selected"{% endif %}>{{ v }}</option>
+						{% endfor %}
+					</select>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="sort_order">Sortuj:</label>
+				<div class="right">
+					<select name="sort_order" id="sort_order">
+						<option value="desc"{% if options.sort_order == 'desc' %} selected="selected"{% endif %}>Malejąco</option>
+						<option value="asc"{% if options.sort_order == 'asc' %} selected="selected"{% endif %}>Rosnąco</option>
+					</select>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="limit">Limit newsów:</label>
+				<div class="right">
+					<input type="text" name="limit" id="limit" value="{{ options.limit }}" maxlength="10" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="template">Plik wyglądu:<br /><small>Plik znajdujący się w katalogu private/application/views. Zamiast slashów użyj kropek, nie dodawaj rozszerzenia</small></label>
+				<div class="right">
+					<input type="text" name="template" id="template" value="{{ options.template }}" />
+				</div>
+			</div>
+			<div class="toolbar ui-widget-header ui-corner-all">
+				{{ form_token() }}
+				<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+			</div>
+		</form>
+	</div>
+</div>

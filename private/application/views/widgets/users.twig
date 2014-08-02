@@ -1,0 +1,14 @@
+<table class="ionic-table">
+	<tr>
+		<th>Poz.</th>
+		<th>Użytkownik</th>
+		<th>Pkt</th>
+	</tr>
+	{% for user in users %}
+	<tr>
+		<td class="centered">{{ loop.index }}</td>
+		<td>{{ user.display_name }}</td>
+		<td>{{ user.bet_points }}</td>
+	</tr>
+	{% endfor %}
+</table>

@@ -1,0 +1,103 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="pl" lang="pl">
+<head>
+<base href="{{ base() }}/" />
+<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
+<title>{{ page.title }}</title>
+{% for key, value in page.http_equiv %}
+<meta http-equiv="{{ key }}" content="{{ value }}" />
+{% endfor %}
+{% for key, value in page.meta %}
+<meta name="{{ key }}" content="{{ value }}" />
+{% endfor %}
+<script type="text/javascript">
+var IONIC_BASE_URL = "{{ base() }}/";
+</script>
+<link rel="icon" href="{{ base() }}/public/img/admin/icon.png" type="image/png" />
+{{ scripts }}
+{{ styles }}
+<script type="text/javascript">
+$(document).ready(function() {
+	setTimeout(function() {
+		$('#layout-notice').slideUp('slow');
+	}, 3000);
+});
+
+$(document).ready(function() {
+	var traverse_ready = true;
+
+	$('.menuleft-root').click(function() {
+
+		if (!traverse_ready || $(this).hasClass('active')) return;
+		var th = $(this);
+
+		traverse_ready = false;
+
+		$('.menuleft-root.active ul').slideUp('slow', function() {
+			$('.menuleft-root.active').removeClass('active');
+			th.addClass('active');
+			th.children('ul').slideDown('slow', function() {
+				traverse_ready = true;
+			});
+		});
+	});
+});
+</script>
+</head>
+<body>
+	<div id="header">
+		<div id="hleft">
+			<h1>Administracja</h1>
+		</div>
+		<div id="hright">
+			<a href="index" title="Powróć na stronę"><img src="public/img/icons/world.png" alt="Wyloguj" /></a>
+			<a href="admin/logout" title="Wyloguj"><img src="public/img/icons/logout.png" alt="Wyloguj" /></a>
+		</div>
+	</div>
+	<div id="navbar">
+		<div id="nbreadcrumb">
+			{% for item in page.breadcrumb %}
+			<a href="{{ item.link }}">{{ item.title }}</a> &raquo;
+			{% endfor %}
+		</div>
+		<div id="ninfo">
+			Zalogowany jako: <strong>{{ current_user.display_name }}</strong> ({{ current_user.group_name }})
+		</div>
+	</div>
+	<ul id="menuleft">
+		{% for category, items in menu %}
+		{% if items|length > 0 %}
+		<li class="menuleft-root{% if category == active_index %} active{% endif %}">
+			<a class="img-c"><img src="public/img/admin/cat/{{ loop.index }}.png" alt="" /></a>
+			<span>{{ category }}</span>
+			<ul{% if category == active_index %} style="display: block"{% endif %}>
+				{% for item in items %}
+				<li{% if item.module == active_module %} class="active"{% endif %}>
+					<a href="{{ item.url }}" style="background-image: url(public/img/admin/item/{{ item.module }}.png)">{{ item.title }}</a>
+				</li>
+				{% endfor %}
+			</ul>
+		</li>
+		{% endif %}
+		{% endfor %}
+	</ul>
+	<div id="page-container">
+		{% if notice %}
+		<div class="ui-widget" id="layout-notice">
+			<div class="ui-state-highlight ui-corner-all" style="padding: 15px; margin-bottom: 10px">
+				<span class="ui-icon ui-icon-info" style="float: left; margin-right: 15px"></span> {{ notice }}
+			</div>
+		</div>
+		{% endif %}
+		{{ content }}
+	</div>
+{% if page.footer_js|length > 0 %}
+<script type="text/javascript">
+{% for js in page.footer_js  %}
+{{ js }}
+{% endfor %}
+</script>
+{% endif %}
+</body>
+</html>

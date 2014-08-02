@@ -1,0 +1,45 @@
+{% for n in main_news %}
+<div class="ionic-box">
+	<h2><a href="{{ make('news', n.slug, n.external_url) }}">{{ n.title }}</a></h2>
+	<div style="font-size: 0.8em; margin-bottom: 10px">
+		<div class="ionic-left">
+			Napisane {{ n.created_at|date }} | {{ n.comments_count }} komentarzy
+		</div>
+	</div>
+	<div class="ionic-post-content">
+		{% if n.big_image %}
+		<img src="public/upload/images/{{ n.big_image }}" style="margin-right: 10px; float: left" alt="" />
+		{% elseif n.small_image %}
+		<img src="public/upload/images/{{ n.small_image }}" style="margin-right: 10px; float: left" alt="" />
+		{% endif %}
+		{{ n.content_intro }}
+	</div>
+</div>
+{% endfor %}
+{% for n in news %}
+<div class="ionic-box">
+	<h2><a href="{{ make('news', n.slug, n.external_url) }}">{{ n.title }}</a></h2>
+	<div style="font-size: 0.8em; margin-bottom: 10px">
+		<div class="ionic-left">
+			Napisane {{ n.created_at|date }} | {{ n.comments_count }} komentarzy
+		</div>
+	</div>
+	<div class="ionic-post-content">
+		{% if n.big_image %}
+		<img src="public/upload/images/{{ n.big_image }}" style="margin-right: 10px; float: left" alt="" />
+		{% elseif n.small_image %}
+		<img src="public/upload/images/{{ n.small_image }}" style="margin-right: 10px; float: left" alt="" />
+		{% endif %}
+		{{ n.content_intro }}
+	</div>
+</div>
+{% endfor %}
+<ul class="ionic-list">
+{% for n in archive %}
+<li>
+	<a href="{{ make('news', n.slug, n.external_url) }}">{{ n.title }} ({{ n.comments_count }} komentarzy)</a>
+	<br />
+	<small>{{ n.created_at|date }}</small>
+</li>
+{% endfor %}
+</ul>

@@ -1,0 +1,41 @@
+<div class="section">
+	<div class="theader">
+		<div class="theader2">
+			Ustawienia widżetu
+		</div>
+	</div>
+	<div class="section-content">
+		<form action="{{ action }}" method="post">
+			<div class="elem">
+				{% if text %}
+				{{ editor('code', options.content|e) }}
+				{% else %}
+				<textarea id="code" name="code">{{ options.content|e }}</textarea>
+				{% endif %}
+			</div>
+			<div class="toolbar ui-widget-header ui-corner-all">
+				{{ form_token() }}
+				{% if not text %}
+				<a class="button" href="{{ action }}/text">Przełącz na edytor wizualny</a>
+				{% else %}
+				<a class="button" href="{{ action }}/html">Przełącz na edytor HTML</a>
+				{% endif %}
+				<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+			</div>
+		</form>
+	</div>
+</div>
+{% if not text %}
+<script type="text/javascript">
+	var editor = CodeMirror.fromTextArea(document.getElementById("code"), {mode: "text/html", tabMode: "indent", lineNumbers: true});
+	$(function(){
+		$('a.button').button();
+	});
+</script>
+{% else %}
+<script type="text/javascript">
+$(function(){
+	$('a.button').button();
+});
+</script>
+{% endif %}

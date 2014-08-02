@@ -1,0 +1,12 @@
+<table class="ionic-table">
+	<tr>
+		<th>Mecz</th>
+		<th>Data</th>
+	</tr>
+	{% for match in timetable %}
+	<tr>
+		<td class="centered">{{ match.home_name }} vs. {{ match.away_name }}</td>
+		<td>{{ match.date|date }}</td>
+	</tr>
+	{% endfor %}
+</table>

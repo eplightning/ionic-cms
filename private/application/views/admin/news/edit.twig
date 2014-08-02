@@ -1,0 +1,242 @@
+<h2>Edycja newsa</h2>
+<form action="admin/news/edit/{{ object.id }}" method="post">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Podstawowe</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="title">Tytuł<br /><small>Tytuł newsa</small></label>
+				<div class="right">
+				{% if errors.has('title') %}
+					<div class="error">{{ errors.first('title') }}</div>
+				{% endif %}
+				<input type="text" id="title" name="title" value="{% if old_data.title != '' %}{{ old_data.title|e }}{% else %}{{ object.title }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="slug">Slug<br />Automatycznie generowanie: <input type="checkbox" class="checkbox" style="vertical-align: text-top" id="gen_slug" name="gen_slug" value="1" checked="checked" /></label>
+				<div class="right">
+				{% if errors.has('slug') %}
+					<div class="error">{{ errors.first('slug') }}</div>
+				{% endif %}
+				<input type="text" onfocus="$('#gen_slug').prop('checked', false)" id="slug" name="slug" value="{% if old_data.slug != '' %}{{ old_data.slug|e }}{% else %}{{ object.slug }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="source">Źródło<br /><small>Źródło newsa</small></label>
+				<div class="right">
+				{% if errors.has('source') %}
+					<div class="error">{{ errors.first('source') }}</div>
+				{% endif %}
+				<input type="text" id="source" name="source" value="{% if old_data.source != '' %}{{ old_data.source|e }}{% else %}{{ object.source }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="image_text">Podpis do obrazka<br /><small>Podpis do obrazka tego newsa</small></label>
+				<div class="right">
+				{% if errors.has('image_text') %}
+					<div class="error">{{ errors.first('image_text') }}</div>
+				{% endif %}
+				<input type="text" id="image_text" name="image_text" value="{% if old_data.image_text != '' %}{{ old_data.image_text|e }}{% else %}{{ object.image_text }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="enable_comments">Komentarze<br /><small>Włączyć komentarze do tego newsa?</small></label>
+				<div class="right">
+					<input type="checkbox" class="checkbox" id="enable_comments" name="enable_comments" value="1"{% if object.enable_comments == 1 %} checked="checked"{% endif %} />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Inne</div>
+		</div>
+		<div class="section-content">
+			{% if can('admin_news_all') %}
+			<div class="elem">
+				<label for="user">Autor<br /><small>Autor tego newsa</small></label>
+				<div class="right">
+				{% if errors.has('user') %}
+					<div class="error">{{ errors.first('user') }}</div>
+				{% endif %}
+				<input type="text" id="user" name="user" value="{% if old_data.user != '' %}{{ old_data.user|e }}{% else %}{{ object.display_name }}{% endif %}" />
+				</div>
+			</div>
+			{% endif %}
+			<div class="elem">
+				<label for="external_url">Zewnętrzny link<br /><small>Gdzie ma news przekierowywać. Zwykle używane przez system do przekierowania na raport pomeczowy</small></label>
+				<div class="right">
+				{% if errors.has('external_url') %}
+					<div class="error">{{ errors.first('external_url') }}</div>
+				{% endif %}
+				<input type="text" id="external_url" name="external_url" value="{% if old_data.external_url != '' %}{{ old_data.external_url|e }}{% else %}{{ object.external_url }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="created_at">Data dodania<br /><small>Data dodania tego newsa</small></label>
+				<div class="right">
+				{% if errors.has('created_at') %}
+					<div class="error">{{ errors.first('created_at') }}</div>
+				{% endif %}
+				<input class="timepicker" type="text" id="created_at" name="created_at" value="{% if old_data.created_at != '' %}{{ old_data.created_at|e }}{% else %}{{ object.created_at }}{% endif %}" />
+				</div>
+			</div>
+			{% if object.is_published == 0 %}
+			<div class="elem">
+				<label for="created_at">Data publikacji<br /><small>Kiedy ten news ma zostać opublikowany</small></label>
+				<div class="right">
+				{% if errors.has('publish_at') %}
+					<div class="error">{{ errors.first('publish_at') }}</div>
+				{% endif %}
+				<input class="timepicker" type="text" id="publish_at" name="publish_at" value="{% if old_data.publish_at != '' %}{{ old_data.publish_at|e }}{% elseif object.publish_at != '0000-00-00 00:00:00' %}{{ object.publish_at }}{% endif %}" />
+				</div>
+			</div>
+			{% endif %}
+		</div>
+	</div>
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Treść</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="news_content">Pełna treść<br /><small>Pełna treść newsa</small></label>
+				<div class="right">
+				{% if errors.has('news_content') %}
+					<div class="error">{{ errors.first('news_content') }}</div>
+				{% endif %}
+				{% if old_data.news_content != '' %}
+					{{ editor('news_content', old_data.news_content|e) }}
+				{% else %}
+					{{ editor('news_content', object.content|e) }}
+				{% endif %}
+				</div>
+			</div>
+			<div class="elem">
+				<label for="news_short">Skrócona treść<br /><small>Skrócona treść newsa. Jeśli pusta zostanie automatycznie pobrany pierwszy akapit newsa.</small></label>
+				<div class="right">
+				{% if errors.has('news_short') %}
+					<div class="error">{{ errors.first('news_short') }}</div>
+				{% endif %}
+				<textarea id="news_short" name="news_short" rows="10" cols="50">{% if old_data.news_short != '' %}{{ old_data.news_short|e }}{% else %}{{ object.content_intro|e }}{% endif %}</textarea>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Obrazki/tagi</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="big_image">Duży obrazek<br /><a style="font-size: 0.8em; cursor: pointer" class="big-preview">(podgląd)</a></label>
+				<div class="right">
+				{% if errors.has('big_image') %}
+					<div class="error">{{ errors.first('big_image') }}</div>
+				{% endif %}
+				<select id="big_image" name="big_image">
+				{% for imgk, imgv in image_list %}
+				<option value="{{ imgk }}"{% if imgv == object.big_image %} selected="selected"{% endif %}>{{ imgv }}</option>
+				{% endfor %}
+				</select>
+				<div id="big-preview-container">
+					<div id="big-preview-container-close">[zamknij]</div>
+				</div>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="small_image">Mały obrazek<br /><a style="font-size: 0.8em; cursor: pointer" class="small-preview">(podgląd)</a></label>
+				<div class="right">
+				{% if errors.has('small_image') %}
+					<div class="error">{{ errors.first('small_image') }}</div>
+				{% endif %}
+				<select id="small_image" name="small_image">
+				{% for imgk, imgv in image_list %}
+				<option value="{{ imgk }}"{% if imgv == object.small_image %} selected="selected"{% endif %}>{{ imgv }}</option>
+				{% endfor %}
+				</select>
+				<div id="small-preview-container">
+					<div id="small-preview-container-close">[zamknij]</div>
+				</div>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="tags">Tagi</label>
+				<div class="right">
+				{% if errors.has('tags') %}
+					<div class="error">{{ errors.first('tags') }}</div>
+				{% endif %}
+				<select id="tags" name="tags[]" multiple="multiple">
+				{% for tagk, tagv in tags %}
+					<option value="{{ tagk }}"{% if tagk in current_tags %} selected="selected"{% endif %}>{{ tagv }}</option>
+				{% endfor %}
+				</select>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	$('input[type="submit"]').button();
+	$('.timepicker').datetimepicker({
+		timeFormat: 'HH:mm:ss',
+		dateFormat: 'yy-mm-dd',
+		showSecond: true
+	});
+	{% if can('admin_news_all') %}
+	$('input#user').autocomplete({
+		minLength: 2,
+		source: IONIC_BASE_URL+"admin/news/autocomplete/display_name"
+	});
+	{% endif %}
+	$('.big-preview').click(function(){
+		if ($('#big-preview-container').css('display') != 'none')
+		{
+			$('#big-preview-container').slideUp('slow');
+			return;
+		}
+
+		var selected = $('#big_image option:selected').text();
+
+		if (selected != '-- Brak')
+		{
+			$('#big-preview-container img').remove();
+			$('#big-preview-container').append($('<img src="public/upload/images/'+selected+'" alt="" style="max-width: 200px; max-height: 200px" />')).slideDown('slow');
+		}
+	});
+	$('#big-preview-container-close').click(function(){
+		$('#big-preview-container').slideUp('slow');
+	});
+	$('#big_image').change(function(){
+		$('#big-preview-container').slideUp('slow');
+	});
+	$('.small-preview').click(function(){
+		if ($('#small-preview-container').css('display') != 'none')
+		{
+			$('#small-preview-container').slideUp('slow');
+			return;
+		}
+
+		var selected = $('#small_image option:selected').text();
+
+		if (selected != '-- Brak')
+		{
+			$('#small-preview-container img').remove();
+			$('#small-preview-container').append($('<img src="public/upload/images/'+selected+'" alt="" style="max-width: 200px; max-height: 200px" />')).slideDown('slow');
+		}
+	});
+	$('#small-preview-container-close').click(function(){
+		$('#small-preview-container').slideUp('slow');
+	});
+	$('#small_image').change(function(){
+		$('#small-preview-container').slideUp('slow');
+	});
+});
+</script>

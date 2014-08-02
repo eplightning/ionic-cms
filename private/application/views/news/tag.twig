@@ -1,0 +1,18 @@
+<div class="ionic-box">
+	<h2>Newsy dla tagu: {{ tag.title }}</h2>
+</div>
+{% for month, posts in grouped_news %}
+<div class="ionic-box">
+	<h2>{{ month|date('month') }}</h2>
+	<ul class="ionic-list">
+	{% for n in posts %}
+	<li>
+		<a href="{{ make('news', n.slug, n.external_url) }}" style="font-size: 1.2em">{{ n.title }} ({{ n.comments_count }} komentarzy)</a>
+		<br />
+		<small>News został dodany {{ n.created_at|date }} przez <a href="{{ make('user', n.user_slug) }}">{{ n.display_name }}</a></small>
+	</li>
+	{% endfor %}
+	</ul>
+</div>
+{% endfor %}
+{{ news.links() }}

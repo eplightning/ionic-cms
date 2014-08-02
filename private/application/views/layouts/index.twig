@@ -1,0 +1,275 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="pl" lang="pl">
+<head>
+<base href="{{ base() }}/" />
+<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
+<title>{{ page.title }}</title>
+{% for key, value in page.http_equiv %}
+<meta http-equiv="{{ key }}" content="{{ value }}" />
+{% endfor %}
+{% for key, value in page.meta %}
+<meta name="{{ key }}" content="{{ value }}" />
+{% endfor %}
+{% for key, value in page.properties %}
+<meta property="{{ key }}" content="{{ value }}" />
+{% endfor %}
+<script type="text/javascript">
+var IONIC_BASE_URL = "{{ base() }}/";
+</script>
+{{ scripts }}
+{{ styles }}
+<link rel="stylesheet" href="{{ base() }}/style.css" media="all" />
+<link rel="stylesheet" href="{{ base() }}/public/css/ionic.css" media="all" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="news/rss" />
+<script type="text/javascript">
+$(function() {
+	$('.ionic-block-title').click(function(){
+		$(this).next().slideToggle('slow');
+	});
+});
+</script>
+</head>
+<body>
+{% if notifications|length > 0 %}
+<div id="ionic-notifications">
+	<span>Powiadomienia: ({{ notifications|length }})</span>
+	<ul id="ionic-notifications-list">
+		{% for n in notifications %}
+		<li style="background-image: url(public/img/notifications/{{ n.type }}.png)">
+			<img src="public/img/icons/delete.png" alt="" class="ionic-delete-notification" id="notification-id-{{ n.id }}" />
+			<a href="{{ n.link }}">{{ n.message }}</a>
+		</li>
+		{% endfor %}
+	</ul>
+</div>
+{% endif %}
+<div id="page-container">
+	<h1>Szkielet szablonu dla systemu IonicCMS</h1>
+	<ul id="page-menu">
+		{% for m in menu %}
+		<li>{{ m.data.title }}
+		{% if m.children|length > 0 %}
+			<ul>
+				{% for m2 in m.children %}
+				<li><a href="{{ m2.data.link }}">{{ m2.data.title }}</a></li>
+				{% endfor %}
+			</ul>
+		{% endif %}
+		</li>
+		{% endfor %}
+	</ul>
+	<ul id="page-breadcrumb">
+		{% for item in page.breadcrumb %}
+		<li><a href="{{ item.link }}">{{ item.title }}</a> &raquo;</li>
+		{% endfor %}
+	</ul>
+	{% if notice %}
+	<div class="ionic-notice">
+		{{ notice }}
+	</div>
+	{% endif %}
+	<div id="page-columns">
+		<div id="page-column-left">
+			<div class="ionic-block">
+				<div class="ionic-block-title">
+					Panel użytkownika
+				</div>
+				<div class="ionic-block-content">
+					{{ widget('Panel logowania', 'loginbox') }}
+				</div>
+			</div>
+			<div class="ionic-block">
+				<div class="ionic-block-title">
+					Newsletter
+				</div>
+				<div class="ionic-block-content">
+					<form action="page/newsletter" method="post">
+						<div>
+							<input type="text" name="email" value="" />
+							<input type="submit" name="submit" value="Zapisz / wypisz" />
+						</div>
+					</form>
+				</div>
+			</div>
+			<div class="ionic-block">
+				<div class="ionic-block-title">
+					Wyszukiwarka
+				</div>
+				<div class="ionic-block-content">
+					<form action="page/search" method="post">
+						<div>
+							<input type="text" name="query" value="" />
+							<input type="submit" name="submit" value="Szukaj" />
+						</div>
+					</form>
+				</div>
+			</div>
+			<div class="ionic-block">
+				<div class="ionic-block-title">
+					Shoutbox (<a href="shoutbox">Archiwum</a>)
+				</div>
+				<div class="ionic-block-content">
+					{{ widget('Shoutbox', 'shoutbox') }}
+				</div>
+			</div>
+			<div class="ionic-block">
+				<div class="ionic-block-title">
+					Sonda
+				</div>
+				<div class="ionic-block-content" style="display: none">
+					{{ widget('Sonda', 'poll') }}
+				</div>
+			</div>
+			<div class="ionic-block">
+				<div class="ionic-block-title">
+					Piłkarz miesiąca
+				</div>
+				<div class="ionic-block-content" style="display: none">
+					{{ widget('Piłkarz miesiąca', 'monthpick') }}
+				</div>
+			</div>
+			<div class="ionic-block">
+				<div class="ionic-block-title">
+					Piłkarz meczu
+				</div>
+				<div class="ionic-block-content" style="display: none">
+					{{ widget('Piłkarz meczu', 'matchpick') }}
+				</div>
+			</div>
+			<div class="ionic-block">
+				<div class="ionic-block-title">
+					Urodziny
+				</div>
+				<div class="ionic-block-content" style="display: none">
+					{{ widget('Urodziny', 'birthdays', {'limit': 2}) }}
+				</div>
+			</div>
+			<div class="ionic-block">
+				<div class="ionic-block-title">
+					Buttony
+				</div>
+				<div class="ionic-block-content" style="display: none">
+					{{ widget('Buttony', 'buttons') }}
+				</div>
+			</div>
+			<div class="ionic-block">
+				<div class="ionic-block-title">
+					Ostatnie komentarze
+				</div>
+				<div class="ionic-block-content" style="display: none">
+					{{ widget('Komentarze', 'comments') }}
+				</div>
+			</div>
+			<div class="ionic-block">
+				<div class="ionic-block-title">
+					Ostatnie pliki
+				</div>
+				<div class="ionic-block-content" style="display: none">
+					{{ widget('Pliki', 'files') }}
+				</div>
+			</div>
+			<div class="ionic-block">
+				<div class="ionic-block-title">
+					Ostatnie video
+				</div>
+				<div class="ionic-block-content" style="display: none">
+					{{ widget('Videos', 'videos') }}
+				</div>
+			</div>
+			<div class="ionic-block">
+				<div class="ionic-block-title">
+					Ostatnie zdjęcia
+				</div>
+				<div class="ionic-block-content" style="display: none">
+					{{ widget('Zdjęcia', 'photos') }}
+				</div>
+			</div>
+			<div class="ionic-block">
+				<div class="ionic-block-title">
+					Kontuzje
+				</div>
+				<div class="ionic-block-content" style="display: none">
+					{{ widget('Kontuzje', 'injuries') }}
+				</div>
+			</div>
+			<div class="ionic-block">
+				<div class="ionic-block-title">
+					Następny mecz
+				</div>
+				<div class="ionic-block-content" style="display: none">
+					{{ widget('Mecz', 'match', { 'type': 'next' }) }}
+				</div>
+			</div>
+			<div class="ionic-block">
+				<div class="ionic-block-title">
+					Statystyki strony
+				</div>
+				<div class="ionic-block-content" style="display: none">
+					{{ widget('Statystyki strony', 'pagestats') }}
+				</div>
+			</div>
+			<div class="ionic-block">
+				<div class="ionic-block-title">
+					Relacja
+				</div>
+				<div class="ionic-block-content" style="display: none">
+					{{ widget('Relacja', 'relation') }}
+				</div>
+			</div>
+			<div class="ionic-block">
+				<div class="ionic-block-title">
+					Newsy
+				</div>
+				<div class="ionic-block-content" style="display: none">
+					{{ widget('Newsy', 'news') }}
+				</div>
+			</div>
+			<div class="ionic-block">
+				<div class="ionic-block-title">
+					Bramki
+				</div>
+				<div class="ionic-block-content" style="display: none">
+					{{ widget('Statystyki', 'stats') }}
+				</div>
+			</div>
+			<div class="ionic-block">
+				<div class="ionic-block-title">
+					Tabela
+				</div>
+				<div class="ionic-block-content" style="display: none">
+					{{ widget('Tabela', 'table') }}
+				</div>
+			</div>
+			<div class="ionic-block">
+				<div class="ionic-block-title">
+					Następne mecze
+				</div>
+				<div class="ionic-block-content" style="display: none">
+					{{ widget('Terminarz', 'timetable') }}
+				</div>
+			</div>
+			<div class="ionic-block">
+				<div class="ionic-block-title">
+					Transfery
+				</div>
+				<div class="ionic-block-content" style="display: none">
+					{{ widget('Transfery', 'transfers') }}
+				</div>
+			</div>
+			<div class="ionic-block">
+				<div class="ionic-block-title">
+					Typer
+				</div>
+				<div class="ionic-block-content" style="display: none">
+					{{ widget('Użytkownicy', 'users') }}
+				</div>
+			</div>
+		</div>
+		<div id="page-column-right">
+			{{ content }}
+		</div>
+	</div>
+</div>
+</body>
+</html>

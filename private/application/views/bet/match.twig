@@ -1,0 +1,49 @@
+<div class="ionic-box">
+	<h2>Typuj mecz: {{ match.home }} vs. {{ match.away }}</h2>
+	<div class="ionic-toolbar">
+		<a href="bet/index">Ranking</a>
+		<a href="bet/matches">Typowanie</a>
+		<a href="bet/archive">Archiwum typów</a>
+		{% if type == 'betting' %}<a href="bet/reset">Zacznij od nowa</a>{% endif %}
+	</div>
+	<div class="ionic-notice">
+		Aktualnie posiadasz {{ current_user.bet_points }} punktów.
+	</div>
+	<h3>Informacje o meczu</h3>
+	<ul class="ionic-list">
+		<li><span class="title">Gospodarz:</span>{{ match.home }}</li>
+		<li><span class="title">Gość:</span>{{ match.away }}</li>
+		<li><span class="title">Data rozpoczęcia typowania:</span>{{ match.date_start|date }}</li>
+		<li><span class="title">Data końca typowania:</span>{{ match.date_end|date }}</li>
+		{% if type == 'betting' %}
+			<li><span class="title">Przelicznik - wyg. gospodarza:</span>{{ match.ratio_home|number_format(2, ',') }}</li>
+			<li><span class="title">Przelicznik - remis:</span>{{ match.ratio_draw|number_format(2, ',') }}</li>
+			<li><span class="title">Przelicznik - wyg. gości:</span>{{ match.ratio_away|number_format(2, ',') }}</li>
+		{% endif %}
+	</ul>
+</div>
+<div class="ionic-box">
+	<form action="bet/match/{{ match.id }}" method="post">
+		<div class="ionic-form">
+			<div class="ionic-form-legend">Twój typ</div>
+			<div class="ionic-form-elem">
+				<label for="bet">Typ:</label>
+				<select name="bet" id="bet">
+					<option value="home"{% if bet and bet.bet == 0 %} selected="selected"{% endif %}>Wygrana gospodarza</option>
+					<option value="draw"{% if bet and bet.bet == 1 %} selected="selected"{% endif %}>Remis</option>
+					<option value="away"{% if bet and bet.bet == 2 %} selected="selected"{% endif %}>Wygrana gości</option>
+				</select>
+			</div>
+			{% if type == 'betting' %}
+			<div class="ionic-form-elem">
+				<label for="points">Stawka:<br /><small>Minimalna stawka wynosi {{ min }}. Aby usunąć typ wpisz 0</small></label>
+				<input type="text" value="{% if bet %}{{ bet.used_points }}{% endif %}" name="points" id="points" />
+			</div>
+			{% endif %}
+			<div class="ionic-form-elem">
+				{{ form_token() }}
+				<input type="submit" name="submit" class="submit" value="Typuj" />
+			</div>
+		</div>
+	</form>
+</div>

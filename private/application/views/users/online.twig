@@ -1,0 +1,23 @@
+<div class="ionic-box">
+	<h2>Kto jest online?</h2>
+	<div class="ionic-notice">
+		<i>Anonimowych użytkowników:</i> {{ online.anonymous }}<br />
+		<i>Gości:</i> {{ online.guests }}
+	</div>
+	<table class="ionic-table">
+		<tr>
+			<th>Użytkownik</th>
+			<th>Ostatnio widziany</th>
+			<th>Lokalizacja</th>
+		</tr>
+		{% for user in online.users %}
+		<tr>
+			<td><a href="{{ make('user', user.slug) }}">{{ user.display_name }}</a></td>
+			<td>{{ user.last_activity|relativedate }}</td>
+			<td>
+				<a href="{{ user.location_url }}">{{ user.location_name }}</a>
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+</div>

@@ -1,0 +1,68 @@
+<h2>Wersje podstrony</h2>
+<div class="section">
+	<div class="theader">
+		<div class="theader2">
+			Wersje
+		</div>
+	</div>
+	<table class="itable">
+		<tr>
+			<th style="width: 16px"></th>
+			<th style="width: 70px">ID</th>
+			<th>Autor</th>
+			<th>Data wersji</th>
+			<th style="width: 45px">Obecna</th>
+			<th style="width: 114px">Akcje</th>
+		</tr>
+		{% for ver in versions %}
+		<tr>
+			<td><img src="public/img/admin/item/pages.png" alt="" /></td>
+			<td class="centered">{{ ver.id }}</td>
+			<td>{{ ver.display_name }}</td>
+			<td>{{ ver.created_at|relativedate }}</td>
+			<td class="centered">{% if ver.current == 1 %} <img
+				src="public/img/icons/accept.png" alt="" /> {% endif %}
+			</td>
+			<td>
+				<a class="show" name="page-{{ ver.id }}">Podgląd</a>
+				{% if ver.current == 0 %}<a class="revert" href="admin/pages/version_revert/{{ ver.id }}">Przywróć</a>
+				<a class="diff" name="page2-{{ ver.id }}">Różnice</a>
+				{% endif %}
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+</div>
+<div id="dialog-preview-content" style="display: none">
+	<div id="dialog-preview-content-in"></div>
+</div>
+<script type="text/javascript">
+$('a.revert').button({text:false, icons: {primary: 'ui-icon-arrowreturnthick-1-w'}});
+$('a.show').button({text: false, icons: {primary: 'ui-icon-search'}});
+$('a.diff').button({text: false, icons: {primary: 'ui-icon-clock'}});
+
+$('#dialog-preview-content').dialog({
+	autoOpen: false,
+	width: 600,
+	height: 600,
+	modal: true,
+	buttons: {
+		'Zamknij': function() { $(this).dialog('close'); }
+	},
+	title: 'Podgląd wersji'
+});
+
+$('a.show').click(function(){
+	$.get(IONIC_BASE_URL+'admin/pages/preview/'+$(this).attr('name').replace('page-', ''), function(response) {
+		$('#dialog-preview-content-in').html(response.content);
+		$('#dialog-preview-content').dialog('open');
+	}, 'json');
+});
+
+$('a.diff').click(function(){
+	$.get(IONIC_BASE_URL+'admin/pages/diff/'+$(this).attr('name').replace('page2-', ''), function(response) {
+		$('#dialog-preview-content-in').html(response.content);
+		$('#dialog-preview-content').dialog('open');
+	}, 'json');
+});
+</script>

@@ -1,0 +1,29 @@
+<div class="ionic-box">
+	<h2>{{ post.title }}</h2>
+	<div style="font-size: 0.8em">
+		<div class="ionic-left">
+			Napisane {{ post.created_at|date }} przez <a href="{{ make('user', post.user_slug) }}">{{ post.display_name }}</a>
+		</div>
+		{% if moderation %}
+		<div class="ionic-right">
+			<a href="blog/edit/{{ post.id }}" title="Edytuj"><img src="public/img/icons/page_edit.png" alt="" /></a>
+			<a href="blog/delete/{{ post.id }}" title="Usuń"><img src="public/img/icons/delete.png" alt="" /></a>
+		</div>
+		{% endif %}
+	</div>
+	<div class="ionic-karma">
+		Karma: {% if post.karma >= 0 %}<span id="karma-indicator" style="color: green">+{{ post.karma }}</span>{% else %}<span id="karma-indicator" style="color: red">{{ post.karma }}</span>{% endif %}
+		{% if can_karma %}<span id="karma-options">( <a id="karma-add">[+]</a> / <a id="karma-minus">[-]</a> )</span>{% endif %}
+	</div>
+</div>
+<div class="ionic-box">
+	<div class="ionic-post-content">
+		{{ post.content }}
+	</div>
+</div>
+{{ comments }}
+<script type="text/javascript">
+$(function() {
+	IonicPage.initKarma({{ post.id }}, 'blog');
+});
+</script>

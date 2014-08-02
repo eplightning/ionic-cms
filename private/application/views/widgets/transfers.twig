@@ -1,0 +1,30 @@
+<ul class="players">
+	{% for player in transfers %}
+	<li>
+		<img src="{{ thumb('players', player.image, '100x0') }}" alt="Zawodnik" />
+		<div class="player-info">
+			<strong>{{ player.name }}</strong>
+		</div>
+		<div class="player-info">
+			<span>{{ player.from_name }}</span>
+		</div>
+		<div class="player-info">
+			<span>{{ player.to_name }}</span>
+		</div>
+		<div class="player-info">
+			<span>{{ player.cost }}</span>
+		</div>
+		<div class="player-info">
+			<span>
+				{% if player.type == 0 %}
+				Transfer
+				{% elseif player.type == 1 %}
+				Wypożyczenie
+				{% else %}
+				Powrót
+				{% endif %}
+			</span>
+		</div>
+	</li>
+	{% endfor %}
+</ul>

@@ -1,0 +1,76 @@
+<h2>Import meczów</h2>
+<form action="admin/bet_matches/import" method="post">
+    <div class="section">
+        <div class="theader">
+            <div class="theader2">Dane</div>
+        </div>
+        <div class="section-content">
+            <div class="elem">
+                <label for="competition">Rozgrywki<br /><small>W jakich rozgrywkach</small></label>
+                <div class="right">
+                <select id="competition" name="competition">
+                {% for k, v in related_competition_id %}
+                    <option value="{{ k }}">{{ v|e }}</option>
+                {% endfor %}
+                </select>
+                </div>
+            </div>
+            <div class="elem">
+                <label for="season">Sezon<br /><small>W jakim sezonie</small></label>
+                <div class="right">
+                <select id="season" name="season">
+                {% for k, v in related_season_id %}
+                    <option value="{{ k }}">{{ v|e }}</option>
+                {% endfor %}
+                </select>
+                </div>
+            </div>
+            <div class="elem">
+                <label for="fixture">Kolejka<br /><small>Kolejka do importu</small></label>
+                <div class="right">
+                <input type="text" id="fixture" name="fixture" />
+                </div>
+            </div>
+            <div class="elem">
+                <label for="date_start">Data rozp.<br /><small>Od kiedy można typować</small></label>
+                <div class="right">
+                    <input class="timepicker" type="text" id="date_start" name="date_start" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="toolbar ui-widget-header ui-corner-all">
+        {{ form_token() }}
+        <input type="submit" name="submit" style="width: auto" value="Zapisz" />
+    </div>
+</form>
+<script type="text/javascript">
+$(function(){
+    $('input[type="submit"]').button();
+
+    $('.timepicker').datetimepicker({
+        timeFormat: 'HH:mm:ss',
+        dateFormat: 'yy-mm-dd',
+        showSecond: true
+    });
+
+    $('#fixture').autocomplete({
+        minLength: 2,
+        source: function( request, response ) {
+            $.ajax({
+                url: IONIC_BASE_URL+'admin/bet_matches/autocomplete_fixture',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    competition: $('#competition').val(),
+                    season: $('#season').val(),
+                    query: request.term
+                },
+                success: function( data ) {
+                    response(data);
+                }
+            });
+        }
+    });
+});
+</script>

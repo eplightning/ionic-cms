@@ -1,0 +1,23 @@
+<div class="ionic-box">
+	<h2>Video</h2>
+	{% if categories|length > 0 %}
+	{% for cat in categories %}
+	<div class="ionic-post">
+		<div class="ionic-post-left">
+			<div class="ionic-post-avatar">{% if cat.video_thumb %}<img src="{{ cat.video_thumb }}" style="width: 120px; max-height: 90px;" alt="" />{% endif %}</div>
+		</div>
+		<div class="ionic-post-right">
+			<div class="ionic-post-info">
+				<a href="video/category/{{ cat.slug }}">{{ cat.title }}</a>
+			</div>
+			<div class="ionic-post-content">
+				{{ cat.description }}
+				{% if cat.video_slug %}<p><strong>Ostatnio dodane video: </strong><a href="video/show/{{ cat.video_slug }}">{{ cat.video_title }}</a></p>{% endif %}
+			</div>
+		</div>
+	</div>
+	{% endfor %}
+	{% else %}
+	<p>Brak kategorii video</p>
+	{% endif %}
+</div>

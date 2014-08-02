@@ -1,0 +1,56 @@
+<h2>Edycja sondy</h2>
+<form action="admin/polls/edit/{{ object.id }}" method="post">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Podstawowe</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="title">Tytuł<br /><small>Tytuł sondy</small></label>
+				<div class="right">
+				{% if errors.has('title') %}
+					<div class="error">{{ errors.first('title') }}</div>
+				{% endif %}
+				<input type="text" id="title" name="title" value="{% if old_data.title != '' %}{{ old_data.title|e }}{% else %}{{ object.title }}{% endif %}" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Opcje</div>
+		</div>
+		<div class="section-content">
+			<div id="elements">
+				{% for opt in current_options %}
+				<div class="elem" id="opt-{{ loop.index }}">
+					<label>Opcja #{{ loop.index }}:</label>
+					<div class="right">
+						<input type="text" name="options[]" value="{{ opt }}" />
+					</div>
+				</div>
+				{% endfor %}
+			</div>
+			<div class="toolbar ui-widget-header ui-corner-all">
+				<a class="add-elem">Dodaj</a>
+				<a class="remove-elem">Usuń</a>
+			</div>
+		</div>
+	</div>
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	IonicAdmin.setOptionsCount({{ current_options|length }});
+	$('input[type="submit"]').button();
+	$('.add-elem').button({icons: {primary: 'ui-icon-plus'}}).click(function(){
+		IonicAdmin.addOption('<div class="elem" id="opt-optid"><label>Opcja #optid:</label><div class="right"><input type="text" name="options[]" /></div></div>');
+	});
+	$('.remove-elem').button({icons: {primary: 'ui-icon-trash'}}).click(function() {
+		IonicAdmin.deleteOption();
+	});
+});
+</script>

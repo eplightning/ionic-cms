@@ -1,0 +1,83 @@
+<h2>Dodawanie tabeli</h2>
+<form action="admin/tables/add" method="post">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Dane</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="title">Tytuł<br /><small>Tytuł tabeli</small></label>
+				<div class="right">
+				{% if errors.has('title') %}
+					<div class="error">{{ errors.first('title') }}</div>
+				{% endif %}
+				<input type="text" id="title" name="title" value="{{ old_data.title|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="sorting_rules">Sposób sortowania<br /><small>Sposób sortowania używany przez generatora.</small></label>
+				<div class="right">
+				{% if errors.has('sorting_rules') %}
+					<div class="error">{{ errors.first('sorting_rules') }}</div>
+				{% endif %}
+				<select id="sorting_rules" name="sorting_rules">
+					<option value="standard"{% if old_data.sorting_rules == 'standard' %} selected="selected"{% endif %}>Standardowy</option>
+					<option value="laliga"{% if old_data.sorting_rules == 'laliga' %} selected="selected"{% endif %}>La Liga</option>
+					<option value="ekstraklasa"{% if old_data.sorting_rules == 'ekstraklasa' %} selected="selected"{% endif %}>Ekstraklasa</option>
+				</select>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="auto_generation">Automatyczne generowanie<br /><small>Przy edycji/dodawaniu meczów ta tabela ma być automatycznie generowana</small></label>
+				<div class="right">
+				{% if errors.has('auto_generation') %}
+					<div class="error">{{ errors.first('auto_generation') }}</div>
+				{% endif %}
+				<input class="checkbox" type="checkbox" id="auto_generation" name="auto_generation" value="1"{% if old_data.auto_generation == '1' %} checked="checked"{% endif %} />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Powiązane</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="competition_id">Rozgrywki<br /><small>Tabela dotyczy rozgrywek ...</small></label>
+				<div class="right">
+				{% if errors.has('competition_id') %}
+					<div class="error">{{ errors.first('competition_id') }}</div>
+				{% endif %}
+				<select id="competition_id" name="competition_id">
+				{% for k, v in related_competition_id %}
+					<option value="{{ k }}"{% if old_data.competition_id == k %} selected="selected"{% endif %}>{{ v|e }}</option>
+				{% endfor %}
+				</select>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="season_id">Sezon<br /><small>W jakim sezonie</small></label>
+				<div class="right">
+				{% if errors.has('season_id') %}
+					<div class="error">{{ errors.first('season_id') }}</div>
+				{% endif %}
+				<select id="season_id" name="season_id">
+				{% for k, v in related_season_id %}
+					<option value="{{ k }}"{% if old_data.season_id == k %} selected="selected"{% endif %}>{{ v|e }}</option>
+				{% endfor %}
+				</select>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	$('input[type="submit"]').button();
+});
+</script>

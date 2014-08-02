@@ -1,0 +1,109 @@
+<h2>Dodawanie transferu</h2>
+<form action="admin/player_transfers/add" method="post">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Podstawowe</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="player_id">Zawodnik<br /><small>Imię i nazwisko zawodnika. Jeśli nie istnieje zostanie utworzony</small></label>
+				<div class="right">
+				{% if errors.has('player_id') %}
+					<div class="error">{{ errors.first('player_id') }}</div>
+				{% endif %}
+				<input type="text" id="player_id" name="player_id" value="{{ old_data.player_id|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="from_team">Od<br /><small>Pole jest opcjonalne jeśli powyższy zawodnik już istnieje w bazie danych</small></label>
+				<div class="right">
+				{% if errors.has('from_team') %}
+					<div class="error">{{ errors.first('from_team') }}</div>
+				{% endif %}
+				<input class="tauto" type="text" id="from_team" name="from_team" value="{{ old_data.from_team|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="team_id">Do<br /><small>Jeśli klub nie istnieje to zostanie utworzony</small></label>
+				<div class="right">
+				{% if errors.has('team_id') %}
+					<div class="error">{{ errors.first('team_id') }}</div>
+				{% endif %}
+				<input class="tauto" type="text" id="team_id" name="team_id" value="{{ old_data.team_id|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="date">Data<br /><small>Data wykonania transferu</small></label>
+				<div class="right">
+				{% if errors.has('date') %}
+					<div class="error">{{ errors.first('date') }}</div>
+				{% endif %}
+				<input class="datepicker" type="text" id="date" name="date" value="{{ old_data.date|e }}" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Opcjonalne</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="update_player">Aktualizuj profil<br /><small>Powoduje aktualizacje danych w profilu transferowanego zawodnika</small></label>
+				<div class="right">
+				<input type="checkbox" class="checkbox" id="update_player" name="update_player" value="1" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="type">Rodzaj transferu<br /><small>Rodzaj tego transferu</small></label>
+				<div class="right">
+				{% if errors.has('type') %}
+					<div class="error">{{ errors.first('type') }}</div>
+				{% endif %}
+				<select id="type" name="type">
+					<option value="0"{% if old_data.type == '0' %} selected="selected"{% endif %}>Zwykły</option>
+					<option value="1"{% if old_data.type == '1' %} selected="selected"{% endif %}>Wypożyczenie</option>
+					<option value="2"{% if old_data.type == '2' %} selected="selected"{% endif %}>Powrót z wypożyczenia</option>
+				</select>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="cost">Koszt<br /><small>Koszt transakcji. Dowolna waluta</small></label>
+				<div class="right">
+				{% if errors.has('cost') %}
+					<div class="error">{{ errors.first('cost') }}</div>
+				{% endif %}
+				<input type="text" id="cost" name="cost" value="{{ old_data.cost|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="description">Opis<br /><small>Informacje o transferze</small></label>
+				<div class="right">
+				{% if errors.has('description') %}
+					<div class="error">{{ errors.first('description') }}</div>
+				{% endif %}
+				<textarea id="description" name="description">{{ old_data.description|e }}</textarea>
+<script type="text/javascript">CKEDITOR.replace( "description" );</script>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	$('input[type="submit"]').button();
+	$('.datepicker').datepicker({dateFormat: 'yy-mm-dd' });
+	$('#player_id').autocomplete({
+		minLength: 2,
+		source: IONIC_BASE_URL+'admin/player_transfers/autocomplete/name'
+	});
+	$('.tauto').autocomplete({
+		minLength: 2,
+		source: IONIC_BASE_URL+'admin/player_transfers/autocomplete/team'
+	});
+});
+</script>

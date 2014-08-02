@@ -1,0 +1,17 @@
+<h2>Wysyłka newslettera</h2>
+<div class="section">
+	<div class="theader">
+		<div class="theader2">Wysyłka</div>
+	</div>
+	<div class="section-content">
+		Pozostało do wysłania: {{ count }}. Poczekaj 5 sekund lub wciśnij poniższy przycisk.
+		<p>
+			<a href="admin/newsletter/send/{{ id }}" class="send">Dalej</a>
+		</p>
+	</div>
+</div>
+<script type="text/javascript">
+$(function(){
+	$('.send').button();
+});
+</script>

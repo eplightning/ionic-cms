@@ -1,0 +1,41 @@
+{% if players|length > 0 %}
+<div class="section">
+    <div class="theader">
+        <div class="theader2">
+            Statystyki
+        </div>
+    </div>
+    <table class="itable">
+        <tr>
+            <th>Zawodnik</th>
+            <th style="width: 80px">Bramki</th>
+            <th style="width: 100px">Żółte kartki</th>
+            <th style="width: 110px">Czerwone kartki</th>
+            <th style="width: 80px">Mecze</th>
+            <th style="width: 80px">Asysty</th>
+            <th style="width: 80px">Minuty</th>
+        </tr>
+        {% for player in players %}
+        <tr>
+            <td>{{ player.name }}</td>
+            <td><input type="text" value="{{ player.goals }}" name="players[{{ player.id }}][goals]" maxlength="10" style="width: 70px" /></td>
+            <td><input type="text" value="{{ player.yellow_cards }}" name="players[{{ player.id }}][yellow_cards]" maxlength="10" style="width: 70px" /></td>
+            <td><input type="text" value="{{ player.red_cards }}" name="players[{{ player.id }}][red_cards]" maxlength="10" style="width: 70px" /></td>
+            <td><input type="text" value="{{ player.matches }}" name="players[{{ player.id }}][matches]" maxlength="10" style="width: 70px" /></td>
+            <td><input type="text" value="{{ player.assists }}" name="players[{{ player.id }}][assists]" maxlength="10" style="width: 70px" /></td>
+            <td><input type="text" value="{{ player.minutes }}" name="players[{{ player.id }}][minutes]" maxlength="10" style="width: 70px" /></td>
+        </tr>
+        {% endfor %}
+    </table>
+    <div class="toolbar ui-widget-header ui-corner-all">
+        {{ form_token() }}
+        <input type="submit" id="submit" name="submit" value="Zapisz" style="width: auto" />
+    </div>
+</div>
+{% else %}
+    <div class="section">
+        <div class="section-content">
+            Podany klub nie posiada żadnych dodanych zawodników w bazie danych
+        </div>
+    </div>
+{% endif %}

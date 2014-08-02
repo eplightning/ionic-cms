@@ -1,0 +1,61 @@
+<h2 class="with-icon" style="background-image: url(public/img/admin/item/competitions.png)">Kluby występujące w tych rozgrywkach</h2>
+<div class="section">
+	<div class="theader">
+		<div class="theader2">
+			Lista klubów
+		</div>
+	</div>
+	<table class="itable">
+		<tr>
+			<th style="width: 16px"></th>
+			<th style="width:50px">ID</th>
+			<th>Klub</th>
+			<th style="width: 40px">Akcje</th>
+		</tr>
+		{% if current|length > 0 %}
+		{% for k,v in current %}
+		<tr>
+			<td><img src="public/img/admin/item/teams.png" alt="" /></td>
+			<td class="centered">{{ k }}</td>
+			<td>{{ v }}</td>
+			<td>
+				<a href="admin/competitions/teams_delete/{{ comp.id }}/{{ k }}" class="delete">Usuń z listy</a>
+			</td>
+		</tr>
+		{% endfor %}
+		{% else %}
+		<tr><td colspan="4"><p>Brak wyników do wyświetlenia</p></td></tr>
+		{% endif %}
+	</table>
+</div>
+{% if select|length > 0 %}
+<form action="admin/competitions/teams/{{ comp.id }}" method="post">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">
+				Przypisz nowe kluby
+			</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<select name="teams[]" id="teams" multiple="multiple" style="width: 100%">
+				{% for k,v in select %}
+					<option value="{{ k }}">{{ v }}</option>
+				{% endfor %}
+				</select>
+			</div>
+			<div class="toolbar ui-widget-header ui-corner-all">
+				{{ form_token() }}
+				<input type="submit" name="submit" style="width: auto" value="Przypisz" />
+			</div>
+		</div>
+	</div>
+</form>
+{% endif %}
+<script type="text/javascript">
+$(function() {
+	$('input[type="submit"]').button();
+	$('a.delete').button({ text: false, icons: { primary: 'ui-icon-trash' } });
+	$('#teams').select2({closeOnSelect: false});
+});
+</script>

@@ -1,0 +1,32 @@
+<div class="ionic-box">
+	<h2>Kadra - {{ team.name }}</h2>
+	{% if players|length > 0 %}
+	{% for pos, pl in players %}
+	<table class="ionic-table">
+		<tr>
+			<th colspan="4">{{ pos }}</th>
+		</tr>
+		<tr>
+			<th style="width: 48px">Kraj</th>
+			<th style="width: 48px">Nr.</th>
+			<th>Imię i nazwisko</th>
+			<th>Data urodzenia</th>
+		</tr>
+		{% for player in pl %}
+		<tr>
+			<td class="centered">
+				{% if player.country %}<img src="public/img/flags/{{ player.country }}.png" alt="" />{% endif %}
+			</td>
+			<td class="centered">
+				{{ player.number }}
+			</td>
+			<td><a href="team/player/{{ team.slug }}/{{ player.slug }}">{{ player.name }}</a></td>
+			<td>
+				{{ player.date|date('short') }}
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+	{% endfor %}
+	{% endif %}
+</div>

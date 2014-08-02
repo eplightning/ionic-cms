@@ -1,0 +1,30 @@
+<div class="ionic-box">
+	<h2>Typer</h2>
+	<div class="ionic-toolbar">
+		<a href="bet/matches">Typowanie</a>
+		<a href="bet/archive">Archiwum typów</a>
+		{% if type == 'betting' %}<a href="bet/reset">Zacznij od nowa</a>{% endif %}
+	</div>
+	<div class="ionic-notice">
+		Aktualnie posiadasz {{ current_user.bet_points }} punktów i znajdujesz się na {{ place }} miejscu.
+	</div>
+</div>
+<div class="ionic-box">
+	<h2>Ranking</h2>
+	<table class="ionic-table">
+		<tr>
+			<th style="width: 120px">Pozycja</th>
+			<th>Gracz</th>
+			<th style="width: 120px">Punktów</th>
+		</tr>
+		{% set i = (players.page-1)*20 %}
+		{% for player in players.results %}{% set i = i + 1 %}
+		<tr>
+			<td>{{ i }}.</td>
+			<td><a href="{{ make('user', player.slug) }}">{{ player.display_name }}</a></td>
+			<td>{{ player.bet_points }}</td>
+		</tr>
+		{% endfor %}
+	</table>
+</div>
+{{ players.links() }}

@@ -1,0 +1,88 @@
+<h2>Dodawanie głosowania</h2>
+<form action="admin/matchpicks/add" method="post">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Podstawowe</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="title">Tytuł<br /><small>Tytuł głosowania</small></label>
+				<div class="right">
+				{% if errors.has('title') %}
+					<div class="error">{{ errors.first('title') }}</div>
+				{% endif %}
+				<input type="text" id="title" name="title" value="{{ old_data.title|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="expires">Data wygaśnięcia<br /><small>Kiedy zakończyć głosowanie, opcjonalne</small></label>
+				<div class="right">
+				{% if errors.has('expires') %}
+					<div class="error">{{ errors.first('expires') }}</div>
+				{% endif %}
+				<input class="timepicker" type="text" id="expires" name="expires" value="{{ old_data.expires|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="match">Mecz<br /><small>Powiązany mecz. Gospodarz - Gość</small></label>
+				<div class="right">
+				{% if errors.has('match') %}
+					<div class="error">{{ errors.first('match') }}</div>
+				{% endif %}
+				<input type="hidden" id="match" name="match" style="width: 100%" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="players">Zawodnicy<br /><small>Zawodnicy ,na których można głosować</small></label>
+				<div class="right">
+					<select name="players[]" id="players" multiple="multiple" style="width: 100%">
+						{% for team, list in players %}
+						<optgroup label="{{ team }}">
+							{% for k,v in list %}
+							<option value="{{ k }}">{{ v }}</option>
+							{% endfor %}
+						</optgroup>
+						{% endfor %}
+					</select>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	$('input[type="submit"]').button();
+	$('#players').select2({closeOnSelect: false});
+	$('#match').select2({
+	    placeholder: 'Brak',
+	    minimumInputLength: 2,
+	    ajax: {
+	    	url: IONIC_BASE_URL+'admin/matchpicks/autocomplete_match',
+	        dataType: 'json',
+	        type: 'POST',
+	        data: function (term, page) {
+	            return {
+	                query: term, // search term
+	            };
+	        },
+	        results: function (data, page) {
+	            return {results: data};
+	        }
+	    },
+	    escapeMarkup: function(m) { return m; },
+	    dropdownCssClass: 'bigdrop', // apply css that makes the dropdown taller
+	    formatSearching: function() { return 'Wyszukiwanie ...'; },
+	    formatNoMatches: function() { return 'Nic nie znaleziono'; },
+	    formatInputTooShort: function(term, minLength) { return 'Wprowadź conajmniej '+minLength+' znaków'; }
+	});
+	$('.timepicker').datetimepicker({
+		timeFormat: 'HH:mm:ss',
+		dateFormat: 'yy-mm-dd',
+		showSecond: true
+	});
+});
+</script>

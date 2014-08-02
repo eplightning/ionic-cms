@@ -1,0 +1,64 @@
+<h2>Dodawanie meczów</h2>
+<form action="admin/bet_matches/add2" method="post">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Wspólne</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="date_start">Data rozp.<br /><small>Od kiedy można typować</small></label>
+				<div class="right">
+					<input class="timepicker" type="text" id="date_start" name="date_start" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Spotkania (gospodarz, gość, data zak., przeliczniki)</div>
+		</div>
+		<div class="section-content">
+			<div id="elements">
+				<div class="elem" id="opt-1" style="text-align: center">
+					<input name="matches[1][home]" style="width: 250px" value="" />
+					<input name="matches[1][away]" style="width: 250px" value="" />
+					<input type="text" name="matches[1][date_end]" class="timepicker" style="width: 140px" />
+					<input type="text" name="matches[1][ratio_home]" maxlength="5" style="width: 50px" value="1.1" />
+					<input type="text" name="matches[1][ratio_draw]" maxlength="5" style="width: 50px" value="1.1" />
+					<input type="text" name="matches[1][ratio_away]" maxlength="5" style="width: 50px" value="1.1" />
+				</div>
+			</div>
+			<div class="toolbar ui-widget-header ui-corner-all">
+				<a class="add-elem">Dodaj</a>
+				<a class="remove-elem">Usuń</a>
+			</div>
+		</div>
+	</div>
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	$('input[type="submit"]').button();
+
+	$('.timepicker').datetimepicker({
+		timeFormat: 'HH:mm:ss',
+		dateFormat: 'yy-mm-dd',
+		showSecond: true
+	});
+
+	$('.add-elem').button({icons: {primary: 'ui-icon-plus'}}).click(function(){
+		IonicAdmin.addOption("<div class=\"elem\" id=\"opt-optid\" style=\"text-align: center\">					<input name=\"matches[optid][home]\" style=\"width: 250px\" value=\"\" />					<input name=\"matches[optid][away]\" style=\"width: 250px\" value=\"\" />					<input type=\"text\" name=\"matches[optid][date_end]\" class=\"timepicker\" style=\"width: 140px\" />					<input type=\"text\" name=\"matches[optid][ratio_home]\" maxlength=\"5\" style=\"width: 50px\" value=\"1.1\" />					<input type=\"text\" name=\"matches[optid][ratio_draw]\" maxlength=\"5\" style=\"width: 50px\" value=\"1.1\" />					<input type=\"text\" name=\"matches[optid][ratio_away]\" maxlength=\"5\" style=\"width: 50px\" value=\"1.1\" /></div>");
+		$('#opt-'+IonicAdmin.options+' .timepicker').datetimepicker({
+			timeFormat: 'HH:mm:ss',
+			dateFormat: 'yy-mm-dd',
+			showSecond: true
+		});
+	});
+	$('.remove-elem').button({icons: {primary: 'ui-icon-trash'}}).click(function() {
+		IonicAdmin.deleteOption();
+	});
+});
+</script>

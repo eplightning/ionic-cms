@@ -1,0 +1,50 @@
+<h2>Dodawanie relacji</h2>
+<form action="admin/relations/add" method="post">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Podstawowe</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="match">Mecz<br /><small>Powiązany mecz. Gospodarz - Gość</small></label>
+				<div class="right">
+				{% if errors.has('match') %}
+					<div class="error">{{ errors.first('match') }}</div>
+				{% endif %}
+				<input type="hidden" id="match" name="match" style="width: 100%" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	$('input[type="submit"]').button();
+	$('#match').select2({
+	    placeholder: 'Brak',
+	    minimumInputLength: 2,
+	    ajax: {
+	    	url: IONIC_BASE_URL+'admin/relations/autocomplete_match',
+	        dataType: 'json',
+	        type: 'POST',
+	        data: function (term, page) {
+	            return {
+	                query: term, // search term
+	            };
+	        },
+	        results: function (data, page) {
+	            return {results: data};
+	        }
+	    },
+	    escapeMarkup: function(m) { return m; },
+	    dropdownCssClass: 'bigdrop', // apply css that makes the dropdown taller
+	    formatSearching: function() { return 'Wyszukiwanie ...'; },
+	    formatNoMatches: function() { return 'Nic nie znaleziono'; },
+	    formatInputTooShort: function(term, minLength) { return 'Wprowadź conajmniej '+minLength+' znaków'; }
+	});
+});
+</script>

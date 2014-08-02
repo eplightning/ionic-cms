@@ -1,0 +1,11 @@
+<div class="ionic-box">
+	<h2>Archiwum sond</h2>
+	<ul class="ionic-list">
+		{% for poll in polls.results %}
+		<li>
+			<a href="poll/show/{{ poll.id }}">{{ poll.title }}</a>{% if poll.is_active == 1 %} (aktywna) {% endif %}
+		</li>
+		{% endfor %}
+	</ul>
+	{{ polls.links() }}
+</div>

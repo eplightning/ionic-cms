@@ -1,0 +1,119 @@
+<h2>Edycja statystyk</h2>
+<form action="admin/player_stats/edit/{{ object.id }}" method="post">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Zawodnik</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label>Zawodnik</label>
+				<div class="right">
+					{{ object.name }}
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Rozgrywki</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="competition_id">Rozgrywki<br /><small>Rozgrywki których dotyczą te statystyki</small></label>
+				<div class="right">
+				{% if errors.has('competition_id') %}
+					<div class="error">{{ errors.first('competition_id') }}</div>
+				{% endif %}
+				<select id="competition_id" name="competition_id">
+				{% for k, v in related_competition_id %}
+					<option value="{{ k }}"{% if (old_data.competition_id == k) or (object.competition_id == k and old_data.competition_id == '') %} selected="selected"{% endif %}>{{ v|e }}</option>
+				{% endfor %}
+				</select>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="season_id">Sezon<br /><small>Sezon którego dotyczą te statystyki</small></label>
+				<div class="right">
+				{% if errors.has('season_id') %}
+					<div class="error">{{ errors.first('season_id') }}</div>
+				{% endif %}
+				<select id="season_id" name="season_id">
+				{% for k, v in related_season_id %}
+					<option value="{{ k }}"{% if (old_data.season_id == k) or (object.season_id == k and old_data.season_id == '') %} selected="selected"{% endif %}>{{ v|e }}</option>
+				{% endfor %}
+				</select>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Statystyki</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="goals">Bramek<br /><small>Ilość zdobytych goli</small></label>
+				<div class="right">
+				{% if errors.has('goals') %}
+					<div class="error">{{ errors.first('goals') }}</div>
+				{% endif %}
+				<input type="text" id="goals" name="goals" value="{% if old_data.goals != '' %}{{ old_data.goals|e }}{% else %}{{ object.goals|e }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="yellow_cards">Żółtych kartek<br /><small>Ilość otrzymanych żółtych kartek przez tego zawodnika</small></label>
+				<div class="right">
+				{% if errors.has('yellow_cards') %}
+					<div class="error">{{ errors.first('yellow_cards') }}</div>
+				{% endif %}
+				<input type="text" id="yellow_cards" name="yellow_cards" value="{% if old_data.yellow_cards != '' %}{{ old_data.yellow_cards|e }}{% else %}{{ object.yellow_cards|e }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="red_cards">Czerwonych kartek<br /><small>Ilość otrzymanych czerwonych kartek przez tego zawodnika</small></label>
+				<div class="right">
+				{% if errors.has('red_cards') %}
+					<div class="error">{{ errors.first('red_cards') }}</div>
+				{% endif %}
+				<input type="text" id="red_cards" name="red_cards" value="{% if old_data.red_cards != '' %}{{ old_data.red_cards|e }}{% else %}{{ object.red_cards|e }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="matches">Występy<br /><small>Ilość występów tego zawodnika</small></label>
+				<div class="right">
+				{% if errors.has('matches') %}
+					<div class="error">{{ errors.first('matches') }}</div>
+				{% endif %}
+				<input type="text" id="matches" name="matches" value="{% if old_data.matches != '' %}{{ old_data.matches|e }}{% else %}{{ object.matches|e }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="assists">Asyst<br /><small>Ilość asyst tego zawodnika</small></label>
+				<div class="right">
+				{% if errors.has('assists') %}
+					<div class="error">{{ errors.first('assists') }}</div>
+				{% endif %}
+				<input type="text" id="assists" name="assists" value="{% if old_data.assists != '' %}{{ old_data.assists|e }}{% else %}{{ object.assists|e }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="minutes">Minut<br /><small>Minut spędzonych przez tego zawodnika na boisku</small></label>
+				<div class="right">
+				{% if errors.has('minutes') %}
+					<div class="error">{{ errors.first('minutes') }}</div>
+				{% endif %}
+				<input type="text" id="minutes" name="minutes" value="{% if old_data.minutes != '' %}{{ old_data.minutes|e }}{% else %}{{ object.minutes|e }}{% endif %}" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	$('input[type="submit"]').button();
+});
+</script>

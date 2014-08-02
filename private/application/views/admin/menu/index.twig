@@ -1,0 +1,185 @@
+<h2 class="with-icon" style="background-image: url(public/img/admin/item/menu.png)">Zarządzanie menu</h2>
+<div id="jstree">
+	<ul>
+	</ul>
+</div>
+<div class="section">
+	<div class="theader">
+		<div class="theader2">Dodaj główną kategorię</div>
+	</div>
+	<div class="section-content">
+		<div class="elem">
+			<label for="tree-title">Tytuł</label>
+			<div class="right"><input type="text" id="tree-title" /></div>
+		</div>
+		<div class="toolbar ui-widget-header ui-corner-all">
+			<button id="tree-root-add">Dodaj</button>
+		</div>
+	</div>
+</div>
+<div id="dialog-edit" style="display: none">
+	<fieldset>
+		<div>
+			<label for="dialog-menu-title">Tytuł:</label> <input type="text"
+				name="dialog-menu-title" id="dialog-menu-title" maxlength="127" />
+		</div>
+		<div>
+			<label for="dialog-menu-link">URL:</label> <input type="text"
+				name="dialog-menu-link" id="dialog-menu-link" maxlength="255" />
+		</div>
+	</fieldset>
+</div>
+<script type="text/javascript">
+var currentEditObject = null;
+$(document).ready(function(){
+	$.jstree._themes = IONIC_BASE_URL+"public/js/themes/";
+
+	$('#dialog-edit').dialog({
+		autoOpen: false,
+		width: 600,
+		height: 300,
+		modal: true,
+		buttons: {
+			'Zapisz': function() {
+				$.post(
+						'{{ "admin/menu/edit"|url }}',
+						{
+							id : currentEditObject.attr('id').replace('menu-',''),
+							title : $('#dialog-menu-title').val(),
+							link : $('#dialog-menu-link').val(),
+							{{ csrf_key }}: IonicAdmin.csrfToken
+						},
+						function (r) {
+							$('#dialog-edit').dialog('close');
+
+							if (currentEditObject != null)
+							{
+								$('#jstree').jstree('refresh', currentEditObject.parent().parent());
+							}
+						}
+					);
+			},
+			'Anuluj': function() { $(this).dialog('close'); }
+		},
+		title: 'Edytuj menu'
+	});
+	$('#tree-root-add').button().click(function(){
+		$('#jstree').jstree('create', this, 'last', {data: $('#tree-title').val()}, null, true);
+	});
+
+	$('#jstree').jstree({
+		plugins : [ 'themes', 'html_data', 'ui', 'crrm', 'contextmenu', 'dnd' ],
+		html_data : {
+			ajax : {
+				type : 'POST',
+				url : '{{ "admin/menu/children"|url }}',
+				data : function (n) {
+					return {
+						id: n.attr ? n.attr('id').replace('menu-','') : 0,
+						{{ csrf_key }}: IonicAdmin.csrfToken
+					};
+				}
+			}
+		},
+		core: {
+			strings: { loading : 'Wczytywanie ...', new_node : 'Nowy element' }
+		},
+		ui : {select_limit:1},
+		contextmenu : {
+			items: function() { return {				'create' : {
+				'separator_before'	: false,
+				'separator_after'	: true,
+				'label'				: 'Utwórz',
+				'action'			: function (obj) { this.create(obj); }
+			},
+			'rename' : {
+				'separator_before'	: false,
+				'separator_after'	: false,
+				'label'				: 'Zmień nazwę',
+				'action'			: function (obj) { this.rename(obj); }
+			},
+			'remove' : {
+				'separator_before'	: false,
+				'icon'				: false,
+				'separator_after'	: false,
+				'label'				: 'Usuń',
+				'action'			: function (obj) { if(this.is_selected(obj)) { this.remove(); } else { this.remove(obj); } }
+			},
+			'edit' : {
+				'separator_before'	: false,
+				'icon'				: false,
+				'separator_after'	: false,
+				'label'				: 'Edytuj',
+				'action'			: function (obj) {
+					currentEditObject = obj;
+					var a = $(obj).children().closest('a');
+
+					$('#dialog-menu-title').val($.trim(a.text()));
+					$('#dialog-menu-link').val(a.attr('href'));
+
+					$('#dialog-edit').dialog('open');
+				}
+			}
+		}}
+		}
+	}).bind('create.jstree', function (e, data) {
+		$.post(
+				'{{ "admin/menu/create"|url }}',
+				{
+					id : data.rslt.parent == -1 ? 'jstree' : data.rslt.parent.attr('id').replace('menu-',''),
+					title : data.rslt.name,
+					{{ csrf_key }}: IonicAdmin.csrfToken
+				},
+				function (r) {
+					if(r.status) {
+						$(data.rslt.obj).attr('id', 'menu-' + r.id);
+
+						data.inst.refresh(data.rslt.parent);
+					}
+					else {
+						$.jstree.rollback(data.rlbk);
+					}
+				}, 'json'
+			);
+	}).bind('remove.jstree', function (e, data) {
+		data.rslt.obj.each(function () {
+			$.post(
+					'{{ "admin/menu/delete"|url }}',
+					{
+						id : this.id.replace('menu-',''),
+						{{ csrf_key }}: IonicAdmin.csrfToken
+					},
+					function (r) {
+						if(!r.status) {
+							data.inst.refresh();
+						}
+					}, 'json'
+				);
+		});
+	}).bind('move_node.jstree', function (e, data) {
+		data.rslt.o.each(function (i) {
+			$.post(
+					'{{ "admin/menu/move"|url }}',
+					{
+						id : this.id.replace('menu-',''),
+						{{ csrf_key }}: IonicAdmin.csrfToken,
+						i : data.rslt.cp,
+						parent : data.rslt.cr === -1 ? 0 : data.rslt.np.attr('id').replace('menu-',''),
+					},
+					function (r) {
+						data.inst.refresh();
+					}, 'json'
+				);
+		});
+	}).bind('rename.jstree', function (e, data) {
+		$.post(
+				'{{ "admin/menu/rename"|url }}',
+				{
+					id : data.rslt.obj.attr('id').replace('menu-',''),
+					title : data.rslt.new_name,
+					{{ csrf_key }}: IonicAdmin.csrfToken
+				}
+			);
+	});
+});
+</script>

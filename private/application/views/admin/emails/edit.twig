@@ -1,0 +1,56 @@
+<h2>Edycja emaila</h2>
+<div class="section">
+	<div class="theader">
+		<div class="theader2">Informacje</div>
+	</div>
+	<div class="section-content">
+		<div class="elem">
+			<label>Tytuł</label>
+			{{ object.title }}
+		</div>
+		<div class="elem">
+			<label>Dostępne zmienne<br /><small>Zmienne, które możesz użyć w treści e-maila</small></label>
+			{{ object.vars }}
+		</div>
+	</div>
+</div>
+<form action="admin/emails/edit/{{ object.id }}" method="post">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Dane</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="subject">Temat e-maila<br /><small>Temat wysyłanego e-maila</small></label>
+				<div class="right">
+				{% if errors.has('subject') %}
+					<div class="error">{{ errors.first('subject') }}</div>
+				{% endif %}
+				<input type="text" id="subject" name="subject" value="{% if old_data.subject != '' %}{{ old_data.subject|e }}{% else %}{{ object.subject }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="message">Treść<br /><small>Treść wysyłanego e-maila</small></label>
+				<div class="right">
+				{% if errors.has('message') %}
+					<div class="error">{{ errors.first('message') }}</div>
+				{% endif %}
+				{% if old_data.message != '' %}
+					{{ editor('message', old_data.message|e) }}
+				{% else %}
+					{{ editor('message', object.message|e) }}
+				{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	$('input[type="submit"]').button();
+});
+</script>

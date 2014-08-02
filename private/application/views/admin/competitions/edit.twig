@@ -1,0 +1,37 @@
+<h2>Edycja rozgrywek</h2>
+<form action="admin/competitions/edit/{{ object.id }}" method="post">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Dane</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="name">Nazwa<br /><small>Nazwa rozgrywek</small></label>
+				<div class="right">
+				{% if errors.has('name') %}
+					<div class="error">{{ errors.first('name') }}</div>
+				{% endif %}
+				<input type="text" id="name" name="name" value="{% if old_data.name != '' %}{{ old_data.name|e }}{% else %}{{ object.name }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="slug">Slug<br /><small>Slug widoczny w linkach</small></label>
+				<div class="right">
+				{% if errors.has('slug') %}
+					<div class="error">{{ errors.first('slug') }}</div>
+				{% endif %}
+				<input type="text" id="slug" name="slug" value="{% if old_data.slug != '' %}{{ old_data.slug|e }}{% else %}{{ object.slug }}{% endif %}" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	$('input[type="submit"]').button();
+});
+</script>

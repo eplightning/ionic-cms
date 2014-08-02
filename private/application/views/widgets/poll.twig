@@ -1,0 +1,27 @@
+{% if not poll.is_init %}
+	<p>Obecnie żadna sonda nie jest aktywna</p>
+{% else %}
+	<strong>{{ poll.title }}</strong>
+	{% if poll.can_vote() %}
+	<form action="poll/vote" method="post">
+		{% for opt in poll.options %}
+		<div style="margin: 5px; padding: 5px">
+			<input type="radio" name="option" value="{{ opt.id }}" /> {{ opt.title }}
+		</div>
+		{% endfor %}
+		<div style="margin: 5px; padding: 5px">
+			{{ form_token() }}
+			<input type="submit" name="submit" value="Głosuj" />
+		</div>
+	</form>
+	{% else %}
+		{% for opt in poll.options %}
+		<div style="margin: 5px; padding: 5px">
+			{{ opt.title }} - {{ opt.percent }}%
+		</div>
+		{% endfor %}
+	{% endif %}
+	<div style="margin: 5px; padding: 5px">
+		<a href="poll/show/{{ poll.id }}">Szczegóły</a> / <a href="poll/index">Archiwum</a>
+	</div>
+{% endif %}

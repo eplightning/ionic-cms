@@ -1,0 +1,36 @@
+<div class="ionic-box">
+	<h2>Plik - {{ file.title }}</h2>
+	{% if can_dl %}
+	<div class="ionic-toolbar">
+		<a href="files/download/{{ file.id }}">Pobierz ten plik</a>
+	</div>
+	{% endif %}
+	<ul class="ionic-list">
+		<li><span class="title">Data dodania:</span> {{ file.created_at|date }}</li>
+		<li><span class="title">Dodane przez:</span> <a href="{{ make('user', file.user_slug) }}">{{ file.display_name }}</a></li>
+		<li><span class="title">Liczba pobrań:</span> {{ file.downloads }}</li>
+		<li><span class="title">Nazwa pliku:</span> {{ file.filename }}</li>
+	</ul>
+</div>
+<div class="ionic-box">
+	<div class="ionic-post-content">
+		{% if file.image %}
+		<a href="public/upload/files/{{ file.image }}" class="lightbox" style="float: left; margin-right: 15px; margin-bottom: 10px">
+			<img src="{{ thumb('files', file.image, '120x0') }}" alt="" />
+		</a>
+		{% endif %}
+		{{ file.description }}
+	</div>
+</div>
+{{ comments }}
+<script type="text/javascript">
+$(document).ready(function(){
+	$('a.lightbox').lightBox({
+		imageLoading: IONIC_BASE_URL+'public/img/lightbox-ico-loading.gif',
+		imageBtnClose: IONIC_BASE_URL+'public/img/lightbox-btn-close.gif',
+		imageBtnPrev: IONIC_BASE_URL+'public/img/lightbox-btn-prev.gif',
+		imageBtnNext: IONIC_BASE_URL+'public/img/lightbox-btn-next.gif',
+		imageBlank: IONIC_BASE_URL+'public/img/lightbox-blank.gif'
+	});
+});
+</script>

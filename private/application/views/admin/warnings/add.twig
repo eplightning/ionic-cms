@@ -1,0 +1,41 @@
+<h2>Dodawanie ostrzeżenia</h2>
+<form action="admin/warnings/add" method="post">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Dane</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="user">Użytkownik<br /><small>Użytkownik otrzymujący to ostrzeżenie</small></label>
+				<div class="right">
+				{% if errors.has('user') %}
+					<div class="error">{{ errors.first('user') }}</div>
+				{% endif %}
+				<input type="text" id="user" name="user" value="{{ old_data.user|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="reason">Powód<br /><small>Powód ostrzeżenia</small></label>
+				<div class="right">
+				{% if errors.has('reason') %}
+					<div class="error">{{ errors.first('reason') }}</div>
+				{% endif %}
+				<input type="text" id="reason" name="reason" value="{{ old_data.reason|e }}" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	$('input[type="submit"]').button();
+	$('input#user').autocomplete({
+		minLength: 2,
+		source: IONIC_BASE_URL+"admin/warnings/autocomplete/display_name"
+	});
+});
+</script>

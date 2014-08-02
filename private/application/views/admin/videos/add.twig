@@ -1,0 +1,81 @@
+<h2>Dodawanie video</h2>
+<form action="admin/videos/add" method="post">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Podstawowe</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="title">Tytuł<br /><small>Tytuł video</small></label>
+				<div class="right">
+				{% if errors.has('title') %}
+					<div class="error">{{ errors.first('title') }}</div>
+				{% endif %}
+				<input type="text" id="title" name="title" value="{{ old_data.title|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="description">Opis<br /><small>Opis filmu</small></label>
+				<div class="right">
+				{% if errors.has('description') %}
+					<div class="error">{{ errors.first('description') }}</div>
+				{% endif %}
+				<textarea id="description" name="description" rows="10" cols="50">{{ old_data.description|e }}</textarea>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="thumbnail">Link do miniaturki<br /><small>Automatycznie dla filmów z YouTube, Vimeo, Dailymotion, Metacafe oraz Flickr-a.</small></label>
+				<div class="right">
+				{% if errors.has('thumbnail') %}
+					<div class="error">{{ errors.first('thumbnail') }}</div>
+				{% endif %}
+				<input type="text" id="thumbnail" name="thumbnail" value="{{ old_data.thumbnail|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="category_id">Kategoria<br /><small>Kategoria video</small></label>
+				<div class="right">
+					<select name="category_id" id="category_id">
+					{% for k, v in categories %}
+					<option value="{{ k }}"{% if current_cat and k == current_cat %} selected="selected"{% endif %}>{{ v }}</option>
+					{% endfor %}
+					</select>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Video</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="link">Link do filmu<br /><small>Poniższe pole zostanie wypełnione jeśli podasz tutaj link do video z YouTube, Vimeo, Dailymotion, Metacafe, Ekstraklasa.tv oraz Flickr-a.</small></label>
+				<div class="right">
+				{% if errors.has('link') %}
+					<div class="error">{{ errors.first('link') }}</div>
+				{% endif %}
+				<input type="text" id="link" name="link" value="{{ old_data.link|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="embed">HTML filmu<br /><small>Kod HTML filmu. Nie wymagane jeśli podałeś link</small></label>
+				<div class="right">
+				{% if errors.has('embed') %}
+					<div class="error">{{ errors.first('embed') }}</div>
+				{% endif %}
+				<textarea id="embed" name="embed" rows="10" cols="50">{{ old_data.embed|e }}</textarea>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	$('input[type="submit"]').button();
+});
+</script>

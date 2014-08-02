@@ -1,0 +1,9 @@
+{% if item.item_link %}
+<div style="padding: 10px">
+	<label>Link:</label>
+	<a href="{{ item.item_link|url }}">{{ item.item_link|url }}</a>
+</div>
+{% endif %}
+<div style="margin: 10px; padding: 10px">
+{{ item.saved_content }}
+</div>

@@ -1,0 +1,25 @@
+{% if data|length > 0 %}
+{% for obj in data %}
+<tr class="grid-column">
+	{% if draw_checkboxes %}
+	<td><input type="checkbox" class="grid-checkbox" name="{{ obj.id }}" /></td>
+	{% endif %}
+	{% for column in columns %}
+	<td{% if column.name == 'id' %} class="centered"{% endif %}>{{ obj[column.name] }}</td>
+	{% endfor %}
+	{% if actions|length > 0 %}
+	<td class="centered">
+		{% for action in actions %}
+		<a href="{{ action.link|format(obj.id) }}"{% if action.class %} class="{{ action.class }}"{% endif %}>{{ action.title }}</a>
+		{% endfor %}
+	</td>
+	{% endif %}
+</tr>
+{% endfor %}
+{% else %}
+<tr class="grid-column">
+	<td colspan="{{ colspan }}">
+		<p>Brak wyników do wyświetlenia</p>
+	</td>
+</tr>
+{% endif %}

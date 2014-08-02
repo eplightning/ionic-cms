@@ -1,0 +1,86 @@
+<h2 class="with-icon" style="background-image: url(public/img/admin/item/prune.png)">Czysczenie</h2>
+<div class="section">
+	<div class="theader">
+		<div class="theader2">Nieaktualne sesje</div>
+	</div>
+	<div class="section-content">
+		<div class="elem">
+			<label>Znalezionych:</label>
+			{{ old_sessions }}
+		</div>
+		{% if old_sessions > 0 %}
+		<div class="toolbar ui-widget-header ui-corner-all">
+			<a href="admin/prune/sessions" class="sessions">Wyczyść</a>
+		</div>
+		{% endif %}
+	</div>
+</div>
+<div class="section">
+	<div class="theader">
+		<div class="theader2">Liczniki komentarzy/newsów</div>
+	</div>
+	<div class="section-content">
+		<div class="elem">
+			Przelicza ilość komentarzy/newsów dla każdego użytkownika
+		</div>
+		<div class="toolbar ui-widget-header ui-corner-all">
+			<a href="admin/prune/counters" class="sessions">Przelicz</a>
+		</div>
+	</div>
+</div>
+<div class="section">
+	<div class="theader">
+		<div class="theader2">Liczniki komentarzy w newsach</div>
+	</div>
+	<form action="admin/prune/news_counters" method="post">
+		<div class="section-content">
+			<div class="elem">
+				<label for="news_count">X ostatnich newsów:</label>
+				<div class="right"><input type="text" id="news_count" name="news_count" maxlength="4" value="100" /></div>
+			</div>
+			<div class="toolbar ui-widget-header ui-corner-all">
+				{{ form_token() }}
+				<input type="submit" name="submit" style="width: auto" value="Przelicz" />
+			</div>
+		</div>
+	</form>
+</div>
+<div class="section">
+	<div class="theader">
+		<div class="theader2">Nieaktywowane konta</div>
+	</div>
+	<form action="admin/prune/accounts" method="post">
+		<div class="section-content">
+			<div class="elem">
+				<label for="older_than">Starsze niż:</label>
+				<input type="text" id="older_than" name="older_than" class="datepicker" />
+			</div>
+			<div class="toolbar ui-widget-header ui-corner-all">
+				{{ form_token() }}
+				<input type="submit" name="submit" style="width: auto" value="Wyczyść" />
+			</div>
+		</div>
+	</form>
+</div>
+<div class="section">
+	<div class="theader">
+		<div class="theader2">Stare wiadomości</div>
+	</div>
+	<form action="admin/prune/messages" method="post">
+		<div class="section-content">
+			<div class="elem">
+				<label for="older_than2">Starsze niż:</label>
+				<input type="text" name="older_than" id="older_than2" class="datepicker" />
+			</div>
+			<div class="toolbar ui-widget-header ui-corner-all">
+				{{ form_token() }}
+				<input type="submit" name="submit" style="width: auto" value="Wyczyść" />
+			</div>
+		</div>
+	</form>
+</div>
+<script type="text/javascript">
+$('input[type=submit]').button();
+$('a.sessions').button();
+$('.datepicker').datepicker({dateFormat: 'yy-mm-dd' });
+</script>

@@ -1,0 +1,148 @@
+<h2>Dodawanie klubu</h2>
+<form action="admin/teams/add" method="post" enctype="multipart/form-data">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Podstawowe</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="name">Nazwa<br /><small>Nazwa klubu</small></label>
+				<div class="right">
+				{% if errors.has('name') %}
+					<div class="error">{{ errors.first('name') }}</div>
+				{% endif %}
+				<input type="text" id="name" name="name" value="{{ old_data.name|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="image">Herb<br /><small>Herb klubu</small></label>
+				<div class="right">
+				{% if errors.has('image') %}
+					<div class="error">{{ errors.first('image') }}</div>
+				{% endif %}
+				<input type="file" id="image" name="image" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="is_distinct">Wyróżniony<br /><small>Wyróżnić klub w tabelach itp.</small></label>
+				<div class="right">
+				{% if errors.has('is_distinct') %}
+					<div class="error">{{ errors.first('is_distinct') }}</div>
+				{% endif %}
+				<input class="checkbox" type="checkbox" id="is_distinct" name="is_distinct" value="1"{% if old_data.is_distinct == '1' %} checked="checked"{% endif %} />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Inne</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="country">Kraj</label>
+				<div class="right">
+				{% if errors.has('country') %}
+					<div class="error">{{ errors.first('country') }}</div>
+				{% endif %}
+				<select name="country" id="country">
+					<option value="">---</option>
+					{% for k,v in countries %}
+					<option value="{{ k }}"{% if k == old_data.country %} selected="selected"{% endif %}>{{ v }}</option>
+					{% endfor %}
+				</select>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="year">Rok założenia<br /><small>Rok założenia klubu</small></label>
+				<div class="right">
+				{% if errors.has('year') %}
+					<div class="error">{{ errors.first('year') }}</div>
+				{% endif %}
+				<input type="text" id="year" name="year" value="{{ old_data.year|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="address">Adres<br /><small>Adres klubu</small></label>
+				<div class="right">
+				{% if errors.has('address') %}
+					<div class="error">{{ errors.first('address') }}</div>
+				{% endif %}
+				<input type="text" id="address" name="address" value="{{ old_data.address|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="colors">Barwy<br /><small>Barwy klubu</small></label>
+				<div class="right">
+				{% if errors.has('colors') %}
+					<div class="error">{{ errors.first('colors') }}</div>
+				{% endif %}
+				<input type="text" id="colors" name="colors" value="{{ old_data.colors|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="stadium">Stadion<br /><small>Stadion klubu</small></label>
+				<div class="right">
+				{% if errors.has('stadium') %}
+					<div class="error">{{ errors.first('stadium') }}</div>
+				{% endif %}
+				<input type="text" id="stadium" name="stadium" value="{{ old_data.stadium|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="chairman">Prezes<br /><small>Prezes/prezydent klubu</small></label>
+				<div class="right">
+				{% if errors.has('chairman') %}
+					<div class="error">{{ errors.first('chairman') }}</div>
+				{% endif %}
+				<input type="text" id="chairman" name="chairman" value="{{ old_data.chairman|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="coach">Trener<br /><small>Trener/menedżer klubu</small></label>
+				<div class="right">
+				{% if errors.has('coach') %}
+					<div class="error">{{ errors.first('coach') }}</div>
+				{% endif %}
+				<input type="text" id="coach" name="coach" value="{{ old_data.coach|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="star">Gwiazda<br /><small>Gwiazda zespołu</small></label>
+				<div class="right">
+				{% if errors.has('star') %}
+					<div class="error">{{ errors.first('star') }}</div>
+				{% endif %}
+				<input type="text" id="star" name="star" value="{{ old_data.star|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="webpage">Strona internetowa<br /><small>Link do strony internetowej klubu</small></label>
+				<div class="right">
+				{% if errors.has('webpage') %}
+					<div class="error">{{ errors.first('webpage') }}</div>
+				{% endif %}
+				<input type="text" id="webpage" name="webpage" value="{{ old_data.webpage|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="description">Opis<br /><small>Informacje o klubie</small></label>
+				<div class="right">
+				{% if errors.has('description') %}
+					<div class="error">{{ errors.first('description') }}</div>
+				{% endif %}
+				{{ editor('description', old_data.description|e) }}
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	$('input[type="submit"]').button();
+});
+</script>

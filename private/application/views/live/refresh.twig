@@ -1,0 +1,7 @@
+<ul class="ionic-list">
+	{% for msg in messages %}
+	<li>
+		{{ msg.minute_display ? msg.minute_display : msg.minute }}: <small>({{ types[msg.type] }})</small> {{ msg.message }}
+	</li>
+	{% endfor %}
+</ul>

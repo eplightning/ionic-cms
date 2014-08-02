@@ -1,0 +1,242 @@
+<h2>Edycja meczu</h2>
+<form action="admin/matches/edit/{{ object.id }}" method="post">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Rozgrywki</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="competition_id">Rozgrywki<br /><small>W jakich rozgrywkach</small></label>
+				<div class="right">
+				{% if errors.has('competition_id') %}
+					<div class="error">{{ errors.first('competition_id') }}</div>
+				{% endif %}
+				<select id="competition_id" name="competition_id">
+				{% for k, v in related_competition_id %}
+					<option value="{{ k }}"{% if (old_data.competition_id == k) or (object.competition_id == k and old_data.competition_id == '') %} selected="selected"{% endif %}>{{ v|e }}</option>
+				{% endfor %}
+				</select>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="season_id">Sezon<br /><small>W jakim sezonie</small></label>
+				<div class="right">
+				{% if errors.has('season_id') %}
+					<div class="error">{{ errors.first('season_id') }}</div>
+				{% endif %}
+				<select id="season_id" name="season_id">
+				{% for k, v in related_season_id %}
+					<option value="{{ k }}"{% if (old_data.season_id == k) or (object.season_id == k and old_data.season_id == '') %} selected="selected"{% endif %}>{{ v|e }}</option>
+				{% endfor %}
+				</select>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="fixture_id">Kolejka<br /><small>W której kolejce jest ten mecz. Jeśli nie istnieje zostanie automatycznie utworzona</small></label>
+				<div class="right">
+				{% if errors.has('fixture_id') %}
+					<div class="error">{{ errors.first('fixture_id') }}</div>
+				{% endif %}
+				<input type="text" id="fixture_id" name="fixture_id" value="{% if old_data.fixture_id != '' %}{{ old_data.fixture_id|e }}{% else %}{{ object.name }}{% endif %}" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Kluby</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="home_id">Gospodarz<br /><small>Drużyna gospodarzy</small></label>
+				<div class="right">
+				{% if errors.has('home_id') %}
+					<div class="error">{{ errors.first('home_id') }}</div>
+				{% endif %}
+				<select id="home_id" name="home_id">
+				{% for k, v in related_home_id %}
+					<option value="{{ k }}"{% if (old_data.home_id == k) or (object.home_id == k and old_data.home_id == '') %} selected="selected"{% endif %}>{{ v|e }}</option>
+				{% endfor %}
+				</select>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="away_id">Gość<br /><small>Drużyna gości</small></label>
+				<div class="right">
+				{% if errors.has('away_id') %}
+					<div class="error">{{ errors.first('away_id') }}</div>
+				{% endif %}
+				<select id="away_id" name="away_id">
+				{% for k, v in related_home_id %}
+					<option value="{{ k }}"{% if (old_data.away_id == k) or (object.away_id == k and old_data.away_id == '') %} selected="selected"{% endif %}>{{ v|e }}</option>
+				{% endfor %}
+				</select>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Dane</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="score">Wynik<br /><small>Wynik w formacie XX:YY. Zostaw puste jeśli mecz się nie odbył</small></label>
+				<div class="right">
+				{% if errors.has('score') %}
+					<div class="error">{{ errors.first('score') }}</div>
+				{% endif %}
+				<input type="text" id="score" name="score" value="{% if old_data.score != '' %}{{ old_data.score|e }}{% else %}{{ object.score|e }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="slug">Slug<br /><small>Slug widoczny w linkach</small></label>
+				<div class="right">
+				{% if errors.has('slug') %}
+					<div class="error">{{ errors.first('slug') }}</div>
+				{% endif %}
+				<input type="text" id="slug" name="slug" value="{% if old_data.slug != '' %}{{ old_data.slug|e }}{% else %}{{ object.slug }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="date">Data<br /><small>Data meczu</small></label>
+				<div class="right">
+				{% if errors.has('date') %}
+					<div class="error">{{ errors.first('date') }}</div>
+				{% endif %}
+				<input class="timepicker" type="text" id="date" name="date" value="{% if old_data.date != '' %}{{ old_data.date|e }}{% else %}{{ object.date|e }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="stadium">Stadion<br /><small>Stadion, na którym odbył/odbędzie się mecz</small></label>
+				<div class="right">
+				{% if errors.has('stadium') %}
+					<div class="error">{{ errors.first('stadium') }}</div>
+				{% endif %}
+				<input type="text" id="stadium" name="stadium" value="{% if old_data.stadium != '' %}{{ old_data.stadium|e }}{% else %}{{ object.stadium }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="description">Opis<br /><small>Krótki opis meczu</small></label>
+				<div class="right">
+				{% if errors.has('description') %}
+					<div class="error">{{ errors.first('description') }}</div>
+				{% endif %}
+				<textarea id="description" name="description" rows="10" cols="50">{% if old_data.description != '' %}{{ old_data.description|e }}{% else %}{{ object.description }}{% endif %}</textarea>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Zapowiedź / Raport pomeczowy</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="prematch_slug">Zapowiedź<br /><small>Wybrany news zostanie ustawiony jako zapowiedź tego meczu</small></label>
+				<div class="right">
+				{% if errors.has('prematch_slug') %}
+					<div class="error">{{ errors.first('prematch_slug') }}</div>
+				{% endif %}
+				<input type="hidden" id="prematch_slug" name="prematch_slug" style="width: 100%" value="{{ object.prematch_slug }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="report_slug">Raport pomeczowy<br /><small>Wybrany news zostanie ustawiony jako raport pomeczowy tego meczu</small></label>
+				<div class="right">
+				{% if errors.has('report_slug') %}
+					<div class="error">{{ errors.first('report_slug') }}</div>
+				{% endif %}
+				<input type="hidden" id="report_slug" name="report_slug" style="width: 100%" value="{{ object.report_slug }}" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	$('input[type="submit"]').button();
+	$('#fixture_id').autocomplete({
+		minLength: 2,
+		source: function( request, response ) {
+			$.ajax({
+				url: IONIC_BASE_URL+'admin/matches/autocomplete_fixture',
+				type: 'POST',
+				dataType: 'json',
+				data: {
+					competition: $('#competition_id').val(),
+					season: $('#season_id').val(),
+					query: request.term
+				},
+				success: function( data ) {
+					response(data);
+				}
+			});
+		}
+	});
+
+	$('.timepicker').datetimepicker({
+		timeFormat: 'HH:mm:ss',
+		dateFormat: 'yy-mm-dd',
+		showSecond: true
+	});
+
+	$('#prematch_slug').select2({
+	    placeholder: 'Brak',
+	    allowClear: true,
+	    minimumInputLength: 2,
+	    ajax: {
+	    	url: IONIC_BASE_URL+'admin/matches/autocomplete_news',
+	        dataType: 'json',
+	        type: 'POST',
+	        data: function (term, page) {
+	            return {
+	                query: term, // search term
+	            };
+	        },
+	        results: function (data, page) {
+	            return {results: data};
+	        }
+	    },
+	    escapeMarkup: function(m) { return m; },
+	    dropdownCssClass: 'bigdrop', // apply css that makes the dropdown taller
+	    formatSearching: function() { return 'Wyszukiwanie ...'; },
+	    formatNoMatches: function() { return 'Nic nie znaleziono'; },
+	    formatInputTooShort: function(term, minLength) { return 'Wprowadź conajmniej '+minLength+' znaków'; },
+	    initSelection: function(element, callback) {
+			callback({id: $(element).val(), text: '{{ prematch }}'});
+		}
+	});
+
+	$('#report_slug').select2({
+	    placeholder: 'Brak',
+	    allowClear: true,
+	    minimumInputLength: 2,
+	    ajax: {
+	    	url: IONIC_BASE_URL+'admin/matches/autocomplete_news',
+	        dataType: 'json',
+	        type: 'POST',
+	        data: function (term, page) {
+	            return {
+	                query: term, // search term
+	            };
+	        },
+	        results: function (data, page) {
+	            return {results: data};
+	        }
+	    },
+	    escapeMarkup: function(m) { return m; },
+	    dropdownCssClass: 'bigdrop', // apply css that makes the dropdown taller
+	    formatSearching: function() { return 'Wyszukiwanie ...'; },
+	    formatNoMatches: function() { return 'Nic nie znaleziono'; },
+	    formatInputTooShort: function(term, minLength) { return 'Wprowadź conajmniej '+minLength+' znaków'; },
+	    initSelection: function(element, callback) {
+			callback({id: $(element).val(), text: '{{ report }}'});
+		}
+	});
+});
+</script>

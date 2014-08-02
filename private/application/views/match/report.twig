@@ -1,0 +1,77 @@
+<div class="ionic-box">
+	<h2>Raport pomeczowy: {{ match.home_name }} vs. {{ match.away_name }}</h2>
+	<div class="ionic-match-score">
+		<img src="{{ thumb('teams', match.home_image, '64x0') }}" alt="{{ match.home_name }}" />
+		<div>{{ match.score ? match.score : '-:-' }}</div>
+		<img src="{{ thumb('teams', match.away_image, '64x0') }}" alt="{{ match.away_name }}" />
+	</div>
+	{% if report_data %}
+	<div class="ionic-relation-details">
+		<div class="ionic-relation-home">
+			<h3>Pierwszy skład</h3>
+			{% for p in report_data.players.0 %}
+			{{ p }}<br />
+			{% endfor %}
+			<h3>Rezerwa</h3>
+			{% for p in report_data.players.1 %}
+			{{ p }}<br />
+			{% endfor %}
+			<h3>Gole</h3>
+			{% for g in report_data.goals.0 %}
+			{{ g.minute}}' {{ g.name }} {% if g.type == 'penalty' %}(rk.){% elseif g.type == 'suicide' %}(samobójczy){% endif %}<br />
+			{% endfor %}
+			<h3>Kartki</h3>
+			{% for c in report_data.cards.0 %}
+			{{ c.minute }}' {{ c.name }} - {% if c.type == 'yellow' %}żółta{% else %}czerwona{% endif %}<br />
+			{% endfor %}
+			<h3>Zmiany</h3>
+			{% for c in report_data.changes.0 %}
+			{{ c.minute }}' {{ c.name }} -&gt; {{ c.new_player }}<br />
+			{% endfor %}
+		</div>
+		<div class="ionic-relation-away">
+			<h3>Pierwszy skład</h3>
+			{% for p in report_data.players.2 %}
+			{{ p }}<br />
+			{% endfor %}
+			<h3>Rezerwa</h3>
+			{% for p in report_data.players.3 %}
+			{{ p }}<br />
+			{% endfor %}
+			<h3>Gole</h3>
+			{% for g in report_data.goals.1 %}
+			{{ g.minute}}' {{ g.name }} {% if g.type == 'penalty' %}(rk.){% elseif g.type == 'suicide' %}(samobójczy){% endif %}
+			{% endfor %}
+			<h3>Kartki</h3>
+			{% for c in report_data.cards.1 %}
+			{{ c.minute }}' {{ c.name }} - {% if c.type == 'yellow' %}żółta{% else %}czerwona{% endif %}<br />
+			{% endfor %}
+			<h3>Zmiany</h3>
+			{% for c in report_data.changes.1 %}
+			{{ c.minute }}' {{ c.name }} -&gt; {{ c.new_player }}<br />
+			{% endfor %}
+		</div>
+	</div>
+	{% endif %}
+</div>
+{% if news %}
+<div class="ionic-box">
+	<div style="font-size: 0.8em">
+		<div class="ionic-left">
+			Napisane {{ news.created_at|date }} przez <a href="{{ make('user', news.user_slug) }}">{{ news.display_name }}</a>
+		</div>
+		<div class="ionic-right">
+			<a href="news/format/{{ news.id }}/printable">Wersja do druku</a> / <a href="news/format/{{ news.id }}/pdf">Wersja PDF</a>
+		</div>
+	</div>
+	<div class="ionic-post-content">
+		{% if news.big_image %}
+		<img src="public/upload/images/{{ news.big_image }}" style="margin-right: 10px; float: left" alt="" />
+		{% elseif news.small_image %}
+		<img src="public/upload/images/{{ news.small_image }}" style="margin-right: 10px; float: left" alt="" />
+		{% endif %}
+		{{ news.content }}
+	</div>
+</div>
+{{ comments }}
+{% endif %}

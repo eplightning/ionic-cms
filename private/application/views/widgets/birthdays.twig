@@ -1,0 +1,16 @@
+<ul class="players">
+	{% for player in birthdays %}
+	<li>
+		<img src="{{ thumb('players', player.image, '100x0') }}" alt="Zawodnik" />
+		<div class="player-info">
+			<strong>{{ player.name }}</strong>
+		</div>
+		<div class="player-info">
+			<span>{{ player.date|date('short') }}</span>
+		</div>
+		<div class="player-info">
+			<span>{{ player.team_name }}</span>
+		</div>
+	</li>
+	{% endfor %}
+</ul>

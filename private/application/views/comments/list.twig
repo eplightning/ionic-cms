@@ -1,0 +1,46 @@
+{% for post in comments %}
+<div class="ionic-post" id="comment-id-{{ post.id }}">
+	<div class="ionic-post-left">
+		{% if post.user_id %}
+		<div class="ionic-post-username"><a href="{{ make('user', post.slug) }}">{{ post.display_name }}</a></div>
+		<div class="ionic-post-status">{% if online.is_online(post.user_id) %}Użytkownik jest online{% endif %}</div>
+		{% if post.avatar %}
+		<div class="ionic-post-avatar">
+			<img src="public/upload/avatars/{{ post.avatar }}" alt="" />
+		</div>
+		{% else %}
+		<div class="ionic-post-avatar">
+			<img src="http://www.gravatar.com/avatar/{{ post.email|md5 }}?s=80" alt="" />
+		</div>
+		{% endif %}
+		<ul class="ionic-list">
+			<li>Komentarzy: {{ post.comments_count }}</li>
+			<li>Newsów: {{ post.news_count }}</li>
+		</ul>
+		{% else %}
+		<div class="ionic-post-username"><a>{{ post.guest_name }}</a></div>
+		{% endif %}
+	</div>
+	<div class="ionic-post-right">
+		<div class="ionic-post-info">
+			<div class="ionic-left">
+			Dodano: {{ post.created_at|relativedate }} | Karma: <span id="post-karma-{{ post.id }}" style="color: {{ post.karma >= 0 ? 'green' : 'red' }}">{{ post.karma }}</span> {% if post.id not in used_karma %}<span id="post-karma-options-{{ post.id }}">( <a class="post-karma-add">[+]</a> / <a class="post-karma-minus">[-]</a> )</span>{% endif %}
+			</div>
+				{% if moderation %}
+				<div class="ionic-right">
+					<a href="comments/edit/{{ post.id }}" title="Edytuj"><img src="public/img/icons/page_edit.png" alt="" /></a>
+					<a class="ionic-post-delete" id="delete-post-{{ post.id }}" title="Usuń"><img src="public/img/icons/delete.png" alt="" /></a>
+					{% if not post.is_reported %}<a href="comments/report/{{ post.id }}" title="Zgłoś"><img src="public/img/icons/report.png" alt="" /></a>{% endif %}
+				</div>
+				{% elseif current_user and not post.is_reported %}
+				<div class="ionic-right">
+					<a href="comments/report/{{ post.id }}" title="Zgłoś"><img src="public/img/icons/report.png" alt="" /></a>
+				</div>
+				{% endif %}
+		</div>
+		<div class="ionic-post-content">
+			{{ post.comment }}
+		</div>
+	</div>
+</div>
+{% endfor %}

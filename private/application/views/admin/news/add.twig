@@ -1,0 +1,201 @@
+<h2>Dodawanie newsa</h2>
+<form action="admin/news/add" method="post">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Podstawowe</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="title">Tytuł<br /><small>Tytuł newsa</small></label>
+				<div class="right">
+				{% if errors.has('title') %}
+					<div class="error">{{ errors.first('title') }}</div>
+				{% endif %}
+				<input type="text" id="title" name="title" value="{{ old_data.title|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="source">Źródło<br /><small>Źródło newsa</small></label>
+				<div class="right">
+				{% if errors.has('source') %}
+					<div class="error">{{ errors.first('source') }}</div>
+				{% endif %}
+				<input type="text" id="source" name="source" value="{{ old_data.source|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="image_text">Podpis do obrazka<br /><small>Podpis do obrazka tego newsa</small></label>
+				<div class="right">
+				{% if errors.has('image_text') %}
+					<div class="error">{{ errors.first('image_text') }}</div>
+				{% endif %}
+				<input type="text" id="image_text" name="image_text" value="{{ old_data.image_text|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="enable_comments">Komentarze<br /><small>Włączyć komentarze do tego newsa?</small></label>
+				<div class="right">
+					<input type="checkbox" class="checkbox" id="enable_comments" name="enable_comments" value="1" checked="checked" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="created_at">Data publikacji<br /><small>Jeśli puste zostanie od razu opublikowany</small></label>
+				<div class="right">
+				{% if errors.has('publish_at') %}
+					<div class="error">{{ errors.first('publish_at') }}</div>
+				{% endif %}
+				<input class="timepicker" type="text" id="publish_at" name="publish_at" value="{% if old_data.publish_at != '' %}{{ old_data.publish_at|e }}{% endif %}" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Treść</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="news_content">Pełna treść<br /><small>Pełna treść newsa</small></label>
+				<div class="right">
+				{% if errors.has('news_content') %}
+					<div class="error">{{ errors.first('news_content') }}</div>
+				{% endif %}
+				{{ editor('news_content', old_data.news_content|e) }}
+				</div>
+			</div>
+			<div class="elem">
+				<label for="news_short">Skrócona treść<br /><small>Skrócona treść newsa. Jeśli pusta zostanie automatycznie pobrany pierwszy akapit newsa.</small></label>
+				<div class="right">
+				{% if errors.has('news_short') %}
+					<div class="error">{{ errors.first('news_short') }}</div>
+				{% endif %}
+				<textarea id="news_short" name="news_short" rows="10" cols="50">{{ old_data.news_short|e }}</textarea>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Obrazki/tagi</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="big_image">Duży obrazek<br /><a style="font-size: 0.8em; cursor: pointer" class="big-preview">(podgląd)</a></label>
+				<div class="right">
+				{% if errors.has('big_image') %}
+					<div class="error">{{ errors.first('big_image') }}</div>
+				{% endif %}
+				<select id="big_image" name="big_image">
+				{% for imgk, imgv in image_list %}
+				<option value="{{ imgk }}"{% if imgk == old_data.big_image %} selected="selected"{% endif %}>{{ imgv }}</option>
+				{% endfor %}
+				</select>
+				<div id="big-preview-container">
+					<div id="big-preview-container-close">[zamknij]</div>
+				</div>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="small_image">Mały obrazek<br /><a style="font-size: 0.8em; cursor: pointer" class="small-preview">(podgląd)</a></label>
+				<div class="right">
+				{% if errors.has('small_image') %}
+					<div class="error">{{ errors.first('small_image') }}</div>
+				{% endif %}
+				<select id="small_image" name="small_image">
+				{% for imgk, imgv in image_list %}
+				<option value="{{ imgk }}"{% if imgk == old_data.small_image %} selected="selected"{% endif %}>{{ imgv }}</option>
+				{% endfor %}
+				</select>
+				<div id="small-preview-container">
+					<div id="small-preview-container-close">[zamknij]</div>
+				</div>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="tags">Tagi</label>
+				<div class="right">
+				{% if errors.has('tags') %}
+					<div class="error">{{ errors.first('tags') }}</div>
+				{% endif %}
+				<select id="tags" name="tags[]" multiple="multiple">
+				{% for tagk, tagv in tags %}
+					<option value="{{ tagk }}">{{ tagv }}</option>
+				{% endfor %}
+				</select>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+var formsubmitted = false;
+
+function ionic_is_not_safe()
+{
+	if (tinymce != undefined)
+	{
+		return tinymce.get('news_content').getContent().length > 0;
+	}
+	else
+	{
+		return $('#news_content').text().length > 0;
+	}
+}
+
+window.onbeforeunload = function() { if (!formsubmitted && ionic_is_not_safe()) { return 'Zmiany nie zostały zapisane.'; } else { return null; } };
+
+$(function(){
+	$('input[type="submit"]').button().click(function() { formsubmitted = true });
+	$('.big-preview').click(function(){
+		if ($('#big-preview-container').css('display') != 'none')
+		{
+			$('#big-preview-container').slideUp('slow');
+			return;
+		}
+
+		var selected = $('#big_image option:selected').text();
+
+		if (selected != '-- Brak')
+		{
+			$('#big-preview-container img').remove();
+			$('#big-preview-container').append($('<img src="public/upload/images/'+selected+'" alt="" style="max-width: 200px; max-height: 200px" />')).slideDown('slow');
+		}
+	});
+	$('#big-preview-container-close').click(function(){
+		$('#big-preview-container').slideUp('slow');
+	});
+	$('#big_image').change(function(){
+		$('#big-preview-container').slideUp('slow');
+	});
+	$('.small-preview').click(function(){
+		if ($('#small-preview-container').css('display') != 'none')
+		{
+			$('#small-preview-container').slideUp('slow');
+			return;
+		}
+
+		var selected = $('#small_image option:selected').text();
+
+		if (selected != '-- Brak')
+		{
+			$('#small-preview-container img').remove();
+			$('#small-preview-container').append($('<img src="public/upload/images/'+selected+'" alt="" style="max-width: 200px; max-height: 200px" />')).slideDown('slow');
+		}
+	});
+	$('#small-preview-container-close').click(function(){
+		$('#small-preview-container').slideUp('slow');
+	});
+	$('#small_image').change(function(){
+		$('#small-preview-container').slideUp('slow');
+	});
+	$('.timepicker').datetimepicker({
+		timeFormat: 'HH:mm:ss',
+		dateFormat: 'yy-mm-dd',
+		showSecond: true
+	});
+});
+</script>

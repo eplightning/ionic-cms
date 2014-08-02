@@ -1,0 +1,58 @@
+<div class="ionic-box">
+	<h2>Lista użytkowników (znaleziono {{ users.total }})</h2>
+	<div class="ionic-notice">
+		<strong>Nazwa zaczyna się na:</strong>
+		{% if not letter %}
+		[wszystkie]&nbsp;
+		{% else %}
+		<a href="users/list">wszystkie</a>&nbsp;
+		{% endif %}
+		{% if letter == '9' %}
+		[0-9]&nbsp;
+		{% else %}
+		<a href="users/list/9">0-9</a>&nbsp;
+		{% endif %}
+		{% for l in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'w', 'x', 'y', 'z'] %}
+		{% if l == letter %}
+		[{{ l }}]&nbsp;
+		{% else %}
+		<a href="users/list/{{ l }}">{{ l }}</a>&nbsp;
+		{% endif %}
+		{% endfor %}
+	</div>
+	<table class="ionic-table">
+		<tr>
+			<th{% if sort[0] == 'display_name' %} class="active"{% endif %}>
+				<a href="{{ base_url }}?page={{ users.page }}&sort=display_name-{{ sort[1] == 'asc' ? 'desc' : 'asc' }}">Użytkownik</a>
+			</th>
+			<th{% if sort[0] == 'id' %} class="active"{% endif %}>
+				<a href="{{ base_url }}?page={{ users.page }}&sort=id-{{ sort[1] == 'asc' ? 'desc' : 'asc' }}">Data rejestracji</a>
+			</th>
+			<th{% if sort[0] == 'points' %} class="active"{% endif %}>
+				<a href="{{ base_url }}?page={{ users.page }}&sort=points-{{ sort[1] == 'asc' ? 'desc' : 'asc' }}">Pkt.</a>
+			</th>
+			<th{% if sort[0] == 'comments_count' %} class="active"{% endif %}>
+				<a href="{{ base_url }}?page={{ users.page }}&sort=comments_count-{{ sort[1] == 'asc' ? 'desc' : 'asc' }}">Kom.</a>
+			</th>
+			<th{% if sort[0] == 'news_count' %} class="active"{% endif %}>
+				<a href="{{ base_url }}?page={{ users.page }}&sort=news_count-{{ sort[1] == 'asc' ? 'desc' : 'asc' }}">Newsów</a>
+			</th>
+			<th>Opcje</th>
+		</tr>
+		{% for user in users.results %}
+		<tr>
+			<td>{{ user.display_name }}</td>
+			<td>{{ user.created_at|date }}</td>
+			<td class="centered">{{ user.points }}</td>
+			<td class="centered">{{ user.comments_count }}</td>
+			<td class="centered">{{ user.news_count }}</td>
+			<td class="centered" style="width: 60px">
+				<a href="{{ make('user', user.slug) }}" title="Pokaż profil"><img src="public/img/icons/users.png" alt="Profil" /></a>
+				<a href="users/email/{{ user.slug }}" title="Wyślij e-mail"><img src="public/img/icons/emails.png" alt="E-mail" /></a>
+				<a href="conversations/new/{{ user.id }}" title="Rozpocznij prywatną dyskusje"><img src="public/img/icons/comments.png" alt="PW" /></a>
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+	{{ users.links() }}
+</div>

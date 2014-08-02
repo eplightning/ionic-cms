@@ -1,0 +1,36 @@
+<div class="section">
+	<div class="theader">
+		<div class="theader2">
+			Ustawienia widżetu
+		</div>
+	</div>
+	<div class="section-content">
+		<form action="{{ action }}" method="post">
+			<div id="elements">
+				{% for item in options.items %}
+				<div class="elem" id="opt-{{ loop.index }}">
+					<textarea name="items[]" cols="50" rows="3">{{ item|e }}</textarea>
+				</div>
+				{% endfor %}
+			</div>
+			<div class="toolbar ui-widget-header ui-corner-all">
+				<a class="add-elem">Dodaj</a>
+				<a class="remove-elem">Usuń</a>
+			</div>
+			<div class="toolbar ui-widget-header ui-corner-all">
+				{{ form_token() }}
+				<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+			</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+$(function(){
+	$('.add-elem').button({icons: {primary: 'ui-icon-plus'}}).click(function(){
+		IonicAdmin.addOption('				<div class="elem" id="opt-optid"><textarea name="items[]" cols="50" rows="3"></textarea></div>');
+	});
+	$('.remove-elem').button({icons: {primary: 'ui-icon-trash'}}).click(function() {
+		IonicAdmin.deleteOption();
+	});
+});
+</script>

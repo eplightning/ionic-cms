@@ -1,0 +1,23 @@
+<h2 class="with-icon" style="background-image: url(public/img/admin/item/config.png)">Konfiguracja</h2>
+<div class="section">
+	<div class="theader">
+		<div class="theader2">Kategorie</div>
+	</div>
+	<table class="itable">
+		<tr>
+			<th style="width: 16px"></th>
+			<th>Kategoria</th>
+			<th style="width: 100px">Elementów</th>
+		</tr>
+		{% for category in categories %}
+		<tr>
+			<td><img src="public/img/admin/item/config.png" alt="" /></td>
+			<td>
+				<a href="admin/config/category/{{ category.id }}">{{ category.name }}</a>
+				<p style="color: #555; font-size: 0.8em">{{ category.description }}</p>
+			</td>
+			<td class="centered">{{ category.aggr }}</td>
+		</tr>
+		{% endfor %}
+	</table>
+</div>

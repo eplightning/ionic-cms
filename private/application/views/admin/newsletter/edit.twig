@@ -1,0 +1,60 @@
+<h2>Edycja newslettera</h2>
+<form action="admin/newsletter/edit/{{ object.id }}" method="post">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Dane</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="title">Tytuł<br /><small>Tytuł wiadomości</small></label>
+				<div class="right">
+				{% if errors.has('title') %}
+					<div class="error">{{ errors.first('title') }}</div>
+				{% endif %}
+				<input type="text" id="title" name="title" value="{% if old_data.title != '' %}{{ old_data.title|e }}{% else %}{{ object.title }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="message">Wiadomość<br /><small>Treść wiadomości</small></label>
+				<div class="right">
+				{% if errors.has('message') %}
+					<div class="error">{{ errors.first('message') }}</div>
+				{% endif %}
+				{% if old_data.message != '' %}
+					{{ editor('message', old_data.message|e) }}
+				{% else %}
+					{{ editor('message', object.message|e) }}
+				{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Inne</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="rebuild_list">Przebuduj liste<br /><small>Powoduje ,że lista e-maila lub użytkowników zostaje wygenerowana ponownie.</small></label>
+				<div class="right">
+				<input type="checkbox" class="checkbox" id="rebuild_list" name="rebuild_list" value="1" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="ignore_settings">Zignoruj ustawienia<br /><small>Tylko jeśli przebudowujesz liste</small></label>
+				<div class="right">
+				<input type="checkbox" class="checkbox" id="ignore_settings" name="ignore_settings" value="1" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	$('input[type="submit"]').button();
+});
+</script>

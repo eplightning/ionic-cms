@@ -1,0 +1,35 @@
+<div class="ionic-box">
+	<h2>Logowanie</h2>
+	<form action="login/index" method="post">
+	<div class="ionic-form">
+		<div class="ionic-form-legend">Dane logowania</div>
+		<div class="ionic-form-elem">
+			<label for="username">Login:</label>
+			<input type="text" name="username" id="username" value="{{ old.username|e }}" />
+		</div>
+		<div class="ionic-form-elem">
+			<label for="password">Hasło:</label>
+			<input type="password" name="password" id="password" />
+		</div>
+	</div>
+	<div class="ionic-form">
+		<div class="ionic-form-legend">Opcje</div>
+		<div class="ionic-form-elem">
+			<label for="remember">Zapamiętaj mnie:<br /><small>Zapamiętuje twoje dane do logowania przez tydzień.</small></label>
+			<input type="checkbox" class="checkbox" name="remember" id="remember" value="1" checked="checked" />
+		</div>
+		<div class="ionic-form-elem">
+			<label for="anonymous">Zaloguj anonimowo:<br /><small>Twój nick nie będzie pokazywany na liście osób online.</small></label>
+			<input type="checkbox" class="checkbox" name="anonymous" id="anonymous" value="1" />
+		</div>
+		<div class="ionic-form-elem">
+			{{ form_token() }}
+			<input type="submit" name="submit" class="submit" value="Zaloguj" />
+		</div>
+	</div>
+	</form>
+	<ul class="ionic-list">
+		<li><a href="login/password">Zapomniałeś hasła?</a></li>
+		<li><a href="register">Załóż nowe konto</a></li>
+	</ul>
+</div>

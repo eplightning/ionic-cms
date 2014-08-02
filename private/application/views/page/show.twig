@@ -1,0 +1,11 @@
+<div class="ionic-box">
+	<h2>{{ sub.title }}</h2>
+	{{ page_content }}
+	{% if sub.updated_at != '0000-00-00 00:00:00' %}
+	<div style="font-size: 0.8em; margin-bottom: 10px">
+		<div class="ionic-left">
+			Ostatnio zmodyfikowano: {{ sub.updated_at|relativedate }}
+		</div>
+	</div>
+	{% endif %}
+</div>

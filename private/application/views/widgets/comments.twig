@@ -1,0 +1,5 @@
+{% for comment in comments %}
+<p>
+	<a href="{{ comment.content_link }}#comment-id-{{ comment.id }}">{{ comment.comment|limit(30) }}</a><br /><small> przez {% if comment.user_id %}<a href="{{ make('user', comment.slug) }}">{{ comment.display_name }}</a>{% else %}{{ comment.guest_name }}{% endif %}</small>
+</p>
+{% endfor %}

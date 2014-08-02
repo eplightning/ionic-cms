@@ -1,0 +1,32 @@
+<div class="ionic-box">
+	<h2>Galeria: {{ cat.title }}</h2>
+	{% if subcategories|length > 0 %}
+	<div class="ionic-notice">
+		<strong>Podkategorie:</strong> 
+		{% for sub in subcategories %}{% if loop.index0 != 0 %}, {% endif %}
+<a href="gallery/category/{{ sub.slug }}">{{ sub.title }}</a>{% endfor %}
+	</div>
+	{% endif %}
+	<p>{{ cat.description }}</p>
+</div>
+<div class="ionic-box ionic-gallery">
+	{% if photos|length > 0 %}
+	{% for photo in photos %}
+	<a href="public/upload/photos/{{ photo.image }}" class="lightbox"><img src="{{ thumb('photos', photo.image, '0x90') }}" alt="{{ photo.title }}" title="{{ photo.title }}" /></a>
+	{% endfor %}
+	{% else %}
+	<p>Brak zdjęć w tej galerii</p>
+	{% endif %}
+</div>
+{{ comments }}
+<script type="text/javascript">
+$(document).ready(function(){
+	$('a.lightbox').lightBox({
+		imageLoading: IONIC_BASE_URL+'public/img/lightbox-ico-loading.gif',
+		imageBtnClose: IONIC_BASE_URL+'public/img/lightbox-btn-close.gif',
+		imageBtnPrev: IONIC_BASE_URL+'public/img/lightbox-btn-prev.gif',
+		imageBtnNext: IONIC_BASE_URL+'public/img/lightbox-btn-next.gif',
+		imageBlank: IONIC_BASE_URL+'public/img/lightbox-blank.gif'
+	});
+});
+</script>

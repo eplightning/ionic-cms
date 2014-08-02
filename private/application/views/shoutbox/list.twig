@@ -1,0 +1,10 @@
+{% for post in posts %}
+<li id="shoutbox-post-{{ post.id }}">
+	<span class="shoutbox-info">
+		{% if post.user_id %}<a href="{{ make('user', post.slug) }}">{{ post.display_name }}</a>{% else %}Gość{% endif %}; {{ post.created_at|relativedate }}
+	</span>
+	<p class="shoutbox-content">
+		{{ post.content }} {% if moderation %}<a class="shoutbox-delete" id="shoutbox-delete-{{ post.id }}">(usuń)</a>{% endif %}
+	</p>
+</li>
+{% endfor %}

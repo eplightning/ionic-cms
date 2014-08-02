@@ -1,0 +1,91 @@
+<div class="ionic-box">
+	<h2>Prywatne dyskusje</h2>
+	<div class="tab-view">
+		<ul class="tab-view-top">
+			<li id="tab-view-top-1" class="active"><a>Twoje</a></li>
+			<li id="tab-view-top-2"><a>Pozostałe</a></li>
+			{% if (not banned and count < limit) or unlimited %}<li id="tab-view-top-3"><a href="conversations/new">Utwórz nową</a></li>{% endif %}
+		</ul>
+		<div class="tab-view-content" id="tab-view-content-1">
+			{% if not unlimited %}
+			<div class="ionic-notice">
+				Dyskusji utworzonych przez Ciebie: {{ count }} / {{ limit }}
+			</div>
+			{% endif %}
+			<table class="ionic-table">
+				<tr>
+					<th>Dyskusja</th>
+					<th style="width: 64px">Postów</th>
+					<th style="width: 200px">Ostatni post</th>
+				</tr>
+				{% for topic in yours %}
+				<tr>
+					<td>
+						<a href="conversations/show/{{ topic.id }}">{{ topic.title }}</a> {% if topic.is_closed %}(zamknięte){% endif %}
+						<br />
+						<small>Utworzone dnia {{ topic.created_at|date }}</small>
+					</td>
+					<td class="centered">
+						{{ topic.messages_count }}
+					</td>
+					<td>
+						{% if topic.last_post_user %}
+						przez <a href="conversations/show/{{ topic.id }}">{{ topic.last_post_user }}</a>
+						<br />
+						<small>napisany {{ topic.last_post_date|relativedate }}</small>
+						{% endif %}
+					</td>
+				</tr>
+				{% endfor %}
+			</table>
+		</div>
+		<div class="tab-view-content" id="tab-view-content-2" style="display: none">
+			<table class="ionic-table">
+				<tr>
+					<th>Dyskusja</th>
+					<th style="width: 64px">Postów</th>
+					<th style="width: 200px">Ostatni post</th>
+				</tr>
+				{% for topic in invited.results %}
+				<tr>
+					<td>
+						<a href="conversations/show/{{ topic.id }}">{{ topic.title }}</a> {% if topic.is_closed %}(zamknięte){% endif %}
+						<br />
+						<small>Utworzone dnia {{ topic.created_at|date }} przez <a href="{{ make('user', topic.slug) }}">{{ topic.display_name }}</a></small>
+					</td>
+					<td class="centered">
+						{{ topic.messages_count }}
+					</td>
+					<td>
+						{% if topic.last_post_user %}
+						przez <a href="conversations/show/{{ topic.id }}">{{ topic.last_post_user }}</a>
+						<br />
+						<small>napisany {{ topic.last_post_date|relativedate }}</small>
+						{% endif %}
+					</td>
+				</tr>
+				{% endfor %}
+			</table>
+			{{ invited.links() }}
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+$(function() {
+var in_progress = false;
+
+$('#tab-view-top-1, #tab-view-top-2').click(function() {
+	if ($(this).hasClass('active') || in_progress) return;
+	in_progress = true;
+
+	var active = $('.tab-view-top .active').prop('id').replace('tab-view-top-', '');
+	var number = $(this).prop('id').replace('tab-view-top-', '');
+
+	$('#tab-view-content-'+active).slideUp('fast', function() {
+		$('#tab-view-top-'+active).removeClass('active');
+		$('#tab-view-top-'+number).addClass('active');
+		$('#tab-view-content-'+number).slideDown('fast', function() { in_progress = false });
+	});
+});
+});
+</script>

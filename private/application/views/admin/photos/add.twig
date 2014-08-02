@@ -1,0 +1,67 @@
+<h2>Dodawanie zdjęć</h2>
+<form action="admin/photos/add" method="post" enctype="multipart/form-data">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Kategoria</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="category_id">Kategoria<br /><small>Kategoria galerii</small></label>
+				<div class="right">
+					<select name="category_id" id="category_id">
+					{% for k, v in categories %}
+					<option value="{{ k }}"{% if current_cat and k == current_cat %} selected="selected"{% endif %}>{{ v }}</option>
+					{% endfor %}
+					</select>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Zdjęcia - Wiele naraz</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label>Zdjęcia:<br /><small>Wymagana jest przeglądarka obsługująca HTML5. Jeśli Twoja go nie obsługuje, skorzystaj z formularza ponizej. Maksymalnie {{ max_file_uploads }} plików jednocześnie.</small></label>
+				<div class="right">
+					<input type="file" name="photos-multi[]" multiple />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Zdjęcia</div>
+		</div>
+		<div class="section-content">
+			<div id="elements">
+				<div class="elem" id="opt-1">
+					<label>Zdjęcie #1:</label>
+					<div class="right">
+						<input type="file" name="photos-1" />
+					</div>
+				</div>
+			</div>
+			<div class="toolbar ui-widget-header ui-corner-all">
+				<a class="add-elem">Dodaj</a>
+				<a class="remove-elem">Usuń</a>
+			</div>
+		</div>
+	</div>
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	$('input[type="submit"]').button();
+	$('.add-elem').button({icons: {primary: 'ui-icon-plus'}}).click(function(){
+		IonicAdmin.addOption('<div class="elem" id="opt-optid"><label>Zdjęcie #optid:</label><div class="right"><input type="file" name="photos-optid" /></div></div>');
+	});
+	$('.remove-elem').button({icons: {primary: 'ui-icon-trash'}}).click(function() {
+		IonicAdmin.deleteOption();
+	});
+});
+</script>

@@ -1,0 +1,6 @@
+{% for file in files %}
+<div class="file">
+	<img src="{{ thumb('files', file.image, '250x120') }}" alt="" />
+	<a href="files/show/{{ file.slug }}">{{ file.title }}</a>
+</div>
+{% endfor %}

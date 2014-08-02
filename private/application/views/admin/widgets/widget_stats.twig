@@ -1,0 +1,60 @@
+<div class="section">
+	<div class="theader">
+		<div class="theader2">
+			Ustawienia widżetu
+		</div>
+	</div>
+	<div class="section-content">
+		<form action="{{ action }}" method="post">
+			<div class="elem">
+				<label for="season">Sezon:</label>
+				<div class="right">
+					<select name="season" id="season">
+					{% for k,v in seasons %}
+					<option value="{{ k }}"{% if k == options.season %} selected="selected"{% endif %}>{{ v }}</option>
+					{% endfor %}
+					</select>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="competition">Rozgrywki:</label>
+				<div class="right">
+					<select name="competition" id="competition">
+					{% for c in competitions %}
+					<option value="{{ c.id }}"{% if c.id == options.competition %} selected="selected"{% endif %}>{{ c.name }}</option>
+					{% endfor %}
+					</select>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="limit">Limit zawodników:</label>
+				<div class="right">
+					<input type="text" name="limit" id="limit" value="{{ options.limit }}" maxlength="10" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="sort">Sortuj według:</label>
+				<div class="right">
+					<select name="sort" id="sort">
+						<option value="goals"{% if options.sort == 'goals' %} selected="selected"{% endif %}>Bramek</option>
+						<option value="red_cards"{% if options.sort == 'red_cards' %} selected="selected"{% endif %}>Czerwonych kartek</option>
+						<option value="yellow_cards"{% if options.sort == 'yellow_cards' %} selected="selected"{% endif %}>Żółtych kartek</option>
+						<option value="assists"{% if options.sort == 'assists' %} selected="selected"{% endif %}>Asyst</option>
+						<option value="matches"{% if options.sort == 'matches' %} selected="selected"{% endif %}>Występów</option>
+                        <option value="minutes"{% if options.sort == 'minutes' %} selected="selected"{% endif %}>Minut</option>
+					</select>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="template">Plik wyglądu:<br /><small>Plik znajdujący się w katalogu private/application/views. Zamiast slashów użyj kropek, nie dodawaj rozszerzenia</small></label>
+				<div class="right">
+					<input type="text" name="template" id="template" value="{{ options.template }}" />
+				</div>
+			</div>
+			<div class="toolbar ui-widget-header ui-corner-all">
+				{{ form_token() }}
+				<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+			</div>
+		</form>
+	</div>
+</div>

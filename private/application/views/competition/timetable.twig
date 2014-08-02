@@ -1,0 +1,52 @@
+<div class="ionic-box">
+	<h2>Terminarz - {{ competition.name }} - {{ season.year }} / {{ season.year+1 }}</h2>
+	{% for fixture in matches %}
+	<h3>{{ fixture.name }}</h3>
+	<table class="ionic-table">
+		<tr>
+			<th>Mecz</th>
+			<th style="width: 150px">Data</th>
+			<th style="width: 60px">Wynik</th>
+		</tr>
+		{% for match in fixture.matches %}
+		<tr>
+			<td>
+				<a href="match/show/{{ match.slug }}">{{ match.home_name }} vs. {{ match.away_name }}</a>
+			</td>
+			<td class="centered">
+				{{ match.date|date }}
+			</td>
+			<td class="centered">
+				{{ match.score }}
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+	{% endfor %}
+	<div class="ionic-form">
+		<form action="competition/timetable/{{ competition.slug }}/{{ season.year }}" method="post">
+			<div class="ionic-form-legend">Filtrowanie</div>
+			<div class="ionic-form-elem">
+				<label for="fixture">Kolejka:</label>
+				<select name="fixture" id="fixture">
+					<option value="0"{% if filters.fixture == 0 %} selected="selected"{% endif %}>Wszystkie</option>
+					{% for id, name in fixtures %}
+					<option value="{{ id }}"{% if filters.fixture == id %} selected="selected"{% endif %}>{{ name }}</option>
+					{% endfor %}
+				</select>
+			</div>
+			<div class="ionic-form-elem">
+				<label for="team">Klub:</label>
+				<select name="team" id="team">
+					<option value="0"{% if filters.team == 0 %} selected="selected"{% endif %}>Wszystkie</option>
+					{% for id, name in teams %}
+					<option value="{{ id }}"{% if filters.team == id %} selected="selected"{% endif %}>{{ name }}</option>
+					{% endfor %}
+				</select>
+			</div>
+			<div class="ionic-form-elem">
+				<input type="submit" name="submit" class="submit" value="Zastosuj" />
+			</div>
+		</form>
+	</div>
+</div>

@@ -1,0 +1,28 @@
+<div class="ionic-box">
+	<h2>{{ pick.title }}</h2>
+	<div style="font-size: 0.8em">
+		Utworzono: {{ pick.created_at|date }} ; Głosów: {{ pick.votes }}{% if pick.expires %} ; Wygasa: {{ pick.expires|date }}{% endif %}
+	</div>
+	{% if pick.can_vote() %}
+	<p>Oceń zawodników w skali 1-10</p>
+	<form action="matchpick/vote" method="post">
+		{% for k, opt in pick.options %}
+		<div style="margin: 5px; padding: 5px">
+			<input type="text" maxlength="2" name="options[{{ k }}]" value="5" style="width: 20px" /><label> - {{ opt.name }}</label>
+		</div>
+		{% endfor %}
+		<div style="margin: 5px; padding: 5px">
+			{{ form_token() }}
+			<input type="submit" name="submit" value="Głosuj" />
+		</div>
+	</form>
+	{% else %}
+	<ul class="ionic-list">
+		{% for opt in pick.options %}
+		<li>
+			<span class="title">{{ opt.name }}:</span> {{ opt.rating|number_format(2, ',', ' ') }}
+		</li>
+		{% endfor %}
+	</ul>
+	{% endif %}
+</div>

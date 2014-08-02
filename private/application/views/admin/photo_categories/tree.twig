@@ -1,0 +1,5 @@
+{% for item in menu %}
+<li id="menu-{{ item.data.id }}"{% if item.has_children %} class="jstree-closed"{% endif %}><a>{{ item.data.title }}</a>
+	{% if item.has_children %}<ul></ul>{% endif %}
+</li>
+{% endfor %}

@@ -1,0 +1,178 @@
+<div class="ionic-box">
+	<h2>{{ conversation.title }}</h2>
+	<div style="font-size: 0.8em">
+		<div class="ionic-left">
+			Dodano {{ conversation.created_at|date }} - status: {% if conversation.is_closed %}zamknięta{% else %}otwarta{% endif %}
+		</div>
+		<div class="ionic-right">
+			<a href="conversations/status/{{ conversation.id }}" title="Zablokuj/odblokuj"><img src="public/img/icons/tag.png" alt="" /></a>
+			<a href="conversations/delete/{{ conversation.id }}" title="Usuń"><img src="public/img/icons/delete.png" alt="" /></a>
+		</div>
+	</div>
+</div>
+<div class="ionic-box">
+	<div class="tab-view">
+		<ul class="tab-view-top">
+			<li id="tab-view-top-1" class="active"><a>Posty</a></li>
+			<li id="tab-view-top-2"><a>Uczestnicy dyskusji</a></li>
+			{% if not banned and not conversation.is_closed %}<li id="tab-view-top-3"><a>Napisz odpowiedź</a></li>{% endif %}
+		</ul>
+	</div>
+	<div class="tab-view-content" id="tab-view-content-1">
+	{% for post in posts.results %}
+	<div class="ionic-post">
+		<div class="ionic-post-left">
+			<div class="ionic-post-username"><a href="{{ make('user', post.slug) }}">{{ post.display_name }}</a></div>
+			<div class="ionic-post-status">{% if online.is_online(post.user_id) %}Użytkownik jest online{% endif %}</div>
+			{% if post.avatar %}
+			<div class="ionic-post-avatar">
+				<img src="public/upload/avatars/{{ post.avatar }}" alt="" />
+			</div>
+			{% endif %}
+			<ul class="ionic-list">
+				<li>Komentarzy: {{ post.comments_count }}</li>
+				<li>Newsów: {{ post.news_count }}</li>
+			</ul>
+		</div>
+		<div class="ionic-post-right">
+			<div class="ionic-post-info">
+				<div class="ionic-left">
+				Dodano: {{ post.created_at|relativedate }}
+				</div>
+				<div class="ionic-right">
+					{% if post.is_reported %}
+					Post już zgłoszony
+					{% else %}
+					<a href="conversations/report/{{ post.id }}" title="Zgłoś"><img src="public/img/icons/report.png" alt="" /></a>
+					{% endif %}
+				</div>
+			</div>
+			<div class="ionic-post-content">
+				{{ post.message }}
+			</div>
+		</div>
+	</div>
+	{% endfor %}
+	{{ posts.links() }}
+	</div>
+	<div class="tab-view-content" id="tab-view-content-2" style="display: none">
+		<ul class="ionic-list">
+			{% for part in users %}
+			<li>
+				<a href="{{ make('user', part.slug) }}">{{ part.display_name }}</a> <a class="ionic-delete-user" id="ionic-delete-user-{{ part.id }}" title="Usuń z dyskusji"><img src="public/img/icons/delete.png" alt="" /></a>
+			</li>
+			{% endfor %}
+		</ul>
+		<form action="conversations/edit_add/{{ conversation.id }}" method="post">
+			<div class="ionic-form">
+			<div class="ionic-form-legend">Dodaj uczestnika</div>
+			<div class="ionic-form-elem">
+				<label for="display_name">Nazwa użytkownika:</label>
+				<input type="text" name="display_name" id="display_name" maxlength="20" />
+			</div>
+			<div class="ionic-form-elem">
+				{{ form_token() }}
+				<input type="submit" name="submit" class="submit" value="Dodaj" />
+			</div>
+			</div>
+		</form>
+	</div>
+	{% if not banned and not conversation.is_closed %}
+	<div class="tab-view-content" id="tab-view-content-3" style="display: none">
+	<form action="conversations/reply/{{ conversation.id }}" method="post">
+		<div class="ionic-form">
+			<div class="ionic-form-legend">Odpowiedź</div>
+			<div class="ionic-form-elem">
+				<textarea id="bbcode" name="message" style="width: 100%">{{ old.message|e }}</textarea>
+			</div>
+			<div class="ionic-form-elem">
+				{{ form_token() }}
+				<input type="submit" name="submit" class="submit" value="Wyślij" />
+			</div>
+		</div>
+		</form>
+	</div>
+	{% endif %}
+</div>
+<script type="text/javascript">
+$(function() {
+var in_progress = false;
+
+$('.tab-view-top li').click(function() {
+	if ($(this).hasClass('active') || in_progress) return;
+	in_progress = true;
+
+	var active = $('.tab-view-top .active').prop('id').replace('tab-view-top-', '');
+	var number = $(this).prop('id').replace('tab-view-top-', '');
+
+	$('#tab-view-content-'+active).slideUp('fast', function() {
+		$('#tab-view-top-'+active).removeClass('active');
+		$('#tab-view-top-'+number).addClass('active');
+		$('#tab-view-content-'+number).slideDown('fast', function() { in_progress = false });
+	});
+});
+
+$('.ionic-delete-user').click(function() {
+	var id = $(this).prop('id').replace('ionic-delete-user-', '');
+	var parent = $(this).parent();
+	$.post(IONIC_BASE_URL+'conversations/edit_delete/{{ conversation.id }}', {user_id: id, csrf_token: IonicPage.csrfToken}, function(response) {
+		if (response.status)
+		{
+			parent.slideUp('slow', function() { $(this).remove(); });
+		}
+	}, 'json');
+});
+
+$('input#display_name').autocomplete({
+	minLength: 2,
+	source: IONIC_BASE_URL+"conversations/autocomplete"
+});
+
+{% if not banned and not conversation.is_closed %}
+$('#bbcode').markItUp({
+    nameSpace:          'bbcode', // Useful to prevent multi-instances CSS conflict
+    onShiftEnter:       {keepDefault:false, openWith:'\n\n'},
+    markupSet: [
+        {name:'Pogrubienie', key:'B', openWith:'[b]', closeWith:'[/b]'},
+        {name:'Kursywa', key:'I', openWith:'[i]', closeWith:'[/i]'},
+        {name:'Podkreślenie', key:'I', openWith:'[u]', closeWith:'[/u]'},
+        {name:'Przekreślenie', key:'S', openWith:'[s]', closeWith:'[/s]'},
+        {separator:'---------------' },
+        {name:'Subscript', openWith:'[sub]', closeWith:'[/sub]'},
+        {name:'Superscript', openWith:'[sup]', closeWith:'[/sup]'},
+        {name:'Do lewej', openWith:'[left]', closeWith:'[/left]'},
+        {name:'Do środka', openWith:'[center]', closeWith:'[/center]'},
+        {name:'Do prawej', openWith:'[right]', closeWith:'[/right]'},
+        {separator:'---------------' },
+        {name:'Wypunktowana lista', openWith:'[list]\n', closeWith:'\n[/list]'},
+        {name:'Numeryczna lista', openWith:'[list=[![Początkowa liczba]!]]\n', closeWith:'\n[/list]'},
+        {name:'Punkt listy', openWith:'[*] '},
+        {separator:'---------------' },
+        {name:'Kolor', openWith:'[color=[![Kolor]!]]', closeWith:'[/color]', dropMenu: [
+            {name:'Żółty', openWith:'[color=yellow]', closeWith:'[/color]', className:"col1-1" },
+            {name:'Pomarańczowy', openWith:'[color=orange]', closeWith:'[/color]', className:"col1-2" },
+            {name:'Czerwony', openWith:'[color=red]', closeWith:'[/color]', className:"col1-3" },
+            {name:'Niebieski', openWith:'[color=blue]', closeWith:'[/color]', className:"col2-1" },
+            {name:'Purpurowy', openWith:'[color=purple]', closeWith:'[/color]', className:"col2-2" },
+            {name:'Zielony', openWith:'[color=green]', closeWith:'[/color]', className:"col2-3" },
+            {name:'Biały', openWith:'[color=white]', closeWith:'[/color]', className:"col3-1" },
+            {name:'Szary', openWith:'[color=gray]', closeWith:'[/color]', className:"col3-2" },
+            {name:'Czarny', openWith:'[color=black]', closeWith:'[/color]', className:"col3-3" }
+        ]},
+        {name:'Rozmiar', openWith:'[size=[![Text size]!]]', closeWith:'[/size]', dropMenu :[
+            {name:'Duży', openWith:'[size=5]', closeWith:'[/size]' },
+            {name:'Normalny', openWith:'[size=3]', closeWith:'[/size]' },
+            {name:'Mały', openWith:'[size=2]', closeWith:'[/size]' }
+        ]},
+        {separator:'---------------' },
+        {name:'Zdjęcie', key:"P", replaceWith:'[img][![Url:!:http://]!][/img]'},
+        {name:'Link', key:"L", openWith:'[url=', closeWith:'[![Tytuł]!]][![Url:!:http://]!][/url]'},
+        {separator:'---------------'},
+        {name:'Cytat', openWith:'[quote]', closeWith: '[/quote]'},
+        {name:'Kod', openWith:'[code]', closeWith:'[/code]'}
+    ]
+});
+{% endif %}
+});
+
+</script>

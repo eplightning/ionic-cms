@@ -1,0 +1,16 @@
+<h2>Wyniki</h2>
+<div class="section">
+	<div class="theader">
+		<div class="theader2">Wyniki</div>
+	</div>
+	<div class="section-content">
+		{% for opt in options %}
+		<div class="elem">
+			<label>{{ opt.name }}</label>
+			<div class="right">
+				{{ opt.rating }} (głosów: {{ opt.votes }})
+			</div>
+		</div>
+		{% endfor %}
+	</div>
+</div>

@@ -1,0 +1,14 @@
+<table class="ionic-table">
+	<tr>
+		<th></th>
+		<th>Zawodnik</th>
+		<th>Goli</th>
+	</tr>
+	{% for player in stats %}
+	<tr>
+		<td class="centered"><img src="{{ thumb('teams', player.team_image, '16x0') }}" alt="" /></td>
+		<td>{{ player.name }}</td>
+		<td>{{ player.goals }}</td>
+	</tr>
+	{% endfor %}
+</table>

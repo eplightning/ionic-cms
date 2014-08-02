@@ -1,0 +1,71 @@
+<h2>Edycja pola</h2>
+<form action="admin/fields/edit/{{ object.id }}" method="post">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Dane</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="title">Tytuł<br /><small>Tytuł pola</small></label>
+				<div class="right">
+				{% if errors.has('title') %}
+					<div class="error">{{ errors.first('title') }}</div>
+				{% endif %}
+				<input type="text" id="title" name="title" value="{% if old_data.title != '' %}{{ old_data.title|e }}{% else %}{{ object.title }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="description">Opis<br /><small>Opis pola</small></label>
+				<div class="right">
+				{% if errors.has('description') %}
+					<div class="error">{{ errors.first('description') }}</div>
+				{% endif %}
+				<textarea id="description" name="description" rows="10" cols="50">{% if old_data.description != '' %}{{ old_data.description|e }}{% else %}{{ object.description }}{% endif %}</textarea>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="type">Typ<br /><small>Typ pola</small></label>
+				<div class="right">
+				{% if errors.has('type') %}
+					<div class="error">{{ errors.first('type') }}</div>
+				{% endif %}
+				<select id="type" name="type">
+					<option value="text"{% if (old_data.type == 'text') or (object.type == 'text' and old_data.type == '') %} selected="selected"{% endif %}>Pole tekstowe</option>
+					<option value="number"{% if (old_data.type == 'number') or (object.type == 'number' and old_data.type == '') %} selected="selected"{% endif %}>Liczba</option>
+					<option value="textarea"{% if (old_data.type == 'textarea') or (object.type == 'textarea' and old_data.type == '') %} selected="selected"{% endif %}>Duże pole tekstowe</option>
+					<option value="select"{% if (old_data.type == 'select') or (object.type == 'select' and old_data.type == '') %} selected="selected"{% endif %}>Pole rozwijane</option>
+					<option value="checkbox"{% if (old_data.type == 'checkbox') or (object.type == 'checkbox' and old_data.type == '') %} selected="selected"{% endif %}>Pole wyboru</option>
+					<option value="date"{% if (old_data.type == 'date') or (object.type == 'date' and old_data.type == '') %} selected="selected"{% endif %}>Data</option>
+				</select>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="default">Domyślna wartość<br /><small>Domyślna wartość tego pola. W przypadku pola wyboru podaj wartość &quot;yes&quot; ,aby pole było domyślnie zaznaczone</small></label>
+				<div class="right">
+				{% if errors.has('default') %}
+					<div class="error">{{ errors.first('default') }}</div>
+				{% endif %}
+				<input type="text" id="default" name="default" value="{% if old_data.default != '' %}{{ old_data.default|e }}{% else %}{{ object.default }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="options">Opcje<br /><small>W przypadku pola rozwijanego podaj opcje w formacie: identyfikator=Wartość pola (jedno na linie)</small></label>
+				<div class="right">
+				{% if errors.has('options') %}
+					<div class="error">{{ errors.first('options') }}</div>
+				{% endif %}
+				<textarea id="options" name="options" rows="10" cols="50">{% if old_data.options != '' %}{{ old_data.options|e }}{% else %}{{ options }}{% endif %}</textarea>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	$('input[type="submit"]').button();
+});
+</script>

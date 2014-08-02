@@ -1,0 +1,56 @@
+<div class="section">
+	<div class="theader">
+		<div class="theader2">
+			Ustawienia widżetu
+		</div>
+	</div>
+	<div class="section-content">
+		<form action="{{ action }}" method="post">
+			<div class="elem">
+				<label for="template">Plik wyglądu:<br /><small>Plik znajdujący się w katalogu private/application/views. Zamiast slashów użyj kropek, nie dodawaj rozszerzenia</small></label>
+				<div class="right">
+					<input type="text" name="template" id="template" value="{{ options.template }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="id">ID:<br /><small>Jeśli używasz pare widżetów tego typu ID musi być unikalne.</small></label>
+				<div class="right">
+					<input type="text" name="id" id="id" value="{{ options.id }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label>Buttony: [Tytuł], [Link], [Link do obrazka]</label>
+			</div>
+			<div id="elements">
+				{% for but in options.buttons %}
+				<div class="elem" id="opt-{{ loop.index }}">
+					<img style="vertical-align: text-top; margin: auto 10px" src="public/img/icons/tag.png" alt="" />
+					<input type="text" name="buttons[{{ loop.index }}][title]" value="{{ but.title }}" style="width: 30%" />
+								<input type="text" name="buttons[{{ loop.index }}][link]" value="{{ but.link }}" style="width: 30%" />
+								<input type="text" name="buttons[{{ loop.index }}][image]" value="{{ but.image }}" style="width: 30%" />
+				</div>
+				{% endfor %}
+			</div>
+			<div class="toolbar ui-widget-header ui-corner-all">
+				<a class="add-elem">Dodaj</a>
+				<a class="remove-elem">Usuń</a>
+			</div>
+			<div class="toolbar ui-widget-header ui-corner-all">
+				{{ form_token() }}
+				<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+			</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+$(function(){
+	IonicAdmin.setOptionsCount({{ options.buttons|length }});
+	$('.add-elem').button({icons: {primary: 'ui-icon-plus'}}).click(function(){
+		IonicAdmin.addOption('				<div class="elem" id="opt-optid"><img style="vertical-align: text-top; margin: auto 10px" src="public/img/icons/tag.png" alt="" /><input type="text" style="width: 30%" name="buttons[optid][title]" value="" />								<input style="width: 30%" type="text" name="buttons[optid][link]" value="" />								<input type="text" style="width: 30%" name="buttons[optid][image]" value="" /></div>');
+	});
+	$('.remove-elem').button({icons: {primary: 'ui-icon-trash'}}).click(function() {
+		IonicAdmin.deleteOption();
+	});
+	$('#elements').sortable();
+});
+</script>

@@ -1,0 +1,35 @@
+<div class="ionic-box">
+	<h2>Mecz: {{ match.home_name }} vs. {{ match.away_name }}</h2>
+	<div class="ionic-match-score">
+		<img src="{{ thumb('teams', match.home_image, '64x0') }}" alt="{{ match.home_name }}" />
+		<div>{{ match.score ? match.score : '-:-' }}</div>
+		<img src="{{ thumb('teams', match.away_image, '64x0') }}" alt="{{ match.away_name }}" />
+	</div>
+	<ul class="ionic-list">
+		<li><span class="title">Rozgrywki: </span>{{ match.competition_name }}</li>
+		<li><span class="title">Sezon: </span>{{ match.season_year }} / {{ match.season_year + 1 }}</li>
+		<li><span class="title">Kolejka: </span>{{ match.fixture_name }}</li>
+		<li><span class="title">Data meczu: </span>{{ match.date|date }}</li>
+		<li><span class="title">Stadion: </span>{{ match.stadium ? match.stadium : 'b\d' }}</li>
+		<li><span class="title">Zapowiedź: </span>{% if match.prematch_slug %}<a href="{{ make('news', match.prematch_slug, '') }}">Dostępna</a>{% else %}Brak{% endif %}</li>
+		<li><span class="title">Raport pomeczowy: </span>{% if match.report_data %}<a href="match/report/{{ match.slug }}">Dostępny</a>{% else %}Brak{% endif %}</li>
+	</ul>
+	{% if match.description %}
+	<h3>Opis</h3>
+	<div class="ionic-box">
+		{{ match.description }}
+	</div>
+	{% endif %}
+	{% if history|length > 0 %}
+	<h3>Inne mecze pomiędzy tymi klubami</h3>
+	<ul class="ionic-list">
+		{% for m in history %}
+		<li>
+			<a href="match/show/{{ m.slug }}">{{ m.home_name }} {{ m.score }} {{ m.away_name }}</a>
+			<br />
+			<small>{{ m.competition_name }} {{ m.season_year }} / {{ m.season_year + 1}} - {{ m.fixture_name }} (Data: {{ m.date|date }})</small>
+		</li>
+		{% endfor %}
+	</ul>
+	{% endif %}
+</div>

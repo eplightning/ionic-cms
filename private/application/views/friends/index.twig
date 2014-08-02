@@ -1,0 +1,102 @@
+<div class="ionic-box">
+	<h2>Lista znajomych</h2>
+	<div class="tab-view">
+		<ul class="tab-view-top">
+			<li id="tab-view-top-1" class="active"><a>Lista</a></li>
+			<li id="tab-view-top-2"><a>Zaproszenia</a></li>
+			<li id="tab-view-top-3"><a>Wyślij zaproszenie</a></li>
+		</ul>
+		<div class="tab-view-content" id="tab-view-content-1">
+			{% if friends|length > 0 %}
+			<ul class="ionic-list">
+				{% for friend in friends %}
+				<li>
+					<a href="{{ make('user', friend.slug) }}">{{ friend.display_name }}</a><br />
+					<small>
+						<a href="conversations/new/{{ friend.id }}">Rozpocznij prywatną dyskusje</a> | <a href="friends/delete/{{ friend.id }}">Usuń z listy</a>
+					</small>
+				</li>
+				{% endfor %}
+			</ul>
+			{% else %}
+			<p>Obecnie nie masz dodanych żadnych znajomych na liście.</p>
+			{% endif %}
+		</div>
+		<div class="tab-view-content" id="tab-view-content-2" style="display: none">
+			<div class="ionic-block">
+				<div class="ionic-block-title">Wysłane zaproszenia</div>
+				<div class="ionic-block-content">
+				{% if (requests.sent)|length > 0 %}
+				<ul class="ionic-list">
+					{% for friend in requests.sent %}
+					<li>
+						<a href="{{ make('user', friend.slug) }}">{{ friend.display_name }}</a>
+					</li>
+					{% endfor %}
+				</ul>
+				{% else %}
+				<p>Nic do wyświetlenia</p>
+				{% endif %}
+				</div>
+			</div>
+			<div class="ionic-block">
+				<div class="ionic-block-title">Odebrane zaproszenia</div>
+				<div class="ionic-block-content">
+				{% if (requests.invites)|length > 0 %}
+				<ul class="ionic-list">
+					{% for friend in requests.invites %}
+					<li>
+						<a href="{{ make('user', friend.slug) }}">{{ friend.display_name }}</a><br />
+						<small>
+							<a href="friends/accept/{{ friend.id }}">Akceptuj</a> | <a href="friends/decline/{{ friend.id }}">Odrzuć</a>
+						</small>
+					</li>
+					{% endfor %}
+				</ul>
+				{% else %}
+				<p>Nic do wyświetlenia</p>
+				{% endif %}
+				</div>
+			</div>
+		</div>
+		<div class="tab-view-content" id="tab-view-content-3" style="display: none">
+		<form action="friends/invite" method="post">
+		<div class="ionic-form">
+			<div class="ionic-form-legend">Zaproś użytkownika</div>
+			<div class="ionic-form-elem">
+				<label for="user">Nazwa użytkownika:<br /><small>Nazwa użytkownika do zaproszenia</small></label>
+				<input type="text" name="user" id="user" />
+			</div>
+			<div class="ionic-form-elem">
+				{{ form_token() }}
+				<input type="submit" name="submit" class="submit" value="Zaproś" />
+			</div>
+		</div>
+		</form>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+$(function() {
+var in_progress = false;
+
+$('.tab-view-top li').click(function() {
+	if ($(this).hasClass('active') || in_progress) return;
+	in_progress = true;
+
+	var active = $('.tab-view-top .active').prop('id').replace('tab-view-top-', '');
+	var number = $(this).prop('id').replace('tab-view-top-', '');
+
+	$('#tab-view-content-'+active).slideUp('fast', function() {
+		$('#tab-view-top-'+active).removeClass('active');
+		$('#tab-view-top-'+number).addClass('active');
+		$('#tab-view-content-'+number).slideDown('fast', function() { in_progress = false });
+	});
+});
+
+$('input#user').autocomplete({
+	minLength: 2,
+	source: IONIC_BASE_URL+"friends/autocomplete"
+});
+});
+</script>

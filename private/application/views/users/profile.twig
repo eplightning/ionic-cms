@@ -1,0 +1,180 @@
+<div class="ionic-notice">
+	{% if user.avatar %}
+	<img src="public/upload/avatars/{{ user.avatar }}" class="ionic-left" alt="" />
+	{% endif %}
+	<h2>Profil użytkownika {{ user.display_name }}</h2>
+</div>
+<ul class="ionic-list">
+	{% if current_user %}
+	<li><a href="conversations/new/{{ user.id }}">Rozpocznij nową prywatną dyskusje</a></li>
+	{% if user.setting_email == 1 %}<li><a href="users/email/{{ user.slug }}">Wyślij e-mail</a></li>{% endif %}
+	{% endif %}
+	{% if not is_friend and current_user and current_user.id != user.id %}
+	<li><a href="friends/invite/{{ user.id }}">Dodaj do listy znajomych</a></li>
+	{% endif %}
+	<li><a href="blog/user/{{ user.slug }}">Pokaż blog użytkownika</a></li>
+</ul>
+<div class="tab-view">
+	<ul class="tab-view-top">
+		<li id="tab-view-top-1" class="active"><a>Dane użytkownika</a></li>
+		<li id="tab-view-top-2"><a>Ostrzeżenia</a></li>
+		<li id="tab-view-top-3"><a>Ostatnie newsy</a></li>
+		<li id="tab-view-top-4"><a>Ostatnie komentarze</a></li>
+	</ul>
+	<div class="tab-view-content" id="tab-view-content-1">
+		<div class="ionic-block">
+			<div class="ionic-block-title">Podstawowe dane</div>
+			<div class="ionic-block-content">
+				<ul class="ionic-list">
+					{% set is_online = online.is_online(user.id) %}
+					{% if is_online %}
+					<li>Użytkownik jest obecnie zalogowany w serwisie</li>
+					{% endif %}
+					<li><span class="title">Nazwa użytkownika:</span> {{ user.display_name }}</li>
+					{% if user.real_name %}
+					<li><span class="title">Imię i nazwisko:</span> {{ user.real_name }}</li>
+					{% endif %}
+					<li><span class="title">Grupa:</span> {{ user.group_name }}</li>
+					{% if user.setting_showemail == 1 %}
+					<li><span class="title">Adres e-mail:</span> <span style="unicode-bidi:bidi-override; direction:rtl">{{ (user.email|reverse)|replace({'@': '&#x40;'}) }}</span></li>
+					{% endif %}
+					<li><span class="title">Data rejestracji:</span> {{ user.created_at|date }}</li>
+					<li><span class="title">Punktów:</span> {{ user.points }}</li>
+					<li><span class="title">Punktów typera:</span> {{ user.bet_points }}</li>
+					<li><span class="title">Ostrzeżeń:</span> {{ user.warnings_count }} / {{ max_warnings }}</li>
+					<li><span class="title">Komentarzy:</span> {{ user.comments_count }}</li>
+					<li><span class="title">Postów na blogu:</span> {{ blogs }}</li>
+					<li><span class="title">Newsów:</span> {{ user.news_count }}</li>
+					{% if user.is_banned %}
+					<li><span class="title">Status konta:</span> Zbanowane</li>
+					{% endif %}
+					{% if can('admin_access') %}
+					<li><span class="title">Adres IP:</span> {{ user.ip }}</li>
+					{% endif %}
+				</ul>
+			</div>
+		</div>
+		{% if fields|length > 0 %}
+		<div class="ionic-block">
+			<div class="ionic-block-title">Dodatkowe dane</div>
+			<div class="ionic-block-content">
+				<ul class="ionic-list">
+					{% for field in fields %}
+					<li>
+						<span class="title">{{ field.title }}:</span>
+						{{ field.value }}
+					</li>
+					{% endfor %}
+				</ul>
+			</div>
+		</div>
+		{% endif %}
+	</div>
+	<div class="tab-view-content" id="tab-view-content-2" style="display: none">
+		<div class="ionic-notice">
+			Ten użytkownik posiada obecnie <strong>{{ warnings|length }}</strong> ostrzeżeń. W przypadku posiadania {{ max_warnings }} lub więcej ostrzeżeń użytkownicy tracą możliwość pisania treści w serwisie.
+		</div>
+		{% for warning in warnings %}
+		<div class="ionic-post ionic-post-nobg">
+			<div class="ionic-post-right">
+				<div class="ionic-post-info">
+					<div class="ionic-left">
+						Ostrzeżenie wystawione <i>{{ warning.created_at|relativedate }}</i> przez <a href="{{ make('user', warning.slug) }}">{{ warning.display_name }}</a>
+					</div>
+					{% if can_unwarn %}
+					<div class="ionic-right">
+						<a href="users/remove_warning/{{ warning.id }}" title="Usuń"><img src="public/img/icons/delete.png" alt="" /></a>
+					</div>
+					{% endif %}
+				</div>
+				<div class="ionic-post-content">
+					{{ warning.reason }}
+				</div>
+			</div>
+		</div>
+		{% endfor %}
+		{% if can_warn %}
+		<form action="users/add_warning/{{ user.id }}" method="post">
+		<div class="ionic-form">
+			<div class="ionic-form-legend">Wystaw nowe ostrzeżenie</div>
+			<div class="ionic-form-elem">
+				<label for="reason">Powód:</label>
+				<textarea name="reason" id="reason" onkeypress="return (this.value.length <= 254)"></textarea>
+			</div>
+			<div class="ionic-form-elem">
+				{{ form_token() }}
+				<input type="submit" name="submit" class="submit" value="Wystaw" />
+			</div>
+		</div>
+		</form>
+		{% endif %}
+	</div>
+	<div class="tab-view-content" id="tab-view-content-3" style="display: none">
+		{% if news|length > 0 %}
+		<p>10 ostatnich newsów tego użytkownika: </p>
+		<ul class="ionic-list">
+	{% for n in news %}
+	<li><a href="{{ make('news', n.slug, n.external_url) }}">{{ n.title }}</a><br /><small>{{ n.created_at|date }}</small></li>
+	{% endfor %}
+		</ul>
+		{% else %}
+		<p>Ten użytkownik nie posiada napisanych newsów</p>
+		{% endif %}
+	</div>
+	<div class="tab-view-content" id="tab-view-content-4" style="display: none">
+		{% if comments|length > 0 %}
+		<p>10 ostatnich komentarzy tego użytkownika: </p>
+		{% for post in comments %}
+		<div class="ionic-post">
+			<div class="ionic-post-left">
+				<div class="ionic-post-username"><a href="{{ make('user', user.slug) }}">{{ user.display_name }}</a></div>
+				<div class="ionic-post-status">{% if is_online %}Użytkownik jest online{% endif %}</div>
+				{% if user.avatar %}
+				<div class="ionic-post-avatar">
+					<img src="public/upload/avatars/{{ user.avatar }}" alt="" />
+				</div>
+				{% endif %}
+				<ul class="ionic-list">
+					<li>Komentarzy: {{ user.comments_count }}</li>
+					<li>Newsów: {{ user.news_count }}</li>
+				</ul>
+			</div>
+			<div class="ionic-post-right">
+				<div class="ionic-post-info">
+					<div class="ionic-left">
+					Dodano: {{ post.created_at|relativedate }} | Karma: {{ post.karma }}
+					</div>
+					<div class="ionic-right">
+						<a href="{{ post.content_link }}#comment-id-{{ post.id }}" title="Podgląd"><img src="public/img/icons/pages.png" alt="" /></a>
+					</div>
+				</div>
+				<div class="ionic-post-content">
+					{{ post.comment }}
+				</div>
+			</div>
+		</div>
+		{% endfor %}
+		{% else %}
+		<p>Ten użytkownik nie posiada żadnych komentarzy</p>
+		{% endif %}
+	</div>
+</div>
+<script type="text/javascript">
+$(function() {
+var in_progress = false;
+
+$('.tab-view-top li').click(function() {
+	if ($(this).hasClass('active') || in_progress) return;
+	in_progress = true;
+
+	var active = $('.tab-view-top .active').prop('id').replace('tab-view-top-', '');
+	var number = $(this).prop('id').replace('tab-view-top-', '');
+
+	$('#tab-view-content-'+active).slideUp('fast', function() {
+		$('#tab-view-top-'+active).removeClass('active');
+		$('#tab-view-top-'+number).addClass('active');
+		$('#tab-view-content-'+number).slideDown('fast', function() { in_progress = false });
+	});
+});
+});
+</script>

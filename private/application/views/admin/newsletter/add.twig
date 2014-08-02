@@ -1,0 +1,66 @@
+<h2>Dodawanie newslettera</h2>
+<form action="admin/newsletter/add" method="post">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Dane</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="title">Tytuł<br /><small>Tytuł wiadomości</small></label>
+				<div class="right">
+				{% if errors.has('title') %}
+					<div class="error">{{ errors.first('title') }}</div>
+				{% endif %}
+				<input type="text" id="title" name="title" value="{{ old_data.title|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="message">Wiadomość<br /><small>Treść wiadomości</small></label>
+				<div class="right">
+				{% if errors.has('message') %}
+					<div class="error">{{ errors.first('message') }}</div>
+				{% endif %}
+				{{ editor('message', old_data.message|e) }}
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Typ wysyłki</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="type">Rodzaj<br /><small>Rodzaj wysyłki</small></label>
+				<div class="right">
+				{% if errors.has('type') %}
+					<div class="error">{{ errors.first('type') }}</div>
+				{% endif %}
+				<select id="type" name="type">
+					<option value="email"{% if old_data.type == 'email' %} selected="selected"{% endif %}>E-maile użytkowników</option>
+					<option value="list"{% if old_data.type == 'list' %} selected="selected"{% endif %}>Lista mailingowa</option>
+					<option value="pm"{% if old_data.type == 'pm' %} selected="selected"{% endif %}>Prywatne wiadomości</option>
+				</select>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="ignore_settings">Zignoruj ustawienia<br /><small>Tylko w przypadku wybrania e-maili użytkowników. Wysyła poczte do wszystkich użytkowników, łącznie z tymi którzy na to się nie zgodzili.</small></label>
+				<div class="right">
+				{% if errors.has('ignore_settings') %}
+					<div class="error">{{ errors.first('ignore_settings') }}</div>
+				{% endif %}
+				<input type="checkbox" class="checkbox" id="ignore_settings" name="ignore_settings" value="1"{% if old_data.ignore_settings == '1' %} checked="checked"{% endif %} />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	$('input[type="submit"]').button();
+});
+</script>

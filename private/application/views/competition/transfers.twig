@@ -1,0 +1,74 @@
+<div class="ionic-box">
+	<h2>Transfery</h2>
+	<ul class="players">
+		{% for player in transfers.results %}
+		<li>
+			<img src="{{ thumb('players', player.image, '100x0') }}" alt="Zawodnik" />
+			<div class="player-info">
+				<strong>{{ player.name }}</strong>
+			</div>
+			<div class="player-info">
+				<span>Od: {{ player.from_name }}</span>
+			</div>
+			<div class="player-info">
+				<span>Do: {{ player.to_name }}</span>
+			</div>
+			<div class="player-info">
+				<span>Kwota: {{ player.cost }}</span>
+			</div>
+			<div class="player-info">
+				<span>Data: {{ player.date }}</span>
+			</div>
+			<div class="player-info">
+				<span>
+					Rodzaj: 
+					{% if player.type == 0 %}
+					Transfer
+					{% elseif player.type == 1 %}
+					Wypożyczenie
+					{% else %}
+					Powrót
+					{% endif %}
+				</span>
+			</div>
+		</li>
+		{% endfor %}
+	</ul>
+</div>
+{{ transfers.links() }}
+<div class="ionic-form">
+	<form action="competition/transfers" method="post">
+		<div class="ionic-form-legend">Filtrowanie</div>
+		<div class="ionic-form-elem">
+			<label for="type">Rodzaj:</label>
+			<select name="type" id="type">
+				<option value="all"{% if filters.type == 'all' %} selected="selected"{% endif %}>Wszystkie</option>
+				<option value="from"{% if filters.type == 'from' %} selected="selected"{% endif %}>Odeszli</option>
+				<option value="to"{% if filters.type == 'to' %} selected="selected"{% endif %}>Dołączyli</option>
+				<option value="loan"{% if filters.type == 'loan' %} selected="selected"{% endif %}>Wypożyczenie</option>
+				<option value="loan_back"{% if filters.type == 'loan_back' %} selected="selected"{% endif %}>Powrót z wypożyczenia</option>
+			</select>
+		</div>
+		<div class="ionic-form-elem">
+			<label for="team">Klub:</label>
+			<select name="team" id="team">
+				<option value="0"{% if filters.team == 0 %} selected="selected"{% endif %}>Wszystkie</option>
+				{% for team in teams %}
+				<option value="{{ team.id }}"{% if filters.team == team.id %} selected="selected"{% endif %}>{{ team.name }}</option>
+				{% endfor %}
+			</select>
+		</div>
+		<div class="ionic-form-elem">
+			<label for="date_start">Data transferu:<br /><small>Od-Do, w formacie RRRR-MM-DD</small></label>
+			<input type="text" name="date_start" id="date_start" maxlength="10" style="width: 100px" value="{{ filters.date_start }}" />&nbsp;<input type="text" name="date_end" id="date_end" maxlength="10" style="width: 100px" value="{{ filters.date_end }}" />
+		</div>
+		<div class="ionic-form-elem">
+			<input type="submit" name="submit" class="submit" value="Zastosuj" />
+		</div>
+	</form>
+</div>
+<script type="text/javascript">
+$(document).ready(function(){
+	$('input#date_start, input#date_end').datepicker({dateFormat: 'yy-mm-dd' });
+});
+</script>

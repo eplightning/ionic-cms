@@ -1,0 +1,5 @@
+<ul class="ionic-list">
+	{% for n in news %}
+	<li><a href="{{ make('news', n.slug, n.external_url) }}">{{ n.title }}</a><br /><small>{{ n.created_at|date }} przez {{ n.display_name }}</small></li>
+	{% endfor %}
+</ul>

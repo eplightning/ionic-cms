@@ -1,0 +1,27 @@
+<div class="ionic-box">
+	<h2>{{ poll.title }}</h2>
+	<div style="font-size: 0.8em">
+		Utworzona: {{ poll.created_at|date }} ; Głosów: {{ poll.votes }}
+	</div>
+	{% if poll.can_vote() %}
+	<form action="poll/vote" method="post">
+		{% for opt in poll.options %}
+		<div style="margin: 5px; padding: 5px">
+			<input type="radio" name="option" value="{{ opt.id }}" /> {{ opt.title }} ({{ opt.percent }}%)
+		</div>
+		{% endfor %}
+		<div style="margin: 5px; padding: 5px">
+			{{ form_token() }}
+			<input type="submit" name="submit" value="Głosuj" />
+		</div>
+	</form>
+	{% else %}
+	<ul class="ionic-list">
+		{% for opt in poll.options %}
+		<li>
+			<span class="title">{{ opt.title }}:</span> {{ opt.percent }}% ({{ opt.votes}} oddanych głosów)
+		</li>
+		{% endfor %}
+	</ul>
+	{% endif %}
+</div>

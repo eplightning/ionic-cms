@@ -1,0 +1,465 @@
+<h2 class="with-icon" style="background-image: url(public/img/admin/item/images.png)">Zarządzanie obrazkami</h2>
+{% if can('admin_images_add') %}
+<div class="toolbar ui-widget-header ui-corner-all">
+	<button id="add-directory">Utwórz katalog</button>
+	<button id="upload-image">Dodaj obrazek</button>
+</div>
+<div class="ui-widget" style="margin-top: 10px">
+	<div class="ui-state-highlight ui-corner-all" style="padding: 15px; margin-bottom: 10px">
+		<span class="ui-icon ui-icon-info" style="float: left; margin-right: 15px"></span> Aby dodać wiele obrazków naraz należy je wrzucić do katalogu public/upload/images na FTP.
+	</div>
+</div>
+{% endif %}
+{% if directories|length > 0 or show_back %}
+<div class="section">
+	<div class="theader">
+		<div class="theader2">
+			Podkatalogi
+		</div>
+	</div>
+	<div class="section-content">
+		<ul class="section-list directories">
+			{% if show_back %}
+			<li><a href="{{ "admin/images/traverse/back"|url }}">Poprzedni katalog</a></li>
+			{% endif %}
+			{% for encoded, directory in directories %}
+			<li>
+				<a href="{{ "admin/images/traverse/"|url }}{{ encoded }}">{{ directory|e }}</a>
+				{% if can('admin_images_delete') %}
+				<a href="{{ "admin/images/delete_directory/"|url }}{{ encoded }}" title="Usuń"><img src="public/img/admin/delete.png" alt="usuń" /></a>
+				{% endif %}
+			</li>
+			{% endfor %}
+		</ul>
+	</div>
+</div>
+{% endif %}
+<div class="section">
+	<div class="theader">
+		<div class="theader2">
+			Obrazki w tym katalogu ({{ images|length }})
+		</div>
+	</div>
+	<div class="section-content">
+{% if images|length > 0 %}
+<ul class="image-list">
+	{% for key, image in images %}
+	<li id="image-{{ key }}">
+		<div class="image-title-bg"></div>
+		<span class="image-title" id="image-name-{{ key }}">{{ image }}</span>
+		<img src="public/{{ path }}/{{ image }}" alt="" />
+		<div class="image-toolbox-bg"></div>
+		<div class="image-toolbox">
+			{% if can('admin_images_delete') %}<a title="Usuń" class="delete-image"><img src="public/img/admin/delete.png" alt="" /></a>{% endif %}
+			{% if can('admin_images_edit') %}
+			<a class="replace-image" title="Podmiana"><img src="public/img/admin/icon.png" alt="" /></a>
+			<a class="resize-image" title="Zmiana rozmiaru"><img src="public/img/admin/resize.png" alt="" /></a>
+			<a class="crop-image" title="Kadrowanie"><img src="public/img/admin/crop.png" alt="" /></a>
+			<a class="rotate-image" title="Obróć"><img src="public/img/admin/rotate.png" alt="" /></a>
+			<a class="effects-image" title="Efekty"><img src="public/img/admin/effects.png" alt="" /></a>
+			{% endif %}
+		</div>
+	</li>
+	{% endfor %}
+</ul>
+{% else %}
+	<p>Brak obrazków w tym katalogu</p>
+{% endif %}
+	</div>
+</div>
+{% if can('admin_images_add') %}
+<div id="dialog-add-directory" style="display: none">
+	<form action="admin/images/add_directory" method="post" id="directory-form">
+		<fieldset>
+			<div>
+				<label for="directory-name">Nazwa katalogu:</label>
+				<input type="text" name="directory-name" id="directory-name" maxlength="127" />
+				{{ form_token() }}
+			</div>
+		</fieldset>
+	</form>
+</div>
+<div id="dialog-upload-image" style="display: none">
+	<form action="admin/images/upload_image" method="post" id="upload-form" enctype="multipart/form-data">
+		<fieldset>
+			<div>
+				<input type="file" name="upload-file" id="upload-file" />
+				{{ form_token() }}
+			</div>
+		</fieldset>
+	</form>
+</div>
+{% endif %}
+{% if can('admin_images_edit') %}
+<div id="dialog-replace" style="display: none">
+	<form action="admin/images/replace_image" method="post" id="upload-form-replace" enctype="multipart/form-data">
+		<fieldset>
+			<div>
+				<input type="hidden" id="image-replace-id" />
+				<input type="file" name="upload-replace" id="upload-replace" />
+				{{ form_token() }}
+			</div>
+		</fieldset>
+	</form>
+</div>
+<div id="dialog-resize" style="display: none">
+	<fieldset>
+		<div>
+			<input type="hidden" id="image-resize-id" />
+			<label for="image-resize-width">Szerokość:</label>
+			<input type="text" name="image-resize-width" id="image-resize-width" maxlength="4" />
+		</div>
+		<div>
+			<label for="image-resize-height">Wysokość:</label>
+			<input type="text" name="image-resize-height" id="image-resize-height" maxlength="4" />
+		</div>
+	</fieldset>
+</div>
+<div id="dialog-crop" style="display: none">
+	<fieldset>
+		<div>
+			<input type="hidden" id="image-crop-id" />
+			<input type="hidden" id="image-crop-x" />
+			<input type="hidden" id="image-crop-y" />
+			<input type="hidden" id="image-crop-w" />
+			<input type="hidden" id="image-crop-h" />
+			<div id="image-crop-container" style="margin: auto; text-align: center">
+
+			</div>
+		</div>
+	</fieldset>
+</div>
+<div id="dialog-rotate" style="display: none">
+	<fieldset>
+		<div>
+			<input type="hidden" id="image-rotate-id" />
+			<label for="image-rotate-degree">Stopni (0-360):</label>
+			<input type="text" name="image-rotate-degree" id="image-rotate-degree" maxlength="3" />
+		</div>
+	</fieldset>
+</div>
+<div id="dialog-effects" style="display: none">
+	<fieldset>
+		<div>
+			<input type="hidden" id="image-effects-id" />
+			<label for="image-effects-type">Efekt:</label>
+			<select id="image-effects-type">
+				<option value="unsharp" selected="selected">Wyostrzenie</option>
+				<option value="negate">Negatyw</option>
+				<option value="grayscale">Skala szarości</option>
+				<option value="blur">Rozmazanie</option>
+			</select>
+		</div>
+	</fieldset>
+</div>
+{% endif %}
+<script type="text/javascript">
+{% if can('admin_images_add') %}
+$('#add-directory').button({icons: { primary: 'ui-icon-plus' }}).click(function() { $('#dialog-add-directory').dialog('open'); });
+$('#upload-image').button({icons: { primary: 'ui-icon-plus' }}).click(function() { $('#dialog-upload-image').dialog('open'); });
+
+$('#dialog-add-directory').dialog({
+	autoOpen: false,
+	width: 600,
+	height: 200,
+	modal: true,
+	buttons: {
+		'Dodaj': function() { $("#directory-form").submit(); },
+		'Anuluj': function() { $(this).dialog('close'); }
+	},
+	title: 'Utwórz katalog'
+});
+
+$('#dialog-upload-image').dialog({
+	autoOpen: false,
+	width: 600,
+	height: 200,
+	modal: true,
+	buttons: {
+		'Dodaj': function() { $("#upload-form").submit(); },
+		'Anuluj': function() { $(this).dialog('close'); }
+	},
+	title: 'Dodaj plik'
+});
+{% endif %}
+{% if can('admin_images_delete') %}
+$('a.delete-image').click(function() {
+	var elem = $(this).parent().parent();
+
+	$.post(IONIC_BASE_URL+'admin/images/delete', { {{ csrf_key }}: IonicAdmin.csrfToken, id: elem.prop('id').replace('image-', '') }, function(response) {
+		if (response.status == true)
+		{
+			elem.hide('slow', function() { elem.remove() });
+		}
+		else
+		{
+			alert('Wystąpił błąd podczas usuwania');
+		}
+	}, 'json');
+});
+{% endif %}
+{% if can('admin_images_edit') %}
+$(function(){$('.image-title').editable(IONIC_BASE_URL+'admin/images/edit_name', {
+	tooltip: 'Kliknij, aby edytować',
+	submitdata: { {{ csrf_key }}: IonicAdmin.csrfToken },
+	onblur: 'submit',
+	loadurl: IONIC_BASE_URL+'admin/images/get_name',
+	loadtype: 'POST',
+});});
+var jcrop_api = null;
+
+function ionic_retrieve_image(image_id)
+{
+	var r;
+
+	$.ajax({
+		url: IONIC_BASE_URL+'admin/images/get_info',
+		type: 'POST',
+		data: { {{ csrf_key }}: IonicAdmin.csrfToken, id: image_id },
+		async: false,
+		dataType: 'json',
+		error: function() { r = false; },
+		success: function(response) {
+			if (response.status)
+			{
+				r = response;
+			}
+			else
+			{
+				r = false;
+			}
+		}
+	});
+
+	return r;
+}
+
+$('#dialog-crop').dialog({
+	autoOpen: false,
+	width: 800,
+	height: 600,
+	modal: true,
+	buttons: {
+		'Zapisz': function() {
+			var w = parseInt($('#image-crop-w').val());
+			var h = parseInt($('#image-crop-h').val());
+			var xco = parseInt($('#image-crop-x').val());
+			var yco = parseInt($('#image-crop-y').val());
+
+			if (w == NaN || h == NaN || xco == NaN || yco == NaN)
+			{
+				return;
+			}
+
+			$.post(IONIC_BASE_URL+'admin/images/crop', {
+				{{ csrf_key }}: IonicAdmin.csrfToken,
+				id: $('#image-crop-id').val(),
+				width: w,
+				height: h,
+				x: xco,
+				y: yco
+				}, function(response) {
+					if (response.status)
+					{
+						$('#dialog-crop').dialog('close');
+					}
+				}, 'json');
+		},
+		'Anuluj': function() { $(this).dialog('close'); }
+	},
+	title: 'Kadrowanie',
+	close: function() {
+		jcrop_api.destroy(); $('#image-crop-image').remove();
+	}
+});
+
+$('#dialog-resize').dialog({
+	autoOpen: false,
+	width: 600,
+	height: 300,
+	modal: true,
+	buttons: {
+		'Zapisz': function() {
+			var w = parseInt($('#image-resize-width').val());
+			var h = parseInt($('#image-resize-height').val());
+
+			if (w == NaN || h == NaN)
+			{
+				return;
+			}
+
+			if (w > 2048 || h > 2048 || w < 1 || h < 1)
+			{
+				return;
+			}
+
+			$.post(IONIC_BASE_URL+'admin/images/resize', {
+				{{ csrf_key }}: IonicAdmin.csrfToken,
+				id: $('#image-resize-id').val(),
+				width: w,
+				height: h
+				}, function(response) {
+					if (response.status)
+					{
+						$('#dialog-resize').dialog('close');
+					}
+				}, 'json');
+		},
+		'Anuluj': function() { $(this).dialog('close'); }
+	},
+	title: 'Zmień rozmiar'
+});
+
+$('#dialog-rotate').dialog({
+	autoOpen: false,
+	width: 600,
+	height: 300,
+	modal: true,
+	buttons: {
+		'Zapisz': function() {
+			var d = parseInt($('#image-rotate-degree').val());
+
+			if (d == NaN || d < 0 || d > 360)
+			{
+				return;
+			}
+
+			$.post(IONIC_BASE_URL+'admin/images/rotate', {
+				{{ csrf_key }}: IonicAdmin.csrfToken,
+				id: $('#image-rotate-id').val(),
+				degree: d
+				}, function(response) {
+					if (response.status)
+					{
+						$('#dialog-rotate').dialog('close');
+					}
+				}, 'json');
+		},
+		'Anuluj': function() { $(this).dialog('close'); }
+	},
+	title: 'Obróć'
+});
+
+$('#dialog-effects').dialog({
+	autoOpen: false,
+	width: 600,
+	height: 300,
+	modal: true,
+	buttons: {
+		'Zapisz': function() {
+			$.post(IONIC_BASE_URL+'admin/images/effects', {
+				{{ csrf_key }}: IonicAdmin.csrfToken,
+				id: $('#image-effects-id').val(),
+				type: $('#image-effects-type').val()
+				}, function(response) {
+					if (response.status)
+					{
+						$('#dialog-effects').dialog('close');
+					}
+				}, 'json');
+		},
+		'Anuluj': function() { $(this).dialog('close'); }
+	},
+	title: 'Zastosuj efekt'
+});
+
+$('#dialog-replace').dialog({
+	autoOpen: false,
+	width: 600,
+	height: 200,
+	modal: true,
+	buttons: {
+		'Zapisz': function() {
+			$("#upload-form-replace").submit();
+		},
+		'Anuluj': function() { $(this).dialog('close'); }
+	},
+	title: 'Podmień obrazek'
+});
+
+$('a.resize-image').click(function() {
+	var id = $(this).parent().parent().prop('id').replace('image-', '');
+
+	var image = ionic_retrieve_image(id);
+
+	if (image == false)
+	{
+		return;
+	}
+
+	$('#image-resize-id').val(id);
+	$('#image-resize-width').val(image.width);
+	$('#image-resize-height').val(image.height);
+
+	$('#dialog-resize').dialog('open');
+});
+
+$('a.crop-image').click(function() {
+	var id = $(this).parent().parent().prop('id').replace('image-', '');
+
+	var image = ionic_retrieve_image(id);
+
+	if (image == false)
+	{
+		return;
+	}
+
+	$('#image-crop-id').val(id);
+
+	var img = $('<img src="'+image.src+'" alt="" style="clear: both; margin: auto" id="image-crop-image" />');
+
+	$('#image-crop-container').append(img);
+
+	$('#image-crop-image').prop('src', image.src);
+	$('#image-crop-w').val(0);
+	$('#image-crop-h').val(0);
+	$('#image-crop-x').val(0);
+	$('#image-crop-y').val(0);
+
+	$('#image-crop-image').Jcrop({
+		onSelect: function(coords) {
+			$('#image-crop-w').val(coords.w);
+			$('#image-crop-h').val(coords.h);
+			$('#image-crop-x').val(coords.x);
+			$('#image-crop-y').val(coords.y);
+		},
+		onChange: function(coords) {
+			$('#image-crop-w').val(coords.w);
+			$('#image-crop-h').val(coords.h);
+			$('#image-crop-x').val(coords.x);
+			$('#image-crop-y').val(coords.y);
+		},
+	}, function(){
+	    jcrop_api = this;
+	});
+
+	$('#dialog-crop').dialog('open');
+});
+
+$('a.rotate-image').click(function() {
+	var id = $(this).parent().parent().prop('id').replace('image-', '');
+
+	$('#image-rotate-id').val(id);
+	$('#image-rotate-degree').val(0);
+
+	$('#dialog-rotate').dialog('open');
+});
+
+$('a.effects-image').click(function() {
+	var id = $(this).parent().parent().prop('id').replace('image-', '');
+
+	$('#image-effects-id').val(id);
+	$('#image-effects-type').val('unsharp');
+
+	$('#dialog-effects').dialog('open');
+});
+
+$('a.replace-image').click(function() {
+	var id = $(this).parent().parent().prop('id').replace('image-', '');
+
+	$('#image-replace-id').val(id);
+
+	$('#dialog-replace').dialog('open');
+});
+{% endif %}
+</script>

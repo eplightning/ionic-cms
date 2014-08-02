@@ -1,0 +1,53 @@
+<div class="ionic-box">
+	<h2>Klub - {{ team.name }}</h2>
+	<div class="ionic-team-info">
+		{% if team.image %}<img src="{{ thumb('teams', team.image, '64x0') }}" alt="" />{% endif %}
+		<ul class="ionic-list">
+			<li><span class="title">Rok założenia:</span>{{ team.year ? team.year : 'b/d' }}</li>
+			<li><span class="title">Kraj:</span>{{ country }}</li>
+			<li><span class="title">Adres:</span>{{ team.address ? team.address : 'b/d' }}</li>
+			<li><span class="title">Barwy:</span>{{ team.colors ? team.colors : 'b/d' }}</li>
+			<li><span class="title">Stadion:</span>{{ team.stadium ? team.stadium : 'b/d' }}</li>
+			<li><span class="title">Prezydent:</span>{{ team.chairman ? team.chairman : 'b/d' }}</li>
+			<li><span class="title">Trener:</span>{{ team.coach ? team.coach : 'b/d' }}</li>
+			<li><span class="title">Gwiazda klubu:</span>{{ team.star ? team.star : 'b/d' }}</li>
+			<li><span class="title">Strona klubu:</span>{{ team.webpage ? team.webpage : 'b/d' }}</li>
+		</ul>
+	</div>
+	{% if team.description %}
+	<h3>Informacje</h3>
+	<div class="ionic-box">
+		{{ team.description }}
+	</div>
+	{% endif %}
+	{% if players|length > 0 %}
+	<h3>Kadra</h3>
+	{% for pos, pl in players %}
+	<table class="ionic-table">
+		<tr>
+			<th colspan="4">{{ pos }}</th>
+		</tr>
+		<tr>
+			<th style="width: 48px">Kraj</th>
+			<th style="width: 48px">Nr.</th>
+			<th>Imię i nazwisko</th>
+			<th>Data urodzenia</th>
+		</tr>
+		{% for player in pl %}
+		<tr>
+			<td class="centered">
+				{% if player.country %}<img src="public/img/flags/{{ player.country }}.png" alt="" />{% endif %}
+			</td>
+			<td class="centered">
+				{{ player.number }}
+			</td>
+			<td><a href="team/player/{{ team.slug }}/{{ player.slug }}">{{ player.name }}</a></td>
+			<td>
+				{{ player.date|date('short') }}
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+	{% endfor %}
+	{% endif %}
+</div>

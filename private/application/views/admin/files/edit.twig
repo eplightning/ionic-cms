@@ -1,0 +1,90 @@
+<h2>Edycja pliku</h2>
+<form action="admin/files/edit/{{ object.id }}" method="post" enctype="multipart/form-data">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Podstawowe</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="title">Tytuł<br /><small>Tytuł pliku</small></label>
+				<div class="right">
+				{% if errors.has('title') %}
+					<div class="error">{{ errors.first('title') }}</div>
+				{% endif %}
+				<input type="text" id="title" name="title" value="{% if old_data.title != '' %}{{ old_data.title|e }}{% else %}{{ object.title }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="slug">Slug<br /><small>Slug widoczny w linkach</small></label>
+				<div class="right">
+				{% if errors.has('slug') %}
+					<div class="error">{{ errors.first('slug') }}</div>
+				{% endif %}
+				<input type="text" id="slug" name="slug" value="{% if old_data.slug != '' %}{{ old_data.slug|e }}{% else %}{{ object.slug }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="description">Opis<br /><small>Opis pliku</small></label>
+				<div class="right">
+				{% if errors.has('description') %}
+					<div class="error">{{ errors.first('description') }}</div>
+				{% endif %}
+				<textarea id="description" name="description" rows="10" cols="50">{% if old_data.description != '' %}{{ old_data.description|e }}{% else %}{{ object.description }}{% endif %}</textarea>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="filename">Nazwa pliku<br /><small>Nazwa pliku z rozszerzeniem. Domyślnie zostanie użyta nazwa wrzuconego pliku.</small></label>
+				<div class="right">
+				{% if errors.has('filename') %}
+					<div class="error">{{ errors.first('filename') }}</div>
+				{% endif %}
+				<input type="text" id="filename" name="filename" value="{% if old_data.filename != '' %}{{ old_data.filename|e }}{% else %}{{ object.filename|e }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="category_id">Kategoria<br /><small>Kategoria pliku</small></label>
+				<div class="right">
+					<select name="category_id" id="category_id">
+					{% for k, v in categories %}
+					<option value="{{ k }}"{% if k == object.category_id %} selected="selected"{% endif %}>{{ v }}</option>
+					{% endfor %}
+					</select>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Upload</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="filelocation">Plik<br /><small>Zostaw puste jeśli bez zmian</small></label>
+				<div class="right">
+				{% if errors.has('filelocation') %}
+					<div class="error">{{ errors.first('filelocation') }}</div>
+				{% endif %}
+				<input type="file" id="filelocation" name="filelocation" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="image">Screenshot<br /><small>Zostaw puste jeśli bez zmian</small></label>
+				<div class="right">
+				{% if errors.has('image') %}
+					<div class="error">{{ errors.first('image') }}</div>
+				{% endif %}
+				<input type="file" id="image" name="image" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	$('input[type="submit"]').button();
+});
+</script>

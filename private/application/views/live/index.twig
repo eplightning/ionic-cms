@@ -1,0 +1,20 @@
+<div class="ionic-box">
+	<h2>Relacje live</h2>
+	<table class="ionic-table">
+		<tr>
+			<th>Mecz</th>
+			<th>Obecny wynik</th>
+			<th>Data meczu</th>
+		</tr>
+		{% for relation in relations.results %}
+		<tr>
+			<td>
+				<a href="live/show/{{ relation.id }}">{{ relation.home_name }} vs. {{ relation.away_name }}</a>{% if relation.is_finished == 1 %} (zakończona){% endif %}
+			</td>
+			<td>{{ relation.current_score ? relation.current_score : '-:-' }}</td>
+			<td>{{ relation.date|date }}</td>
+		</tr>
+		{% endfor %}
+	</table>
+</div>
+{{ relations.links() }}

@@ -1,0 +1,73 @@
+<div class="ionic-box">
+	<h2>Panel kontrolny</h2>
+	<form action="users/panel" method="post">
+		<div class="ionic-form">
+			<div class="ionic-form-legend">Zmiana hasła</div>
+			<div class="ionic-form-elem">
+				<label for="old_password">Stare hasło:<br /><small>Podaj obecnie używane hasło</small></label>
+				<input type="password" name="old_password" id="old_password" />
+			</div>
+			<div class="ionic-form-elem">
+				<label for="new_password">Nowe hasło:<br /><small>Podaj nowe hasło</small></label>
+				<input type="password" name="new_password" id="new_password" />
+			</div>
+			<div class="ionic-form-elem">
+				<label for="confirm_password">Potwierdź nowe:<br /><small>Potwierdź podane wyżej hasło</small></label>
+				<input type="password" name="confirm_password" id="confirm_password" />
+			</div>
+			<div class="ionic-form-elem">
+				{{ form_token() }}
+				<input type="submit" name="change_password" value="Zmień hasło" class="submit" />
+			</div>
+		</div>
+	</form>
+	<form action="users/panel" method="post" enctype="multipart/form-data">
+		<div class="ionic-form">
+			<div class="ionic-form-legend">Zmiana avatara</div>
+			<div class="ionic-form-elem">
+				<label for="avatar">Nowy avatar:<br /><small>Avatar musi być typu JPG, GIF lub PNG. Maksymalny rozmiar pliku to {{ avatar_size }} KB. Wymiary zostaną automatycznie dopasowane ({{ avatar_dimensions }}).</small></label>
+				<input type="file" name="avatar" id="avatar" />
+			</div>
+			{% if current_user.avatar %}
+			<div class="ionic-form-elem">
+				<label for="delete_avatar">Usuń obecny avatar:</label>
+				<input type="checkbox" name="delete_avatar" id="delete_avatar" class="checkbox" value="1" />
+			</div>
+			{% endif %}
+			<div class="ionic-form-elem">
+				{{ form_token() }}
+				<input type="submit" name="change_avatar" value="Zmień avatar" class="submit" />
+			</div>
+		</div>
+	</form>
+	<form action="users/panel" method="post">
+		<div class="ionic-form">
+			<div class="ionic-form-legend">Ustawienia</div>
+			<div class="ionic-form-elem">
+				<label for="setting_email">Czy chcesz otrzymywać e-maile od serwisu:<br /><small>Dotyczy notyfikacji, emaili od użytkowników, newslettera itd.</small></label>
+				<input type="checkbox" name="setting_email" id="setting_email" value="1" class="checkbox"{% if current_user.setting_email %} checked="checked"{% endif %} />
+			</div>
+			<div class="ionic-form-elem">
+				<label for="setting_showemail">Czy pokazywać twój adres e-mail w profilu:<br /><small>Nie zalecane</small></label>
+				<input type="checkbox" name="setting_showemail" id="setting_showemail" value="1" class="checkbox"{% if current_user.setting_showemail %} checked="checked"{% endif %} />
+			</div>
+		</div>
+		<div class="ionic-form">
+			<div class="ionic-form-legend">Aktualizacja danych</div>
+			<div class="ionic-form-elem">
+				<label for="real_name">Imię i nazwisko:<br /><small>Twoje prawdziwe imię i nazwisko. Pole opcjonalne.</small></label>
+				<input type="text" name="real_name" id="real_name" maxlength="255" value="{{ current_user.real_name }}" />
+			</div>
+			{% for field in custom_fields %}
+			<div class="ionic-form-elem">
+				<label for="field-{{ field.id }}">{{ field.title }}<br /><small>{{ field.description }}</small></label>
+				{{ field.html }}
+			</div>
+			{% endfor %}
+			<div class="ionic-form-elem">
+				{{ form_token() }}
+				<input type="submit" name="submit" value="Aktualizuj dane" class="submit" />
+			</div>
+		</div>
+	</form>
+</div>

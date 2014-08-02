@@ -1,0 +1,83 @@
+<div class="ionic-box">
+	<h2>Rejestracja</h2>
+	<form action="register/accepted" method="post">
+	<div class="ionic-form">
+		<div class="ionic-form-legend">Szczegóły konta</div>
+		<div class="ionic-form-elem">
+			<div class="error" id="error-username"{% if not errors.has('username') %} style="display: none"{% endif %}>{{ errors.first('username') }}</div>
+			<label for="username">Login:<br /><small>Login używany podczas logowania.</small></label>
+			<input type="text" name="username" id="username" maxlength="20" value="{{ old.username|e }}" />
+		</div>
+		<div class="ionic-form-elem">
+			<div class="error" id="error-display_name"{% if not errors.has('display_name') %} style="display: none"{% endif %}>{{ errors.first('display_name') }}</div>
+			<label for="display_name">Nazwa wyświetlana:<br /><small>Nazwa widoczna dla innych użytkowników</small></label>
+			<input type="text" name="display_name" id="display_name" maxlength="20" value="{{ old.display_name|e }}" />
+		</div>
+		<div class="ionic-form-elem">
+			<div class="error" id="error-email"{% if not errors.has('email') %} style="display: none"{% endif %}>{{ errors.first('email') }}</div>
+			<label for="email">Adres e-mail:<br /><small>Prawidłowy adres e-mail</small></label>
+			<input type="text" name="email" id="email" maxlength="70" value="{{ old.email|e }}" />
+		</div>
+		<div class="ionic-form-elem">
+			<div class="error" id="error-password"{% if not errors.has('password') %} style="display: none"{% endif %}>{{ errors.first('password') }}</div>
+			<label for="password">Hasło:<br /><small>Hasło do logowania</small></label>
+			<input type="password" name="password" id="password" />
+		</div>
+		<div class="ionic-form-elem">
+			<div class="error" id="error-password_confirm"{% if not errors.has('password_confirm') %} style="display: none"{% endif %}>{{ errors.first('password_confirm') }}</div>
+			<label for="password_confirm">Potwierdź hasło:<br /><small>Potwierdź podane wyżej hasło</small></label>
+			<input type="password" name="password_confirm" id="password_confirm" />
+		</div>
+		<div class="ionic-form-elem">
+			{{ recaptcha }}
+		</div>
+		<div class="ionic-form-elem">
+			{{ form_token() }}
+			<input type="submit" name="submit" class="submit" value="Wyślij" />
+		</div>
+	</div>
+	</form>
+</div>
+<script type="text/javascript">
+$(function() {
+	$('#username, #display_name, #email').blur(function(){
+		var elem = $(this).prop('id');
+
+		$.post(IONIC_BASE_URL+'register/ajax', { id: $(this).prop('id'), value: $(this).val() }, function(response){
+			if (response.error)
+			{
+				$('#error-'+elem).html(response.message);
+				$('#error-'+elem).slideDown('slow');
+			}
+			else
+			{
+				$('#error-'+elem).slideUp('slow');
+			}
+		}, 'json');
+	});
+
+	$('#password').blur(function(){
+		if ($('#password').val().length < 6)
+		{
+			$('#error-password').html('Hasło jest za krótkie');
+			$('#error-password').slideDown('slow');
+		}
+		else
+		{
+			$('#error-password').slideUp('slow');
+		}
+	});
+
+	$('#password_confirm').blur(function(){
+		if ($('#password').val() != $(this).val())
+		{
+			$('#error-password_confirm').html('Hasło nie pasuje');
+			$('#error-password_confirm').slideDown('slow');
+		}
+		else
+		{
+			$('#error-password_confirm').slideUp('slow');
+		}
+	});
+});
+</script>

@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="pl" lang="pl">
+<head>
+<base href="{{ base() }}/" />
+<meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
+<title>Logowanie do panelu administracyjnego</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="icon" href="{{ base() }}/public/img/admin/icon.png" type="image/png" />
+<style type="text/css">
+body {
+	padding: 0px;
+	margin: 0px;
+	font-family: Verdana, Tahoma, Arial, sans-serif;
+	font-size: 11px;
+	background: #bdbdbd;
+}
+
+#window {
+	width: 560px;
+	height: 348px;
+	border: 1px solid #9a9a9a;
+	margin: 100px auto;
+	overflow: hidden;
+	border-right: 3px solid #9a9a9a;
+	border-bottom: 3px solid #9a9a9a;
+}
+
+#left {
+	float: left;
+	width: 136px;
+	height: 348px;
+}
+
+#right {
+	float: right;
+	width: 424px;
+	background: #fff;
+	color: #000;
+	height: 348px;
+}
+
+#header {
+	width: 409px;
+	height: 25px;
+	padding-top: 13px;
+	padding-left: 15px;
+	background-image: url(public/img/admin/login_bg.gif);
+	background-repeat: repeat-x;
+	font-weight: bold;
+}
+
+#message {
+	width: 400px;
+	padding: 5px;
+	margin: 10px auto;
+	margin-bottom: 10px;
+	border: 1px solid #aaa;
+	background: #efefef;
+	border-left: 3px solid #aaa;
+}
+
+#username {
+	margin-top: 10px;
+}
+
+#username, #password, #submit {
+	width: 400px;
+	padding: 12px;
+	padding-top: 0px;
+	text-align: center;
+}
+
+#submit {
+	text-align: right;
+}
+
+#username input {
+	width: 310px;
+	border: 1px solid #c3c3c3;
+	font-family: inherit;
+	font-size: 18px;
+	color: #000;
+	padding: 10px;
+	background-image: url(public/img/admin/username.png);
+	background-repeat: no-repeat;
+	background-position: 2% 50%;
+	padding-left: 50px;
+}
+
+#password input {
+	width: 310px;
+	border: 1px solid #c3c3c3;
+	font-family: inherit;
+	font-size: 18px;
+	color: #000;
+	padding: 10px;
+	background-image: url(public/img/admin/password.png);
+	background-repeat: no-repeat;
+	background-position: 2% 50%;
+	padding-left: 50px;
+}
+
+#submit input {
+	width: auto;
+	background: #5e7096;
+	padding: 10px;
+	font-family: inherit;
+	font-size: 13px;
+	color: #fff;
+	border: 1px solid #414c63;
+	cursor: pointer;
+	margin-right: 14px;
+}
+
+#footer {
+	width: 350px;
+	padding: 20px;
+	border-top: 1px solid #c3c3c3;
+	float: right;
+	text-align: right;
+}
+</style>
+</head>
+<body>
+	<div id="window">
+		<div id="left">
+			<img src="public/img/admin/login.gif" alt="" />
+		</div>
+		<div id="right">
+			<div id="header">Logowanie do panelu administracyjnego</div>
+			{% if message %}
+			<div id="message">{{ message|e }}</div>
+			{% endif %}
+			<form action="{{ url|e }}" method="post">
+				<div id="username">
+					<input type="text" name="alusername" value="" />
+				</div>
+				<div id="password">
+					<input type="password" name="alpassword" value="" />
+				</div>
+				<div id="submit">
+					{{ form_token() }}
+					<input type="submit" name="alsubmit" value="Zaloguj" />
+				</div>
+			</form>
+			<div id="footer">Powered by IonicCMS</div>
+		</div>
+	</div>
+</body>
+</html>

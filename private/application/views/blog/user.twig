@@ -1,0 +1,29 @@
+<div class="ionic-box">
+	<h2>Blog użytkownika {{ user.display_name }}</h2>
+	{% if current_user %}
+	<div class="ionic-toolbar">
+		<a href="blog/write">Dodaj wpis w twoim blogu</a>
+		{% if user.id != current_user.id %}<a href="blog/user/{{ current_user.slug }}">Twój blog</a>{% endif %}
+	</div>
+	{% endif %}
+</div>
+{% for post in posts.results %}
+<div class="ionic-box">
+	<h2><a href="blog/post/{{ post.slug }}">{{ post.title }}</a></h2>
+	<div style="font-size: 0.8em; margin-bottom: 10px">
+		<div class="ionic-left">
+			Napisane {{ post.created_at|date }} | {{ post.comments_count }} komentarzy
+		</div>
+		{% if moderation %}
+		<div class="ionic-right">
+			<a href="blog/edit/{{ post.id }}" title="Edytuj"><img src="public/img/icons/page_edit.png" alt="" /></a>
+			<a href="blog/delete/{{ post.id }}" title="Usuń"><img src="public/img/icons/delete.png" alt="" /></a>
+		</div>
+		{% endif %}
+	</div>
+	<div class="ionic-post-content">
+		{{ post.content }}
+	</div>
+</div>
+{% endfor %}
+{{ posts.links() }}

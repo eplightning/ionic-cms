@@ -1,0 +1,25 @@
+<ul class="ionic-list">
+	<li>
+		Newsów: {{ pagestats.news }}
+	</li>
+	<li>
+		Użytkowników: {{ pagestats.users }}
+	</li>
+	<li>
+		Ostatni użytkownik: <a href="{{ make('user', pagestats.last_user.slug) }}">{{ pagestats.last_user.display_name }}</a>
+	</li>
+	<li>
+		Istnieje od: {{ exists.days }} dni
+	</li>
+	<li>
+		Gości online (anonimowych użytkowników): {{ online.guests }} ({{ online.anonymous }})
+	</li>
+	<li>
+		Użytkownicy online ({{ online.users|length }}):
+		<p>
+			{% for usr in online.users %}{% if loop.index != 1 %}, {% endif %}
+			<a href="{{ make('user', usr.slug) }}" title="{{ usr.location_name }}">{{ usr.display_name }}</a>
+			{% endfor %}
+		</p>
+	</li>
+</ul>

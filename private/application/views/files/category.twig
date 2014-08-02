@@ -1,0 +1,31 @@
+<div class="ionic-box">
+	<h2>Kategoria plików: {{ cat.title }}</h2>
+	{% if subcategories|length > 0 %}
+	<div class="ionic-notice">
+		<strong>Podkategorie:</strong> 
+		{% for sub in subcategories %}{% if loop.index0 != 0 %}, {% endif %}
+<a href="files/category/{{ sub.slug }}">{{ sub.title }}</a>{% endfor %}
+	</div>
+	{% endif %}
+	{% for file in files.results %}
+	<div class="ionic-post">
+		<div class="ionic-post-left">
+			<div class="ionic-post-avatar">{% if file.image %}<img src="{{ thumb('files', file.image, '120x0') }}" alt="" />{% endif %}</div>
+			<ul class="ionic-list">
+				<li>{{ file.created_at|date }}</li>
+				<li>Komentarzy: {{ file.comments_count }}</li>
+				<li>Pobrań: {{ file.downloads }}</li>
+			</ul>
+		</div>
+		<div class="ionic-post-right">
+			<div class="ionic-post-info">
+				<a href="files/show/{{ file.slug }}">{{ file.title }}</a>
+			</div>
+			<div class="ionic-post-content">
+				{{ file.description }}
+			</div>
+		</div>
+	</div>
+	{% endfor %}
+	{{ files.links() }}
+</div>

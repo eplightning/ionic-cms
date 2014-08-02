@@ -1,0 +1,30 @@
+<div class="ionic-box">
+	<h2>Kategoria video: {{ cat.title }}</h2>
+	{% if subcategories|length > 0 %}
+	<div class="ionic-notice">
+		<strong>Podkategorie:</strong>
+		{% for sub in subcategories %}{% if loop.index0 != 0 %}, {% endif %}
+<a href="video/category/{{ sub.slug }}">{{ sub.title }}</a>{% endfor %}
+	</div>
+	{% endif %}
+	{% for video in videos.results %}
+	<div class="ionic-post">
+		<div class="ionic-post-left">
+			<div class="ionic-post-avatar">{% if video.thumbnail %}<img src="{{ video.thumbnail }}" style="width: 120px; max-height: 90px;" alt="" />{% endif %}</div>
+			<ul class="ionic-list">
+				<li>{{ video.created_at|date }}</li>
+				<li>Komentarzy: {{ video.comments_count }}</li>
+			</ul>
+		</div>
+		<div class="ionic-post-right">
+			<div class="ionic-post-info">
+				<a href="video/show/{{ video.slug }}">{{ video.title }}</a>
+			</div>
+			<div class="ionic-post-content">
+				{{ video.description }}
+			</div>
+		</div>
+	</div>
+	{% endfor %}
+	{{ videos.links() }}
+</div>

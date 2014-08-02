@@ -1,0 +1,19 @@
+<div class="ionic-box">
+	<h2>Ostatnie wpisy w blogach</h2>
+	{% if current_user %}
+	<div class="ionic-toolbar">
+		<a href="blog/write">Dodaj wpis w twoim blogu</a>
+		<a href="blog/user/{{ current_user.slug }}">Twój blog</a>
+	</div>
+	{% endif %}
+</div>
+<ul class="ionic-list">
+{% for post in posts.results %}
+<li>
+	<a href="blog/post/{{ post.slug }}" style="font-size: 1.2em">{{ post.title }} ({{ post.comments_count }} komentarzy)</a>
+	<br />
+	<small>Blog użytkownika <a href="blog/user/{{ post.user_slug }}">{{ post.display_name }}</a>. Wpis został dodany {{ post.created_at|relativedate }}</small>
+</li>
+{% endfor %}
+</ul>
+{{ posts.links() }}

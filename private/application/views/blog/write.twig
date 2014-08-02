@@ -1,0 +1,64 @@
+<div class="ionic-box">
+	<h2>Dodaj nowy wpis w blogu</h2>
+	<form action="blog/write" method="post">
+	<div class="ionic-form">
+		<div class="ionic-form-legend">Szczegóły wpisu</div>
+		<div class="ionic-form-elem">
+			<label for="title">Tytuł:<br /><small>Tytuł wpisu.</small></label>
+			<input type="text" name="title" id="title" maxlength="127" value="{{ old.title|e }}" />
+		</div>
+		<div class="ionic-form-elem">
+			<textarea id="bbcode" name="content" style="width: 100%">{{ old.content|e }}</textarea>
+		</div>
+		<div class="ionic-form-elem">
+			{{ form_token() }}
+			<input type="submit" name="submit" class="submit" value="Wyślij" />
+		</div>
+	</div>
+	</form>
+</div>
+<script type="text/javascript">
+$('#bbcode').markItUp({
+    nameSpace:          'bbcode', // Useful to prevent multi-instances CSS conflict
+    onShiftEnter:       {keepDefault:false, openWith:'\n\n'},
+    markupSet: [
+        {name:'Pogrubienie', key:'B', openWith:'[b]', closeWith:'[/b]'},
+        {name:'Kursywa', key:'I', openWith:'[i]', closeWith:'[/i]'},
+        {name:'Podkreślenie', key:'I', openWith:'[u]', closeWith:'[/u]'},
+        {name:'Przekreślenie', key:'S', openWith:'[s]', closeWith:'[/s]'},
+        {separator:'---------------' },
+        {name:'Subscript', openWith:'[sub]', closeWith:'[/sub]'},
+        {name:'Superscript', openWith:'[sup]', closeWith:'[/sup]'},
+        {name:'Do lewej', openWith:'[left]', closeWith:'[/left]'},
+        {name:'Do środka', openWith:'[center]', closeWith:'[/center]'},
+        {name:'Do prawej', openWith:'[right]', closeWith:'[/right]'},
+        {separator:'---------------' },
+        {name:'Wypunktowana lista', openWith:'[list]\n', closeWith:'\n[/list]'},
+        {name:'Numeryczna lista', openWith:'[list=[![Początkowa liczba]!]]\n', closeWith:'\n[/list]'},
+        {name:'Punkt listy', openWith:'[*] '},
+        {separator:'---------------' },
+        {name:'Kolor', openWith:'[color=[![Kolor]!]]', closeWith:'[/color]', dropMenu: [
+            {name:'Żółty', openWith:'[color=yellow]', closeWith:'[/color]', className:"col1-1" },
+            {name:'Pomarańczowy', openWith:'[color=orange]', closeWith:'[/color]', className:"col1-2" },
+            {name:'Czerwony', openWith:'[color=red]', closeWith:'[/color]', className:"col1-3" },
+            {name:'Niebieski', openWith:'[color=blue]', closeWith:'[/color]', className:"col2-1" },
+            {name:'Purpurowy', openWith:'[color=purple]', closeWith:'[/color]', className:"col2-2" },
+            {name:'Zielony', openWith:'[color=green]', closeWith:'[/color]', className:"col2-3" },
+            {name:'Biały', openWith:'[color=white]', closeWith:'[/color]', className:"col3-1" },
+            {name:'Szary', openWith:'[color=gray]', closeWith:'[/color]', className:"col3-2" },
+            {name:'Czarny', openWith:'[color=black]', closeWith:'[/color]', className:"col3-3" }
+        ]},
+        {name:'Rozmiar', openWith:'[size=[![Text size]!]]', closeWith:'[/size]', dropMenu :[
+            {name:'Duży', openWith:'[size=5]', closeWith:'[/size]' },
+            {name:'Normalny', openWith:'[size=3]', closeWith:'[/size]' },
+            {name:'Mały', openWith:'[size=2]', closeWith:'[/size]' }
+        ]},
+        {separator:'---------------' },
+        {name:'Zdjęcie', key:"P", replaceWith:'[img][![Url:!:http://]!][/img]'},
+        {name:'Link', key:"L", openWith:'[url=', closeWith:'[![Tytuł]!]][![Url:!:http://]!][/url]'},
+        {separator:'---------------'},
+        {name:'Cytat', openWith:'[quote]', closeWith: '[/quote]'},
+        {name:'Kod', openWith:'[code]', closeWith:'[/code]'}
+    ]
+});
+</script>

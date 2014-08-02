@@ -1,0 +1,33 @@
+<div class="ionic-box">
+	<h2>Typowanie meczów</h2>
+	<div class="ionic-toolbar">
+		<a href="bet/index">Ranking</a>
+		<a href="bet/archive">Archiwum typów</a>
+		{% if type == 'betting' %}<a href="bet/reset">Zacznij od nowa</a>{% endif %}
+	</div>
+	<div class="ionic-notice">
+		Aktualnie posiadasz {{ current_user.bet_points }} punktów.
+	</div>
+	<table class="ionic-table">
+		<tr>
+			<th>Mecz</th>
+			<th style="width: 60px">Twój typ</th>
+			<th style="width: 150px">Koniec typowania</th>
+		</tr>
+		{% for match in matches %}
+		<tr>
+			<td><a href="bet/match/{{ match.id }}">{{ match.home }} vs. {{ match.away }}</a></td>
+			<td>
+				{% if bets[match.id] is defined %}
+				{% if bets[match.id] == 1 %}remis{% elseif bets[match.id] == 2 %}gość{% else %}gospodarz{% endif %}
+				{% else %}
+				brak
+				{% endif %}
+			</td>
+			<td>
+				{{ match.date_end|date }}
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+</div>

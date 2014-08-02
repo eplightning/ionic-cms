@@ -1,0 +1,23 @@
+<div class="ionic-box">
+	<h2>Pliki do pobrania</h2>
+	{% if categories|length > 0 %}
+	{% for cat in categories %}
+	<div class="ionic-post">
+		<div class="ionic-post-left">
+			<div class="ionic-post-avatar">{% if cat.file_image %}<img src="{{ thumb('files', cat.file_image, '120x0') }}" alt="" />{% endif %}</div>
+		</div>
+		<div class="ionic-post-right">
+			<div class="ionic-post-info">
+				<a href="files/category/{{ cat.slug }}">{{ cat.title }}</a>
+			</div>
+			<div class="ionic-post-content">
+				{{ cat.description }}
+				{% if cat.file_slug %}<p><strong>Ostatnio dodany plik: </strong><a href="files/show/{{ cat.file_slug }}">{{ cat.file_title }}</a></p>{% endif %}
+			</div>
+		</div>
+	</div>
+	{% endfor %}
+	{% else %}
+	<p>Brak kategorii plików</p>
+	{% endif %}
+</div>

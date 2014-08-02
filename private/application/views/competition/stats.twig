@@ -1,0 +1,29 @@
+<div class="ionic-box">
+	<h2>Statystyki zawodników - {{ competition.name }} - {{ season.year }} / {{ season.year+1 }}</h2>
+	<table class="ionic-table">
+		<tr>
+			<th>P.</th>
+			<th style="width: 36px"></th>
+			<th>Zawodnik</th>
+			<th{% if sort_by == 'matches' %} class="active"{% endif %}><a href="competition/stats/{{ competition.slug }}/{{ season.year }}/matches">M.</a></th>
+            <th{% if sort_by == 'minutes' %} class="active"{% endif %}><a href="competition/stats/{{ competition.slug }}/{{ season.year }}/minutes">Min.</a></th>
+			<th{% if sort_by == 'goals' %} class="active"{% endif %}><a href="competition/stats/{{ competition.slug }}/{{ season.year }}/goals">Bramek</a></th>
+			<th{% if sort_by == 'yellow_cards' %} class="active"{% endif %}><a href="competition/stats/{{ competition.slug }}/{{ season.year }}/yellow_cards">Ż. kartki</a></th>
+			<th{% if sort_by == 'red_cards' %} class="active"{% endif %}><a href="competition/stats/{{ competition.slug }}/{{ season.year }}/red_cards">C. kartki</a></th>
+			<th{% if sort_by == 'assists' %} class="active"{% endif %}><a href="competition/stats/{{ competition.slug }}/{{ season.year }}/assists">Asysty</a></th>
+		</tr>
+		{% for player in players %}
+		<tr>
+			<td>{{ loop.index }}.</td>
+			<td class="centered"><img src="{{ thumb('teams', player.team_image, '16x0') }}" alt="" /></td>
+			<td><a href="team/player/{{ player.team_slug }}/{{ player.player_slug }}">{{ player.player_name }}</a></td>
+			<td class="centered">{{ player.matches }}</td>
+            <td class="centered">{{ player.minutes }}</td>
+			<td class="centered">{{ player.goals }}</td>
+			<td class="centered">{{ player.yellow_cards }}</td>
+			<td class="centered">{{ player.red_cards }}</td>
+			<td class="centered">{{ player.assists }}</td>
+		</tr>
+		{% endfor %}
+	</table>
+</div>

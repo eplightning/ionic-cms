@@ -1,0 +1,39 @@
+{% if monthpick.player is not null %}
+<strong>{{ monthpick.player.title }}</strong>
+<ul class="players">
+	<li>
+		<div>
+			<img src="{{ thumb('players', monthpick.player.image, '100x0') }}" alt="Zawodnik" />
+			<div class="player-info">
+				<strong>{{ monthpick.player.name }}</strong>
+			</div>
+			<div class="player-info">
+				{{ monthpick.player_votes }} głosów ({{ monthpick.player_percent }}%)
+			</div>
+		</div>
+	</li>
+</ul>
+{% endif %}
+{% if monthpick.active.is_init %}
+<div>
+	<strong>{{ monthpick.active.title }}</strong>
+	{% if monthpick.active.can_vote() %}
+	<form action="monthpick/vote" method="post">
+		<div style="margin: 5px; padding: 5px">
+			<select name="option">
+				{% for k, opt in monthpick.active.options %}
+					<option value="{{ k }}">{{ opt.name }}</option>
+				{% endfor %}
+			</select>
+		</div>
+		<div style="margin: 5px; padding: 5px">
+			{{ form_token() }}
+			<input type="submit" name="submit" value="Głosuj" />
+		</div>
+	</form>
+	{% endif %}
+	<div style="margin: 5px; padding: 5px">
+		<a href="monthpick/show/{{ monthpick.active.id }}">Szczegóły głosowania</a>
+	</div>
+</div>
+{% endif %}

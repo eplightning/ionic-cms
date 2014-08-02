@@ -1,0 +1,70 @@
+<div class="ionic-box">
+	<h2>Relacja live: {{ relation.home_name }} vs. {{ relation.away_name }}</h2>
+	<div class="ionic-match-score">
+		<img src="{{ thumb('teams', relation.home_image, '64x0') }}" alt="{{ relation.home_name }}" />
+		<div>{{ relation.current_score ? relation.current_score : '-:-' }}</div>
+		<img src="{{ thumb('teams', relation.away_image, '64x0') }}" alt="{{ relation.away_name }}" />
+	</div>
+	<div class="ionic-relation-details">
+		<div class="ionic-relation-home">
+			<h3>Pierwszy skład</h3>
+			{% for p in players.0 %}
+			{{ p.number }}. {{ p.name }}<br />
+			{% endfor %}
+			<h3>Rezerwa</h3>
+			{% for p in players.1 %}
+			{{ p.number }}. {{ p.name }}<br />
+			{% endfor %}
+			<h3>Gole</h3>
+			{% for g in goals.0 %}
+			{{ g.minute}}' {{ g.name }} {% if g.type == 'penalty' %}(rk.){% elseif g.type == 'suicide' %}(samobójczy){% endif %}<br />
+			{% endfor %}
+			<h3>Kartki</h3>
+			{% for c in cards.0 %}
+			{{ c.minute }}' {{ c.name }} - {% if c.type == 'yellow' %}żółta{% else %}czerwona{% endif %}<br />
+			{% endfor %}
+			<h3>Zmiany</h3>
+			{% for c in changes.0 %}
+			{{ c.minute }}' {{ c.name }} -&gt; {{ c.new_player }}<br />
+			{% endfor %}
+		</div>
+		<div class="ionic-relation-away">
+			<h3>Pierwszy skład</h3>
+			{% for p in players.2 %}
+			{{ p.number }}. {{ p.name }}<br />
+			{% endfor %}
+			<h3>Rezerwa</h3>
+			{% for p in players.3 %}
+			{{ p.number }}. {{ p.name }}<br />
+			{% endfor %}
+			<h3>Gole</h3>
+			{% for g in goals.1 %}
+			{{ g.minute}}' {{ g.name }} {% if g.type == 'penalty' %}(rk.){% elseif g.type == 'suicide' %}(samobójczy){% endif %}
+			{% endfor %}
+			<h3>Kartki</h3>
+			{% for c in cards.1 %}
+			{{ c.minute }}' {{ c.name }} - {% if c.type == 'yellow' %}żółta{% else %}czerwona{% endif %}<br />
+			{% endfor %}
+			<h3>Zmiany</h3>
+			{% for c in changes.1 %}
+			{{ c.minute }}' {{ c.name }} -&gt; {{ c.new_player }}<br />
+			{% endfor %}
+		</div>
+	</div>
+</div>
+<div class="ionic-box" id="relation-messages">
+	<ul class="ionic-list">
+		{% for msg in messages %}
+		<li>
+			{{ msg.minute_display ? msg.minute_display : msg.minute }}: <small>({{ types[msg.type] }})</small> {{ msg.message }}
+		</li>
+		{% endfor %}
+	</ul>
+</div>
+{% if relation.is_finished == 0 and refresh >= 1 %}
+<script type="text/javascript">
+$(document).ready(function(){
+	IonicPage.setupRelationRefresh({{ refresh }}, {{ relation.id }});
+});
+</script>
+{% endif %}

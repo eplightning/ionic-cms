@@ -1,0 +1,27 @@
+<div class="section">
+	<div class="theader">
+		<div class="theader2">
+			Ustawienia widżetu
+		</div>
+	</div>
+	<div class="section-content">
+		<form action="{{ action }}" method="post">
+			<div class="elem">
+				<label for="limit">Limit filmów:</label>
+				<div class="right">
+					<input type="text" name="limit" id="limit" value="{{ options.limit }}" maxlength="10" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="template">Plik wyglądu:<br /><small>Plik znajdujący się w katalogu private/application/views. Zamiast slashów użyj kropek, nie dodawaj rozszerzenia</small></label>
+				<div class="right">
+					<input type="text" name="template" id="template" value="{{ options.template }}" />
+				</div>
+			</div>
+			<div class="toolbar ui-widget-header ui-corner-all">
+				{{ form_token() }}
+				<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+			</div>
+		</form>
+	</div>
+</div>

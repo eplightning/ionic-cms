@@ -1,0 +1,29 @@
+<h2>Konfiguracja</h2>
+<form action="{{ action }}" method="post">
+{% for section, i in config %}
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">{{ section }}</div>
+		</div>
+		<div class="section-content">
+			{% for j in i %}
+			<div class="elem">
+				<label for="{{ j.item.php_key }}">{{ j.item.name }}<br /><small>{{ j.item.description }}</small></label>
+				<div class="right">
+				{{ j.html }}
+				</div>
+			</div>
+			{% endfor %}
+		</div>
+	</div>
+{% endfor %}
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function() {
+	$('input[type="submit"]').button();
+});
+</script>

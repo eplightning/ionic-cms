@@ -1,0 +1,12 @@
+{% for seasons in list %}
+<div class="ionic-box">
+{% for row in seasons %}
+<h2>{{ row.name }}</h2>
+<ul class="ionic-list">
+    {% for k, v in row.links %}
+    <li><a href="{{ v }}">{{ k }}</a></li>
+    {% endfor %}
+</ul>
+{% endfor %}
+</div>
+{% endfor %}

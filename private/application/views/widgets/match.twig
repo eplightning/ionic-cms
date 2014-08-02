@@ -1,0 +1,8 @@
+{% if match %}
+<p>Następny mecz:</p>
+<ul class="ionic-list">
+	<li>{{ match.home_name }} vs. {{ match.away_name }}</li>
+	<li>{{ match.date|date }}</li>
+	<li>{{ match.competition_name }} ({{ match.fixture_name }})</li>
+</ul>
+{% endif %}

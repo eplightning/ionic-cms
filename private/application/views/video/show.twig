@@ -1,0 +1,16 @@
+<div class="ionic-box">
+	<h2>Video - {{ video.title }}</h2>
+	<ul class="ionic-list">
+		<li><span class="title">Data dodania:</span> {{ video.created_at|date }}</li>
+		<li><span class="title">Dodane przez:</span> <a href="{{ make('user', video.user_slug) }}">{{ video.display_name }}</a></li>
+	</ul>
+</div>
+<div class="ionic-box">
+	<div style="text-align: center">
+		{{ video.embed }}
+	</div>
+	<div class="ionic-post-content" style="margin-top: 10px">
+		{{ video.description }}
+	</div>
+</div>
+{{ comments }}
