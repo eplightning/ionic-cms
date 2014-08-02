@@ -776,6 +776,39 @@ Autoloader::namespaces(array(
     'Symfony\Component\Console' => path('sys').'vendor/Symfony/Component/Console',
     'Symfony\Component\HttpFoundation' => path('sys').'vendor/Symfony/Component/HttpFoundation'));
 
+if (defined('HACK_BROKENFCGI'))
+{
+    $req = strstr($_SERVER['REQUEST_URI'], '?');
+
+    if ($req)
+    {
+        $req = substr($req, 1);
+
+        if (!empty($req))
+        {
+            $_GET = array();
+
+            $str = explode('&', $req);
+
+            foreach ($str as $s)
+            {
+                if (empty($s)) continue;
+
+                $s = explode('=', $s, 2);
+
+                if (!isset($s[1]))
+                {
+                    $s[1] = '1'; // ?
+                }
+
+                $_GET[$s[0]] = $s[1];
+            }
+        }
+    }
+
+    unset($req);
+}
+
 if (magic_quotes())
 {
     $magics = array(&$_GET, &$_POST, &$_COOKIE, &$_REQUEST);
