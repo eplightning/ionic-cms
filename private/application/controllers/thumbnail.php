@@ -68,6 +68,8 @@ class Thumbnail_Controller extends Controller {
             $image->saveToFile(path('public').'upload'.DS.$type.DS.'thumbnail'.DS.$filename.'_'.$size.'.png');
         }
 
+        header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + Config::get('advanced.thumbnail_expires', 86400)));
+
         $image->output('png');
         exit;
     }
