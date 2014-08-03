@@ -379,7 +379,7 @@ img.ionic-right {
 }
 
 #ionic-notifications {
-	position: absolute;
+	position: fixed;
 	right: 10px;
 	top: 10px;
 	width: 400px;
