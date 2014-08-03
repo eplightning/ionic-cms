@@ -214,6 +214,10 @@ class Sport_Package extends \Ionic\Package {
      */
     public function upgrade_package(\Ionic\Package\API $api, $version)
     {
+        // 1.1, 1.1.1 -> 1.2
+        if ($version == '1.1' or $version == '1.1.1')
+            $version = '1.2';
+
         // 1.2 -> 1.2.1
         if ($version == '1.2')
         {

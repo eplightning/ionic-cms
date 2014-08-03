@@ -287,7 +287,14 @@ class Admin_Packages_Controller extends Admin_Controller {
             );
 
             if ($f == 'core')
+            {
+                if ($pkg_class->can_upgrade($installed_packages[$f]->version))
+                {
+                    $list[$f]['actions']['Aktualizuj'] = 'admin/packages/upgrade/'.$f;
+                }
+
                 continue;
+            }
 
             // Installed
             if (isset($installed_packages[$f]))

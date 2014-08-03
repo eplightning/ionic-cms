@@ -104,6 +104,10 @@ class Core_Package extends \Ionic\Package {
             $version = '1.2';
         }
 
+        // nieoficjalny build
+        if ($version == '1.1.1')
+            $version = '1.2';
+
         // 1.2 -> 1.2.1
         if ($version == '1.2')
         {

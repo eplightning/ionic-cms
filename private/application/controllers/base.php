@@ -189,7 +189,7 @@ abstract class Base_Controller extends Controller {
         }
         else
         {
-            Asset::add('mobile', 'public/js/mobile.js', 'jquery')
+            Asset::add('mobile', 'public/js/mobile.js', 'jquery');
         }
 
         if (Config::get('advanced.cookie_policy', true))
