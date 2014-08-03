@@ -136,3 +136,18 @@ IonicCMS 1.2
 		- Zaimplementowano usuwanie/aktualizacje/instalacje (chociaż jak narazie komponent sportowy tego nie obsługuje)
 		- Włącz/wyłącz teraz ukrywa nieaktywne moduły w panelu administracyjnym
 	- Lepsze wsparcie tagów Open Graph
+
+IonicCMS 1.2.1:
+    - Ulepszony wybór tagów/obrazków przy edycji/dodawaniu newsów
+    - Zmiana meta taga csrf_token na csrf-token w celu większej poprawności z HTML5
+    - Poprawione kodowanie znaków specjalnych przez edytor WYSYWIG
+    - Poprawione kodowanie znaków w nagłówkach RSS
+    - Opcjonalny hack dla serwerów z nieprawidłowo skonfigurowanym FastCGI (głównie nginx)
+    - Poprawione wyświetlanie błędów na serwerach z zlib.compression_output
+    - Usunięto niepotrzebny kod ,który powodował niezgodność z nowszymi wersjami PHP (yield)
+    - Poprawki w określaniu tytułu strony
+    - Optymalizacja sortowania według bilansu bramek w tabeli
+    - Obsługa nagłówka HTTP Expires w generatorze miniaturek (konfigurowalne)
+    - Kosmetyczne poprawki w domyślnym ionic.css
+    - Dodana możliwość aktualizacji głównego modułu systemu
+    - Zintegrowane wyświetlanie komunikatu o korzystaniu z cookie (do wyłączenia w konfiguracji)
