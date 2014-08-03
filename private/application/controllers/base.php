@@ -101,6 +101,23 @@ abstract class Base_Controller extends Controller {
             $response->content->with('main_news', $this->main_news);
         }
 
+        // Cookie policy
+        if (Config::get('advanced.cookie_policy', true))
+        {
+            if (Cookie::get('cookie_accept', null) == 'cookie_accept')
+            {
+                $response->content->with('cookie_policy', false);
+            }
+            else
+            {
+                $response->content->with('cookie_policy', true);
+            }
+        }
+        else
+        {
+            $response->content->with('cookie_policy', false);
+        }
+
         // Add menu stuff to layout
         $response->content->with('menu', $menu);
 
@@ -169,6 +186,15 @@ abstract class Base_Controller extends Controller {
         if (!$this->page->is_mobile)
         {
             Asset::add('ionic', 'public/js/ionic.js', 'jquery');
+        }
+        else
+        {
+            Asset::add('mobile', 'public/js/mobile.js', 'jquery')
+        }
+
+        if (Config::get('advanced.cookie_policy', true))
+        {
+            Asset::add('jquery.cookie', 'public/js/jquery.cookie.js', 'jquery');
         }
     }
 
