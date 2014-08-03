@@ -235,7 +235,9 @@ INSERT INTO `{dbp}config` (`id`, `category_id`, `name`, `description`, `section`
 (76, 12, 'Licznik odsłon newsów', 'Włączyć licznik odsłon newsów (dodatkowe zapytanie SQL)?', 'Optymalizacje', '0', 'yesno', '', 'bool', 'news_counter'),
 (77, 12, 'Użyj dużego obrazka', 'Używać dużego obrazka w tagach Open Graph? Dotyczy newsów.', 'Open Graph', '0', 'yesno', '', 'bool', 'og_bigimage'),
 (78, 12, 'Dodaj tytuł strony', 'Czy dodawać tytuł strony w tagach Open Graph?', 'Open Graph', '0', 'yesno', '', 'bool', 'og_fulltitle'),
-(79, 12, 'Domyślny obrazek', 'Adres relatywny do głównego katalogu strony.', 'Open Graph', 'opengraph.png', 'text', '', 'string', 'og_defaultimage');
+(79, 12, 'Domyślny obrazek', 'Adres relatywny do głównego katalogu strony.', 'Open Graph', 'opengraph.png', 'text', '', 'string', 'og_defaultimage'),
+(80, 12, 'Czas ważności miniaturek', 'Czas ważności miniaturek prezentowany w nagłówku HTTP Expires (nie wpływa na działanie generatora) w sekundach.', 'Optymalizacje', '86400', 'text', 'numeric', 'int', 'thumbnail_expires'),
+(81, 12, 'Polityka cookie', 'Czy generować komunikat o polityce cookie?', 'Optymalizacje', '1', 'yesno', '', 'bool', 'cookie_policy');
 
 CREATE TABLE IF NOT EXISTS `{dbp}config_categories` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,

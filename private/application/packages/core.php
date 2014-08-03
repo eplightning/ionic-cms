@@ -65,7 +65,7 @@ class Core_Package extends \Ionic\Package {
      */
     public function get_version()
     {
-        return '1.2';
+        return '1.2.1';
     }
 
     /**
@@ -104,7 +104,16 @@ class Core_Package extends \Ionic\Package {
             $version = '1.2';
         }
 
-        $api->update_package('core', $version);
+        // 1.2 -> 1.2.1
+        if ($version == '1.2')
+        {
+            $api->add_config(12, 'Czas ważności miniaturek', 'Czas ważności miniaturek prezentowany w nagłówku HTTP Expires (nie wpływa na działanie generatora) w sekundach.', 'Optymalizacje', '86400', 'text', 'numeric', 'int', 'thumbnail_expires');
+            $api->add_config(12, 'Polityka cookie', 'Czy generować komunikat o polityce cookie?', 'Optymalizacje', '1', 'yesno', '', 'bool', 'cookie_policy');
+
+            $version = '1.2.1';
+        }
+
+        $api->update_package('core', $this->get_version());
         return true;
     }
 }
