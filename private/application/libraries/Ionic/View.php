@@ -32,17 +32,7 @@ class View extends \Laravel\View {
         $this->view = $view;
         $this->data = $data;
 
-        // In order to allow developers to load views outside of the normal loading
-        // conventions, we'll allow for a raw path to be given in place of the
-        // typical view name, giving total freedom on view loading.
-        if (starts_with($view, 'path: '))
-        {
-            $this->path = substr($view, 6);
-        }
-        else
-        {
-            $this->path = str_replace('.', DS, $view).'.twig';
-        }
+        $this->path = str_replace('.', DS, $view).'.twig';
 
         // If a session driver has been specified, we will bind an instance of the
         // validation error message container to every view. If an error instance
