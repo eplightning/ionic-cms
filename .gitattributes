@@ -1,0 +1,6 @@
+*.php text
+*.css text
+*.html text
+*.twig text
+*.js text
+* text=auto
