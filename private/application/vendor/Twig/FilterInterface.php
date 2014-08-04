@@ -2,39 +2,41 @@
 
 /*
  * This file is part of Twig.
-*
-* (c) 2010 Fabien Potencier
-*
-* For the full copyright and license information, please view the LICENSE
-* file that was distributed with this source code.
-*/
+ *
+ * (c) 2010 Fabien Potencier
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 /**
  * Represents a template filter.
  *
- * @package    twig
- * @author     Fabien Potencier <fabien@symfony.com>
+ * Use Twig_SimpleFilter instead.
+ *
+ * @author Fabien Potencier <fabien@symfony.com>
+ * @deprecated since 1.12 (to be removed in 2.0)
  */
 interface Twig_FilterInterface
 {
-	/**
-	 * Compiles a filter.
-	 *
-	 * @return string The PHP code for the filter
-	 */
-	function compile();
+    /**
+     * Compiles a filter.
+     *
+     * @return string The PHP code for the filter
+     */
+    public function compile();
 
-	function needsEnvironment();
+    public function needsEnvironment();
 
-	function needsContext();
+    public function needsContext();
 
-	function getSafe(Twig_Node $filterArgs);
+    public function getSafe(Twig_Node $filterArgs);
 
-	function getPreservesSafety();
+    public function getPreservesSafety();
 
-	function getPreEscape();
+    public function getPreEscape();
 
-	function setArguments($arguments);
+    public function setArguments($arguments);
 
-	function getArguments();
+    public function getArguments();
 }

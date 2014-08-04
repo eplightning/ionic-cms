@@ -2,83 +2,95 @@
 
 /*
  * This file is part of Twig.
-*
-* (c) 2009 Fabien Potencier
-*
-* For the full copyright and license information, please view the LICENSE
-* file that was distributed with this source code.
-*/
+ *
+ * (c) 2009 Fabien Potencier
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 /**
  * Represents a macro node.
  *
- * @package    twig
- * @author     Fabien Potencier <fabien@symfony.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class Twig_Node_Macro extends Twig_Node
 {
-	public function __construct($name, Twig_NodeInterface $body, Twig_NodeInterface $arguments, $lineno, $tag = null)
-	{
-		parent::__construct(array('body' => $body, 'arguments' => $arguments), array('name' => $name), $lineno, $tag);
-	}
+    public function __construct($name, Twig_NodeInterface $body, Twig_NodeInterface $arguments, $lineno, $tag = null)
+    {
+        parent::__construct(array('body' => $body, 'arguments' => $arguments), array('name' => $name), $lineno, $tag);
+    }
 
-	/**
-	 * Compiles the node to PHP.
-	 *
-	 * @param Twig_Compiler A Twig_Compiler instance
-	 */
-	public function compile(Twig_Compiler $compiler)
-	{
-		$arguments = array();
-		foreach ($this->getNode('arguments') as $argument) {
-			$arguments[] = '$'.$argument->getAttribute('name').' = null';
-		}
+    /**
+     * Compiles the node to PHP.
+     *
+     * @param Twig_Compiler A Twig_Compiler instance
+     */
+    public function compile(Twig_Compiler $compiler)
+    {
+        $compiler
+            ->addDebugInfo($this)
+            ->write(sprintf("public function get%s(", $this->getAttribute('name')))
+        ;
 
-		$compiler
-		->addDebugInfo($this)
-		->write(sprintf("public function get%s(%s)\n", $this->getAttribute('name'), implode(', ', $arguments)), "{\n")
-		->indent()
-		;
+        $count = count($this->getNode('arguments'));
+        $pos = 0;
+        foreach ($this->getNode('arguments') as $name => $default) {
+            $compiler
+                ->raw('$_'.$name.' = ')
+                ->subcompile($default)
+            ;
 
-		if (!count($this->getNode('arguments'))) {
-			$compiler->write("\$context = \$this->env->getGlobals();\n\n");
-		} else {
-			$compiler
-			->write("\$context = \$this->env->mergeGlobals(array(\n")
-			->indent()
-			;
+            if (++$pos < $count) {
+                $compiler->raw(', ');
+            }
+        }
 
-			foreach ($this->getNode('arguments') as $argument) {
-				$compiler
-				->write('')
-				->string($argument->getAttribute('name'))
-				->raw(' => $'.$argument->getAttribute('name'))
-				->raw(",\n")
-				;
-			}
+        $compiler
+            ->raw(")\n")
+            ->write("{\n")
+            ->indent()
+        ;
 
-			$compiler
-			->outdent()
-			->write("));\n\n")
-			;
-		}
+        if (!count($this->getNode('arguments'))) {
+            $compiler->write("\$context = \$this->env->getGlobals();\n\n");
+        } else {
+            $compiler
+                ->write("\$context = \$this->env->mergeGlobals(array(\n")
+                ->indent()
+            ;
 
-		$compiler
-		->write("\$blocks = array();\n\n")
-		->write("ob_start();\n")
-		->write("try {\n")
-		->indent()
-		->subcompile($this->getNode('body'))
-		->outdent()
-		->write("} catch(Exception \$e) {\n")
-		->indent()
-		->write("ob_end_clean();\n\n")
-		->write("throw \$e;\n")
-		->outdent()
-		->write("}\n\n")
-		->write("return ob_get_clean();\n")
-		->outdent()
-		->write("}\n\n")
-		;
-	}
+            foreach ($this->getNode('arguments') as $name => $default) {
+                $compiler
+                    ->write('')
+                    ->string($name)
+                    ->raw(' => $_'.$name)
+                    ->raw(",\n")
+                ;
+            }
+
+            $compiler
+                ->outdent()
+                ->write("));\n\n")
+            ;
+        }
+
+        $compiler
+            ->write("\$blocks = array();\n\n")
+            ->write("ob_start();\n")
+            ->write("try {\n")
+            ->indent()
+            ->subcompile($this->getNode('body'))
+            ->outdent()
+            ->write("} catch (Exception \$e) {\n")
+            ->indent()
+            ->write("ob_end_clean();\n\n")
+            ->write("throw \$e;\n")
+            ->outdent()
+            ->write("}\n\n")
+            ->write("return ('' === \$tmp = ob_get_clean()) ? '' : new Twig_Markup(\$tmp, \$this->env->getCharset());\n")
+            ->outdent()
+            ->write("}\n\n")
+        ;
+    }
 }

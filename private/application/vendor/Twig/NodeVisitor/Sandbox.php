@@ -2,105 +2,91 @@
 
 /*
  * This file is part of Twig.
-*
-* (c) 2009 Fabien Potencier
-*
-* For the full copyright and license information, please view the LICENSE
-* file that was distributed with this source code.
-*/
+ *
+ * (c) 2009 Fabien Potencier
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 /**
  * Twig_NodeVisitor_Sandbox implements sandboxing.
  *
- * @package    twig
- * @author     Fabien Potencier <fabien@symfony.com>
+ * @author Fabien Potencier <fabien@symfony.com>
  */
 class Twig_NodeVisitor_Sandbox implements Twig_NodeVisitorInterface
 {
-	protected $inAModule = false;
-	protected $tags;
-	protected $filters;
-	protected $functions;
+    protected $inAModule = false;
+    protected $tags;
+    protected $filters;
+    protected $functions;
 
-	/**
-	 * Called before child nodes are visited.
-	 *
-	 * @param Twig_NodeInterface $node The node to visit
-	 * @param Twig_Environment   $env  The Twig environment instance
-	 *
-	 * @return Twig_NodeInterface The modified node
-	 */
-	public function enterNode(Twig_NodeInterface $node, Twig_Environment $env)
-	{
-		// in a sandbox tag, only include tags are allowed
-		if ($node instanceof Twig_Node_Sandbox && !$node->getNode('body') instanceof Twig_Node_Include) {
-			foreach ($node->getNode('body') as $n) {
-				if ($n instanceof Twig_Node_Text && ctype_space($n->getAttribute('data'))) {
-					continue;
-				}
+    /**
+     * Called before child nodes are visited.
+     *
+     * @param Twig_NodeInterface $node The node to visit
+     * @param Twig_Environment   $env  The Twig environment instance
+     *
+     * @return Twig_NodeInterface The modified node
+     */
+    public function enterNode(Twig_NodeInterface $node, Twig_Environment $env)
+    {
+        if ($node instanceof Twig_Node_Module) {
+            $this->inAModule = true;
+            $this->tags = array();
+            $this->filters = array();
+            $this->functions = array();
 
-				if (!$n instanceof Twig_Node_Include) {
-					throw new Twig_Error_Syntax('Only "include" tags are allowed within a "sandbox" section', $n->getLine());
-				}
-			}
-		}
+            return $node;
+        } elseif ($this->inAModule) {
+            // look for tags
+            if ($node->getNodeTag()) {
+                $this->tags[] = $node->getNodeTag();
+            }
 
-		if ($node instanceof Twig_Node_Module) {
-			$this->inAModule = true;
-			$this->tags = array();
-			$this->filters = array();
-			$this->functions = array();
+            // look for filters
+            if ($node instanceof Twig_Node_Expression_Filter) {
+                $this->filters[] = $node->getNode('filter')->getAttribute('value');
+            }
 
-			return $node;
-		} elseif ($this->inAModule) {
-			// look for tags
-			if ($node->getNodeTag()) {
-				$this->tags[] = $node->getNodeTag();
-			}
+            // look for functions
+            if ($node instanceof Twig_Node_Expression_Function) {
+                $this->functions[] = $node->getAttribute('name');
+            }
 
-			// look for filters
-			if ($node instanceof Twig_Node_Expression_Filter) {
-				$this->filters[] = $node->getNode('filter')->getAttribute('value');
-			}
+            // wrap print to check __toString() calls
+            if ($node instanceof Twig_Node_Print) {
+                return new Twig_Node_SandboxedPrint($node->getNode('expr'), $node->getLine(), $node->getNodeTag());
+            }
+        }
 
-			// look for functions
-			if ($node instanceof Twig_Node_Expression_Function) {
-				$this->functions[] = $node->getAttribute('name');
-			}
+        return $node;
+    }
 
-			// wrap print to check __toString() calls
-			if ($node instanceof Twig_Node_Print) {
-				return new Twig_Node_SandboxedPrint($node->getNode('expr'), $node->getLine(), $node->getNodeTag());
-			}
-		}
+    /**
+     * Called after child nodes are visited.
+     *
+     * @param Twig_NodeInterface $node The node to visit
+     * @param Twig_Environment   $env  The Twig environment instance
+     *
+     * @return Twig_NodeInterface The modified node
+     */
+    public function leaveNode(Twig_NodeInterface $node, Twig_Environment $env)
+    {
+        if ($node instanceof Twig_Node_Module) {
+            $this->inAModule = false;
 
-		return $node;
-	}
+            return new Twig_Node_SandboxedModule($node, array_unique($this->filters), array_unique($this->tags), array_unique($this->functions));
+        }
 
-	/**
-	 * Called after child nodes are visited.
-	 *
-	 * @param Twig_NodeInterface $node The node to visit
-	 * @param Twig_Environment   $env  The Twig environment instance
-	 *
-	 * @return Twig_NodeInterface The modified node
-	 */
-	public function leaveNode(Twig_NodeInterface $node, Twig_Environment $env)
-	{
-		if ($node instanceof Twig_Node_Module) {
-			$this->inAModule = false;
+        return $node;
+    }
 
-			return new Twig_Node_SandboxedModule($node, array_unique($this->filters), array_unique($this->tags), array_unique($this->functions));
-		}
-
-		return $node;
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function getPriority()
-	{
-		return 0;
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public function getPriority()
+    {
+        return 0;
+    }
 }
