@@ -527,7 +527,8 @@ class Admin_Images_Controller extends Admin_Controller {
             Asset::add('jcrop', 'public/js/jquery.Jcrop.min.js', 'jquery');
 
         Asset::add('jeditable', 'public/js/jquery.jeditable.min.js', 'jquery');
-
+        Asset::add('lazyload', 'public/js/jquery.lazyload.min.js', 'jquery');
+        
         $this->view = View::make('admin.images.index', array(
                     'directories' => $directories,
                     'images'      => $images,

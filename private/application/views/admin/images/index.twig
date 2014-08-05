@@ -47,7 +47,7 @@
 	<li id="image-{{ key }}">
 		<div class="image-title-bg"></div>
 		<span class="image-title" id="image-name-{{ key }}">{{ image }}</span>
-		<img src="public/{{ path }}/{{ image }}" alt="" />
+		<img data-original="public/{{ path }}/{{ image }}" alt="" class="image-display" />
 		<div class="image-toolbox-bg"></div>
 		<div class="image-toolbox">
 			{% if can('admin_images_delete') %}<a title="Usuń" class="delete-image"><img src="public/img/admin/delete.png" alt="" /></a>{% endif %}
@@ -154,6 +154,30 @@
 </div>
 {% endif %}
 <script type="text/javascript">
+{# nie chcemy słabych przeglądarek zniszczyć więc tylko poniżej 500 elementów #}
+{% if images|length < 500 %}
+function image_list_adjust_margin()
+{
+	var img_section = $('#image-section');
+	var width = img_section.width();
+	var image_width = 232; // todo: auto
+	var images_per_row = Math.floor(width / image_width);
+	var margin = Math.floor((width - images_per_row * image_width) / images_per_row / 2);
+
+	$('.image-list li').stop(true, true);
+
+	$('.image-list li').animate({
+		marginLeft: margin + 'px',
+		marginRight: margin + 'px'
+	}, 900, 'swing');
+}
+
+image_list_adjust_margin();
+$(window).resize(image_list_adjust_margin);
+{% endif %}
+
+$('.image-display').lazyload({effect: 'fadeIn'});
+
 {% if can('admin_images_add') %}
 $('#add-directory').button({icons: { primary: 'ui-icon-plus' }}).click(function() { $('#dialog-add-directory').dialog('open'); });
 $('#upload-image').button({icons: { primary: 'ui-icon-plus' }}).click(function() { $('#dialog-upload-image').dialog('open'); });
