@@ -1,7 +1,7 @@
 <fieldset>
 	{% for option in options %}
 	<p>
-	<strong>{{ option.title }}:</strong> {% if option.votes == 0 or item.votes == 0 %}0%{% else %}{{ option.votes/item.votes*100 }}%{% endif %} ({{ option.votes }})
+	<strong>{{ option.title }}:</strong> {% if option.votes == 0 or item.votes == 0 %}0%{% else %}{{ (option.votes/item.votes*100)|number_format(2, '.') }}%{% endif %} ({{ option.votes }})
 	{% endfor %}
 	</p>
 </fieldset>

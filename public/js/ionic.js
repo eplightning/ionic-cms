@@ -3,6 +3,7 @@ var IonicPage = {
     lastCommentId: null,
     contentId: null,
     contentType: null,
+    hiddenProperty: null,
 
     refreshShoutbox: function() {
         $('.shoutbox-refresh').prop('disabled', true);
@@ -60,12 +61,21 @@ var IonicPage = {
         }, 'json');
     },
 
+    refreshShoutboxAuto: function() {
+        if (IonicPage.hiddenProperty !== null && document[IonicPage.hiddenProperty])
+        {
+            return;
+        }
+
+        IonicPage.refreshShoutbox();
+    },
+
     setShoutboxAutoRefresh: function(seconds) {
         if (seconds < 1) seconds = 1;
 
         seconds *= 1000;
 
-        setInterval(function() { IonicPage.refreshShoutbox(); }, seconds);
+        setInterval(IonicPage.refreshShoutboxAuto, seconds);
     },
 
     initKarma: function(cid, ctype) {
@@ -158,6 +168,23 @@ var IonicPage = {
 
 $(function() {
     IonicPage.csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+    if (typeof document.hidden !== 'undefined')
+    {
+        IonicPage.hiddenProperty = 'hidden';
+    }
+    else if (typeof document.mozHidden !== 'undefined')
+    {
+        IonicPage.hiddenProperty = 'mozHidden';
+    }
+    else if (typeof document.msHidden !== 'undefined')
+    {
+        IonicPage.hiddenProperty = 'msHidden';
+    }
+    else if (typeof document.webkitHidden != 'undefined')
+    {
+        IonicPage.hiddenProperty = 'webkitHidden';
+    }
 
     $('.shoutbox-refresh').click(function(){
         if (!$(this).prop('disabled'))
