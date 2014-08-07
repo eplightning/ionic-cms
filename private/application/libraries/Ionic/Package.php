@@ -18,6 +18,7 @@ namespace Ionic;
  * int|bool    ionic.karma_add(int content_id, string type) <- type == 'up' or type == 'down'
  * array       ionic.karma_valid(string type)
  * array       ionic.notification_add(string type, User user, array parameters)
+ * array       ionic.pagemap_links(string format)
  *
  * @package Ionic
  * @author  Wrexdot <wrexdot@gmail.com>

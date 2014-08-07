@@ -1,35 +1,11 @@
 <div class="ionic-box">
 	<h2>Mapa strony</h2>
-	<h3>Ogólne</h3>
+	{% for section, pair in links %}
+	<h3>{{ section }}</h3>
 	<ul class="ionic-list">
-		<li><a href="news/index">Strona główna</a></li>
-		<li><a href="news/archive">Archiwum newsów</a></li>
-		<li><a href="news/rss">RSS</a></li>
-		<li><a href="bet/index">Typer</a></li>
-		<li><a href="blog/index">Blogi użytkowników</a></li>
-		<li><a href="competition/index">Rozgrywki (tabele, terminarze itd.)</a></li>
-		<li><a href="competition/injuries">Kontuzje</a></li>
-		<li><a href="competition/transfers">Transfery</a></li>
-		<li><a href="conversations/index">Prywatne dyskusje</a></li>
-		<li><a href="files/index">Repozytorium plików</a></li>
-		<li><a href="friends/index">Lista znajomych</a></li>
-		<li><a href="gallery/index">Galeria</a></li>
-		<li><a href="live/index">Relacje live</a></li>
-		<li><a href="login/index">Logowanie</a></li>
-		<li><a href="login/password">Zapomniane hasło</a></li>
-		<li><a href="matchpick/index">Piłkarz meczu</a></li>
-		<li><a href="monthpick/index">Piłkarz miesiąca</a></li>
-		<li><a href="poll/index">Archiwum sond</a></li>
-		<li><a href="submit/news">Zaproponuj news</a></li>
-		<li><a href="shoutbox/index">Archiwum shoutboxa</a></li>
-		<li><a href="users/list">Lista użytkowników</a></li>
-		<li><a href="users/online">Użytkownicy online</a></li>
-		<li><a href="video/index">Biblioteka video</a></li>
-	</ul>
-	<h3>Podstrony</h3>
-	<ul class="ionic-list">
-		{% for page in pages %}
-		<li><a href="page/show/{{ page.slug }}">{{ page.title }}</a></li>
+		{% for name, link in pair %}
+		<li><a href="{{ base_url }}/{{ link }}">{{ name }}</a></li>
 		{% endfor %}
 	</ul>
+	{% endfor %}
 </div>

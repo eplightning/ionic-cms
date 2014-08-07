@@ -12,15 +12,87 @@ class Page_Controller extends Base_Controller {
     /**
      * Site map
      */
-    public function action_map()
+    public function action_map($format = 'html')
     {
-        $this->page->set_title('Mapa strony');
-        $this->page->breadcrumb_append('Mapa strony', 'page/map');
-        $this->online('Mapa strony', 'page/map');
+        if (Cache::has('pagemap-links'))
+        {
+            $links = Cache::get('pagemap-links');
+        }
+        else
+        {
+            $links = array('Główne' => array(), 'Dla zalogowanych' => array(), 'Podstrony' => array(), 'Newsy' => array());
 
-        $this->view = View::make('page.map', array(
-                    'pages' => DB::table('pages')->take(100)->get(array('title', 'slug'))
-                ));
+            $links['Główne']['Strona główna'] = 'news';
+            $links['Główne']['Archiwum newsów'] = 'news/archive';
+            $links['Główne']['RSS'] = 'news/rss';
+            $links['Główne']['Blogi użytkowników'] = 'blog';
+            $links['Dla zalogowanych']['Prywatne dyskusje'] = 'conversations';
+            $links['Główne']['Repozytorium plików'] = 'files';
+            $links['Dla zalogowanych']['Lista znajomych'] = 'friends';
+            $links['Główne']['Galeria'] = 'gallery';
+            $links['Główne']['Logowanie'] = 'login';
+            $links['Główne']['Formularz przywracania zapomnianego hasła'] = 'login/password';
+            $links['Główne']['Archiwum sond'] = 'poll';
+            $links['Dla zalogowanych']['Zaproponuj news'] = 'submit/news';
+            $links['Główne']['Archiwum shoutbox\'a'] = 'shoutbox';
+            $links['Główne']['Lista użytkowników'] = 'users/list';
+            $links['Główne']['Użytkownicy online'] = 'users/online';
+            $links['Główne']['Biblioteka video'] = 'video';
+
+            foreach (DB::table('news')->order_by('id', 'desc')->take(100)->get(array('title', 'slug')) as $p)
+            {
+                $links['Newsy'][$p->title] = 'news/show/'.$p->slug;
+            }
+
+            foreach (DB::table('pages')->order_by('id', 'desc')->take(100)->get(array('title', 'slug')) as $p)
+            {
+                $links['Podstrony'][$p->title] = 'page/show/'.$p->slug;
+            }
+
+            foreach (\Event::fire('ionic.pagemap_links', array($format)) as $r)
+            {
+                if (is_array($r))
+                {
+                    $links = array_merge($links, $r);
+                }
+            }
+
+            Cache::put('pagemap-links', $links);
+        }
+
+        if ($format == 'sitemap.xml' || $format == 'xml')
+        {
+            $xml = new SimpleXMLElement("<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">
+</urlset>");
+
+            $base = URL::base();
+
+            foreach ($links as $links2)
+            {
+                foreach ($links2 as $title => $url)
+                {
+                    $elem = $xml->addChild('url');
+
+                    $elem->addChild('loc', $base.'/'.$url);
+                }
+            }
+
+            return Response::make($xml->asXML(), 200, array(
+                'Content-type' => 'text/xml; charset=UTF-8'
+            ));
+        }
+        else
+        {
+            $this->page->set_title('Mapa strony');
+            $this->page->breadcrumb_append('Mapa strony', 'page/map');
+            $this->online('Mapa strony', 'page/map');
+
+            $this->view = View::make('page.map', array(
+                'base_url' => URL::base(),
+                'links' => $links
+            ));
+        }
     }
 
     /**

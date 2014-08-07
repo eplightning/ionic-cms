@@ -88,79 +88,131 @@ class Sport_Package extends \Ionic\Package {
     public function init_package()
     {
         // Widget names
-        \Event::listen('ionic.widget_name', function()
-                {
-                    return array(
-                        'relation' => 'Relacja live',
-                        'matchpick' => 'Piłkarz meczu',
-                        'monthpick' => 'Piłkarz miesiąca',
-                        'injuries' => 'Kontuzje',
-                        'table' => 'Tabela',
-                        'timetable' => 'Terminarz',
-                        'transfers' => 'Transfery',
-                        'birthdays' => 'Urodziny zaw.',
-                        'match' => 'Mecz',
-                        'stats' => 'Statystyki',
-                    );
-                });
+        \Event::listen('ionic.widget_name', function() {
+            return array(
+                'relation' => 'Relacja live',
+                'matchpick' => 'Piłkarz meczu',
+                'monthpick' => 'Piłkarz miesiąca',
+                'injuries' => 'Kontuzje',
+                'table' => 'Tabela',
+                'timetable' => 'Terminarz',
+                'transfers' => 'Transfery',
+                'birthdays' => 'Urodziny zaw.',
+                'match' => 'Mecz',
+                'stats' => 'Statystyki',
+            );
+        });
 
         // Template directories
-        \Event::listen('ionic.template_directories', function()
-                {
-                    return array(
-                        'bet' => 'Typer',
-                        'competition' => 'Rozgrywki',
-                        'live' => 'Relacje live',
-                        'match' => 'Mecz',
-                        'matchpick' => 'Piłkarz meczu',
-                        'monthpick' => 'Piłkarz miesiąca',
-                        'team' => 'Klub',
-                    );
-                });
+        \Event::listen('ionic.template_directories', function() {
+            return array(
+                'bet' => 'Typer',
+                'competition' => 'Rozgrywki',
+                'live' => 'Relacje live',
+                'match' => 'Mecz',
+                'matchpick' => 'Piłkarz meczu',
+                'monthpick' => 'Piłkarz miesiąca',
+                'team' => 'Klub',
+            );
+        });
 
         // Allowed thumbnail
-        \Event::listen('ionic.thumbnail_allowed', function($type)
-                {
-                    if ($type == 'teams' or $type == 'players')
-                        return true;
-                });
+        \Event::listen('ionic.thumbnail_allowed', function($type) {
+            if ($type == 'teams' or $type == 'players')
+                return true;
+        });
 
         // Controller path
-        \Event::listen('ionic.controller_path', function($controller)
-                {
-                    if (is_file($path = path('app').'packages/sport/controllers/'.$controller.EXT))
-                    {
-                        return $path;
-                    }
-                });
+        \Event::listen('ionic.controller_path', function($controller) {
+            if (is_file($path = path('app').'packages/sport/controllers/'.$controller.EXT))
+            {
+                return $path;
+            }
+        });
 
         // Current season
-        IoC::singleton('current_season', function()
+        IoC::singleton('current_season', function() {
+            if (\Cache::has('current-season'))
+            {
+                return \Cache::get('current-season');
+            }
+            else
+            {
+                $season = \DB::table('seasons')->where('is_active', '=', 1)->first('*');
+
+                if (!$season)
                 {
-                    if (\Cache::has('current-season'))
-                    {
-                        return \Cache::get('current-season');
-                    }
-                    else
-                    {
-                        $season = \DB::table('seasons')->where('is_active', '=', 1)->first('*');
+                    // Fallback
+                    $season = new \stdClass;
+                    $season->id = 0;
+                    $season->year = date('Y');
+                    $season->is_active = 1;
 
-                        if (!$season)
-                        {
-                            // Fallback
-                            $season = new \stdClass;
-                            $season->id = 0;
-                            $season->year = date('Y');
-                            $season->is_active = 1;
+                    return $season;
+                }
 
-                            return $season;
-                        }
+                \Cache::put('current-season', $season);
 
-                        \Cache::put('current-season', $season);
+                return $season;
+            }
+        });
 
-                        return $season;
-                    }
-                });
+        // Pagemap
+        \Event::listen('ionic.pagemap_links', function($format) {
+            $links = array('Rozgrywki' => array(), 'Tabele' => array(), 'Terminarze' => array(), 'Tabele krzyżowe' => array(), 'Statystyki zawodników' => array(),
+                           'Kluby' => array());
+
+            $links['Rozgrywki']['Lista rozgrywek'] = 'competition';
+            $links['Rozgrywki']['Kontuzje'] = 'competition/injuries';
+            $links['Rozgrywki']['Transfery'] = 'competition/transfers';
+            $links['Rozgrywki']['Typer'] = 'bet';
+            $links['Rozgrywki']['Relacje live'] = 'live';
+            $links['Rozgrywki']['Piłkarz meczu'] = 'matchpick';
+            $links['Rozgrywki']['Piłkarz miesiąca'] = 'monthpick';
+
+            // Teams
+            foreach (DB::table('teams')->order_by('is_distinct', 'desc')->order_by('id', 'desc')->take(10)->get(array('name', 'slug')) as $c)
+            {
+                $links['Kluby'][$c->name] = 'team/show/'.$c->slug;
+            }
+
+            // Competition
+            $competitions = array();
+            $seasons = array();
+
+            foreach (DB::table('competitions')->order_by('id', 'desc')->get(array('id', 'name', 'slug')) as $c)
+            {
+                $competitions[$c->id] = array($c->name, $c->slug);
+            }
+
+            foreach (DB::table('seasons')->order_by('year', 'desc')->get(array('id', 'year')) as $c)
+            {
+                $seasons[$c->id] = array($c->year, $c->year + 1);
+            }
+
+            // Timetable/crosstab
+            foreach (DB::table('matches')->join('fixtures', 'fixtures.id', '=', 'matches.fixture_id')
+                                        ->order_by('competition_id', 'desc')->order_by('season_id', 'desc')
+                                        ->distinct()->get(array('fixtures.competition_id', 'fixtures.season_id')) as $row)
+            {
+                $links['Terminarze']['Terminarz '.$competitions[$row->competition_id][0].' ('.$seasons[$row->season_id][0].' / '.$seasons[$row->season_id][1].')'] = 'competition/timetable/'.$competitions[$row->competition_id][1].'/'.$seasons[$row->season_id][0];
+                $links['Tabele krzyżowe']['Tabela krzyżowa '.$competitions[$row->competition_id][0].' ('.$seasons[$row->season_id][0].' / '.$seasons[$row->season_id][1].')'] = 'competition/crosstab/'.$competitions[$row->competition_id][1].'/'.$seasons[$row->season_id][0];
+            }
+
+            // Stats
+            foreach (DB::table('player_stats')->order_by('competition_id', 'desc')->order_by('season_id', 'desc')
+                                        ->distinct()->get(array('competition_id', 'season_id')) as $row)
+            {
+                $links['Statystyki zawodników']['Statystyki '.$competitions[$row->competition_id][0].' ('.$seasons[$row->season_id][0].' / '.$seasons[$row->season_id][1].')'] = 'competition/stats/'.$competitions[$row->competition_id][1].'/'.$seasons[$row->season_id][0];            }
+
+            // Tables
+            foreach (DB::table('tables')->get(array('slug', 'title')) as $row)
+            {
+                $links['Tabele']['Tabela '.$row->title] = 'competition/table/'.$row->slug;
+            }
+
+            return $links;
+        });
 
         $root = path('app').'packages'.DS.'sport'.DS;
 
