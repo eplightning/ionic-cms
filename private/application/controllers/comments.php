@@ -219,14 +219,25 @@ class Comments_Controller extends Base_Controller {
         if (!Request::ajax() or Request::method() != 'POST' or Request::forged() or !ctype_digit($id))
             return Response::json(array('status' => false));
 
-        $id = DB::table('comments')->where('id', '=', (int) $id)->first(array('id', 'user_id', 'content_id', 'content_type', 'content_link'));
+        $id = DB::table('comments')->left_join('users', 'users.id', '=', 'comments.user_id')
+                                   ->where('comments.id', '=', (int) $id)
+                                   ->first(array('comments.id', 'comments.user_id', 'comments.content_id', 'comments.content_type', 'comments.content_link',
+                                                 'comments.guest_name', 'users.display_name'));
 
         // let's assume it was removed by someone else
         if (!$id)
             return Response::json(array('status' => true));
 
         Model\Comment::delete($id);
-        Model\Log::add('Usunął komentarz', $this->user->id);
+        
+        if (!$id->user_id or empty($id->display_name))
+        {
+            Model\Log::add('Usunięto komentarz gościa '.$id->guest_name, $this->user->id);
+        }
+        else
+        {
+            Model\Log::add('Usunięto komentarz użytkownika '.$id->display_name, $this->user->id);
+        }
 
         return Response::json(array('status' => true));
     }
