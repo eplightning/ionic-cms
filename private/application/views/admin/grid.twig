@@ -9,7 +9,7 @@
 {% endif %}
 <div class="section">
 	<div class="theader">
-		<div class="theader2">
+		<div class="theader2" id="grid-elements-count">
 			{% if total_items == 1 %}
 			1 element
 			{% elseif total_items > 1 and total_items < 5 %}
@@ -95,6 +95,16 @@
 	<div class="toolbar ui-widget-header ui-corner-all">
 		<a href="{{ (grid_url~"/filter/_clear_all")|url }}" class="cancel-button">Zresetuj filtry</a> <a class="hide-filter">Ukryj</a>
 	</div>
+	{% if help|length > 0 %}
+	<div class="ui-widget" style="margin-top: 10px">
+		<div class="ui-state-highlight ui-corner-all" style="padding: 15px; margin-bottom: 10px">
+			<span class="ui-icon ui-icon-info" style="float: left; margin-right: 15px"></span> <strong>Pomoc</strong>
+			{% for tip in help %}
+			<p>{{ tip }}</p>
+			{% endfor %}
+		</div>
+	</div>
+	{% endif %}
 	{% for filter in filters %}
 	<div class="section">
 		<div class="theader">
@@ -216,7 +226,9 @@ function paginate(page)
 {
 	$('#grid-view .grid-column').remove();
 
-	$.get(IONIC_BASE_URL+'{{ grid_url }}/index/'+page, function(html) {
+	$.get(IONIC_BASE_URL+'{{ grid_url }}/index/'+page, function(response) {
+		html = response.view;
+
 		$('#grid-view').append(html);
 
 		$('#grid-view .delete-button').button({text: false, icons: {primary: 'ui-icon-trash'}});
@@ -242,7 +254,26 @@ function paginate(page)
 			onblur: 'submit'
 		});
 		{% endif %}
-	});
+
+		if (response.records == 1)
+		{
+			$('#grid-elements-count').text('1 element');
+		}
+		else if (response.records > 1 && response.records < 5)
+		{
+			$('#grid-elements-count').text(response.records+' elementy');
+		}
+		else
+		{
+			$('#grid-elements-count').text(response.records+' elementów');
+		}
+
+		if ($('#slider').slider('value') != response.page)
+		{
+			$('#grid-pagination-title select').val(response.page);
+			$('#slider').slider('value', response.page);
+		}
+	}, 'json');
 }
 
 $(function(){
@@ -357,9 +388,7 @@ $(function(){
 			});
 		}
 	});
-	{% endfor %}
-	{% endif %}
-
+	{% endfor %}{% endif %}
 	{% for preview_name, preview_data in previews %}
 	$('#dialog-preview-content-{{ preview_name }}').dialog({
 		autoOpen: false,

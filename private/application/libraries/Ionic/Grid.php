@@ -54,6 +54,11 @@ class Grid {
     /**
      * @var array
      */
+    protected $help = array();
+
+    /**
+     * @var array
+     */
     protected $inline_edit = array();
 
     /**
@@ -115,8 +120,11 @@ class Grid {
      * Constructor
      *
      * @param string $table
+     * @param string $title
+     * @param string $url
      * @param array $selects
      * @param number $perpage
+     * @param bool $prefer_ajax
      */
     public function __construct($table, $title, $url, array $selects = array(), $perpage = 20, $prefer_ajax = null)
     {
@@ -130,10 +138,15 @@ class Grid {
 
     /**
      * Add action
+     *
+     * @param string $title
+     * @param string $link
+     * @param string $class
+     * @param string $type
      */
     public function add_action($title, $link, $class = '', $type = 0)
     {
-        if ($type == 1 or ($type == 2 and $this->prefer_ajax))
+        if ($type == static::ACTION_AJAX or ($type == static::ACTION_BOTH and $this->prefer_ajax))
         {
             $class = $class ? $class.' grid-action-ajax' : 'grid-action-ajax';
         }
@@ -164,7 +177,7 @@ class Grid {
      */
     public function add_column($name, $title, $value = null, $select_col = null, $sort_column = null)
     {
-        $this->columns[$name] = array('name'        => $name, 'title'       => $title, 'value'       => $value, 'sort_column' => $sort_column);
+        $this->columns[$name] = array('name' => $name, 'title' => $title, 'value' => $value, 'sort_column' => $sort_column);
 
         if (is_string($select_col))
         {
@@ -272,10 +285,23 @@ class Grid {
 
     /**
      * Add group by command
+     *
+     * @param string $group
      */
     public function add_groupby($group)
     {
         $this->groupby = $group;
+    }
+
+    /**
+     * Add tip
+     *
+     * @param string $id
+     * @param string $help_string
+     */
+    public function add_help($id, $help_string)
+    {
+        $this->help[$id] = $help_string;
     }
 
     /**
@@ -298,7 +324,7 @@ class Grid {
      */
     public function add_multi_action($name, $title, Closure $action)
     {
-        $this->multi_actions[$name] = array('name'   => $name, 'title'  => $title, 'action' => $action);
+        $this->multi_actions[$name] = array('name' => $name, 'title' => $title, 'action' => $action);
     }
 
     /**
@@ -872,17 +898,24 @@ class Grid {
 
             if (count($this->actions))
                 $colspan++;
+
             if ($this->checkbox)
                 $colspan++;
 
-            $view->with('draw_checkboxes', $this->checkbox);
-            $view->with('columns', $this->columns);
-            $view->with('colspan', $colspan);
-            $view->with('actions', $this->actions);
-            $view->with('data', $data);
-            $view->with('grid_url', $this->url);
+            $view->with(array(
+                'draw_checkboxes' => $this->checkbox,
+                'columns' => $this->columns,
+                'colspan' => $colspan,
+                'actions' => $this->actions,
+                'data' => $data,
+                'grid_url' => $this->url
+            ));
 
-            return \Response::make($view);
+            return \Response::json(array(
+                'view' => $view->render(),
+                'records' => $records,
+                'page' => $id
+            ));
         }
         else
         {
@@ -892,29 +925,33 @@ class Grid {
 
             if (count($this->actions))
                 $colspan++;
+
             if ($this->checkbox)
                 $colspan++;
 
-            $view->with('table', $this->table);
-            $view->with('columns', $this->columns);
-            $view->with('data', $data);
-            $view->with('colspan', $colspan);
-            $view->with('actions', $this->actions);
-            $view->with('buttons', $this->buttons);
-            $view->with('draw_checkboxes', $this->checkbox);
-            $view->with('draw_pagination', $this->pagination);
-            $view->with('filters', $this->filters);
-            $view->with('multi_actions', $this->multi_actions);
-            $view->with('total_items', $records);
-            $view->with('total_pages', $pages);
-            $view->with('order_column', $order_column);
-            $view->with('perpage', $limit);
-            $view->with('filter_values', $filter_values);
-            $view->with('custom_filters', $custom_filters);
-            $view->with('grid_title', $this->title);
-            $view->with('grid_url', $this->url);
-            $view->with('inline_edit', !empty($this->inline_edit));
-            $view->with('previews', $this->preview);
+            $view->with(array(
+                'table' => $this->table,
+                'columns' => $this->columns,
+                'data' => $data,
+                'colspan' => $colspan,
+                'actions' => $this->actions,
+                'buttons' => $this->buttons,
+                'draw_checkboxes' => $this->checkbox,
+                'draw_pagination' => $this->pagination,
+                'filters' => $this->filters,
+                'multi_actions' => $this->multi_actions,
+                'total_items' => $records,
+                'total_pages' => $pages,
+                'order_column' => $order_column,
+                'perpage' => $limit,
+                'filter_values' => $filter_values,
+                'custom_filters' => $custom_filters,
+                'grid_title' => $this->title,
+                'grid_url' => $this->url,
+                'inline_edit' => !empty($this->inline_edit),
+                'previews' => $this->preview,
+                'help' => $this->help
+            ));
 
             if (!empty($this->inline_edit))
             {

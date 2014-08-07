@@ -211,6 +211,8 @@ class Admin_Comments_Controller extends Admin_Controller {
 
         $grid->add_preview('display_name', 'Podgląd komentarza', 'admin/comments/preview/');
 
+        $grid->add_help('preview', 'Wyświetlenie podglądu komentarza wraz z linkiem do niego jest dostępne poprzez kliknięcie na autora komentarza.');
+
         $grid->add_column('id', 'ID', 'id', null, 'comments.id');
         $grid->add_column('display_name', 'Autor', function($obj) {
             if ($obj->display_name)
@@ -224,8 +226,8 @@ class Admin_Comments_Controller extends Admin_Controller {
         }, 'users.display_name', 'users.display_name');
         $grid->add_column('created_at', 'Dodano', 'created_at', 'comments.created_at', 'comments.created_at');
         $grid->add_column('content_type', 'Gdzie', function($obj) use ($types) {
-                    return isset($types[$obj->content_type]) ? $types[$obj->content_type] : $obj->content_type;
-                }, 'comments.content_type', 'comments.content_type');
+            return isset($types[$obj->content_type]) ? $types[$obj->content_type] : $obj->content_type;
+        }, 'comments.content_type', 'comments.content_type');
         $grid->add_column('ip', 'Adres IP', 'ip', 'comments.ip', 'comments.ip');
 
         $grid->add_filter_perpage(array(20, 30, 50));
