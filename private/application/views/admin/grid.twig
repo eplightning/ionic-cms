@@ -105,6 +105,22 @@
 		</div>
 	</div>
 	{% endif %}
+	{% if custom_filters|length > 0 %}
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">
+				Inne filtry
+			</div>
+		</div>
+		<div class="section-content">
+			<ul class="section-list">
+				{% for k,cf in custom_filters %}
+				<li>{{ cf.type }} <small><a href="{{ (grid_url~"/filter/_customdel/"~k)|url }}">(wyłącz)</a></small></li>
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+	{% endif %}
 	{% for filter in filters %}
 	<div class="section">
 		<div class="theader">
@@ -169,22 +185,6 @@
 		</div>
 	</div>
 	{% endfor %}
-	{% if custom_filters|length > 0 %}
-	<div class="section">
-		<div class="theader">
-			<div class="theader2">
-				Inne filtry
-			</div>
-		</div>
-		<div class="section-content">
-			<ul class="section-list">
-				{% for k,cf in custom_filters %}
-				<li>{{ cf.type }} <small><a href="{{ (grid_url~"/filter/_customdel/"~k)|url }}">(wyłącz)</a></small></li>
-				{% endfor %}
-			</ul>
-		</div>
-	</div>
-	{% endif %}
 </div>
 {% endif %}
 {% for preview_name, preview_data in previews %}
