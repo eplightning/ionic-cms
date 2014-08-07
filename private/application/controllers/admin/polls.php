@@ -11,13 +11,20 @@ class Admin_Polls_Controller extends Admin_Controller {
         if (!$id)
             return Response::error(500);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/polls/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/polls/index');
+            return Response::error(500);
         }
 
         if ($id->is_active == 0)
@@ -32,9 +39,17 @@ class Admin_Polls_Controller extends Admin_Controller {
 
         \Cache::forget('poll');
 
-        $this->notice('Operacja wykonana pomyślnie');
         $this->log(sprintf('Aktywowano/deaktywowano sondę: %s', $id->title));
-        return Redirect::to('admin/polls/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Operacja wykonana pomyślnie');
+            return Redirect::to('admin/polls/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     public function action_add()
@@ -119,21 +134,36 @@ class Admin_Polls_Controller extends Admin_Controller {
         if (!$id)
             return Response::error(500);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/polls/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/polls/index');
+            return Response::error(500);
         }
 
         DB::table('polls')->where('id', '=', $id->id)->delete();
         \Cache::forget('poll');
 
-        $this->notice('Obiekt usunięty pomyślnie');
         $this->log(sprintf('Usunięto sondę: %s', $id->title));
-        return Redirect::to('admin/polls/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Sonda usunięta pomyślnie');
+            return Redirect::to('admin/polls/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     public function action_edit($id)
@@ -248,27 +278,6 @@ class Admin_Polls_Controller extends Admin_Controller {
         $this->page->set_title('Sondy');
         $this->page->breadcrumb_append('Sondy', 'admin/polls/index');
 
-        $this->page->add_footer_js("$(function() {
-	$('#grid-right-column').after($('<div id=\"dialog-preview-content\" style=\"display: none\"><div id=\"dialog-preview-content-in\"></div></div>'));
-	$('#dialog-preview-content').dialog({
-		autoOpen: false,
-		width: 600,
-		height: 400,
-		modal: true,
-		buttons: {
-			'Zamknij': function() { $(this).dialog('close'); }
-		},
-		title: 'Podgląd wyników'
-	});
-
-	$('a.preview').click(function(){
-		$.get(IONIC_BASE_URL+'admin/polls/preview/'+$(this).attr('name').replace('preview-', ''), function(response) {
-			$('#dialog-preview-content-in').html(response);
-			$('#dialog-preview-content').dialog('open');
-		});
-	});
-});");
-
         $grid = $this->make_grid();
 
         $result = $grid->handle_index($id);
@@ -333,18 +342,25 @@ class Admin_Polls_Controller extends Admin_Controller {
             $grid->add_button('Dodaj sondę', 'admin/polls/add', 'add-button');
         if (Auth::can('admin_polls_edit'))
             $grid->add_action('Edytuj', 'admin/polls/edit/%d', 'edit-button');
-        $grid->add_action('Aktywuj/deaktywuj', 'admin/polls/active/%d', 'accept-button');
+        $grid->add_action('Aktywuj/deaktywuj', 'admin/polls/active/%d', 'accept-button', Ionic\Grid::ACTION_BOTH);
         if (Auth::can('admin_polls_delete'))
-            $grid->add_action('Usuń', 'admin/polls/delete/%d', 'delete-button');
+            $grid->add_action('Usuń', 'admin/polls/delete/%d', 'delete-button', Ionic\Grid::ACTION_BOTH);
+
+        $grid->add_preview('title', 'Podgląd wyników', 'admin/polls/preview/');
+
+        $grid->add_help('preview', 'Podgląd wyników jest dostępny poprzez kliknięcie na tytuł sondy.');
 
         $grid->add_column('id', 'ID', 'id', null, 'polls.id');
-        $grid->add_column('title', 'Tytuł', function($obj) {
-                    return '<a class="preview" style="cursor: pointer" name="preview-'.$obj->id.'" title="Podgląd">'.Str::limit($obj->title, 30).'</a>'.($obj->is_active == 1 ? ' (<strong>aktywna</strong>)' : '');
-                }, 'polls.title', 'polls.title');
+        $grid->add_column('title', 'Tytuł', 'title', 'polls.title', 'polls.title');
         $grid->add_column('created_at', 'Dodano', 'created_at', 'polls.created_at', 'polls.created_at');
-        $grid->add_column('votes', 'Głosów', 'votes', 'polls.votes', 'polls.votes');
 
-        $grid->add_selects(array('polls.is_active'));
+        $grid->add_column('is_active', 'Akt', function($data) {
+            if ($data->is_active == '1')
+                return '<img style="margin: 0px auto; display: block" src="public/img/icons/accept.png" alt="" />';
+            return '';
+        }, 'polls.is_active', 'polls.is_active');
+
+        $grid->add_column('votes', 'Głosów', 'votes', 'polls.votes', 'polls.votes');
 
         $grid->add_filter_perpage(array(20, 30, 50));
         $grid->add_filter_select('is_active', 'Aktywna', array('_all_' => 'Wszystkie', 1       => 'Tak', 0       => 'Nie'), '_all_');
@@ -358,14 +374,14 @@ class Admin_Polls_Controller extends Admin_Controller {
             $id = $this->user->id;
 
             $grid->add_multi_action('delete_selected', 'Usuń zaznaczone', function($ids) use ($id) {
-                        $affected = DB::table('polls')->where_in('id', $ids)->delete();
+                $affected = DB::table('polls')->where_in('id', $ids)->delete();
 
-                        if ($affected)
-                        {
-                            \Cache::forget('poll');
-                            \Model\Log::add('Masowo usunięto sondy ('.$affected.')', $id);
-                        }
-                    });
+                if ($affected)
+                {
+                    \Cache::forget('poll');
+                    \Model\Log::add('Masowo usunięto sondy ('.$affected.')', $id);
+                }
+            });
         }
 
         return $grid;

@@ -71,20 +71,35 @@ class Admin_Tags_Controller extends Admin_Controller {
         if (!$id)
             return Response::error(500);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/tags/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/tags/index');
+            return Response::error(500);
         }
 
         DB::table('tags')->where('id', '=', $id->id)->delete();
 
-        $this->notice('Obiekt usunięty pomyślnie');
         $this->log(sprintf('Usunięto tag: %s', $id->title));
-        return Redirect::to('admin/tags/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Tag usunięty pomyślnie');
+            return Redirect::to('admin/tags/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     public function action_edit($id)
@@ -203,7 +218,7 @@ class Admin_Tags_Controller extends Admin_Controller {
         if (Auth::can('admin_tags_edit'))
             $grid->add_action('Edytuj', 'admin/tags/edit/%d', 'edit-button');
         if (Auth::can('admin_tags_delete'))
-            $grid->add_action('Usuń', 'admin/tags/delete/%d', 'delete-button');
+            $grid->add_action('Usuń', 'admin/tags/delete/%d', 'delete-button', Ionic\Grid::ACTION_BOTH);
 
         $grid->add_column('id', 'ID', 'id', null, 'tags.id');
         $grid->add_column('title', 'Tytuł', 'title', 'tags.title', 'tags.title');

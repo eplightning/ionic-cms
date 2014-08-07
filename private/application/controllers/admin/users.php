@@ -138,25 +138,47 @@ class Admin_Users_Controller extends Admin_Controller {
 
             if (in_array($id->group_id, $roots))
             {
-                $this->notice('Nie możesz wykonać tej akcji na root administratorze!');
-                return Redirect::to('admin/users/index');
+                if (!Request::ajax())
+                {
+                    $this->notice('Nie możesz wykonać tej akcji na root administratorze!');
+                    return Redirect::to('admin/users/index');
+                }
+                else
+                {
+                    return Response::error(403);
+                }
             }
         }
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/users/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/users/index');
+            return Response::error(500);
         }
 
         DB::table('profiles')->where('user_id', '=', $id->id)->update(array('is_banned' => ($id->is_banned == 1 ? 0 : 1)));
 
-        $this->notice('Użytkownik pomyślnie zbanowany/odbanowany');
         $this->log(sprintf('Zbanowano/odbanowano użytkownika: %s', $id->display_name));
-        return Redirect::to('admin/users/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Użytkownik pomyślnie zbanowany/odbanowany');
+            return Redirect::to('admin/users/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     /**
@@ -500,10 +522,10 @@ class Admin_Users_Controller extends Admin_Controller {
         $grid->add_column('group', 'Grupa', 'name', 'groups.name', 'groups.name');
         $grid->add_column('created_at', 'Data rejestracji', 'created_at', 'profiles.created_at', 'profiles.created_at');
         $grid->add_column('is_banned', 'Ban', function($data) {
-                    if ($data->is_banned == '1')
-                        return '<img style="margin: 0px auto; display: block" src="public/img/icons/accept.png" alt="" />';
-                    return '';
-                }, 'profiles.is_banned', 'profiles.is_banned');
+            if ($data->is_banned == '1')
+                return '<img style="margin: 0px auto; display: block" src="public/img/icons/accept.png" alt="" />';
+            return '';
+        }, 'profiles.is_banned', 'profiles.is_banned');
 
         $grid->add_related('profiles', 'profiles.user_id', '=', 'users.id');
         $grid->add_related('groups', 'groups.id', '=', 'users.group_id');
@@ -519,7 +541,7 @@ class Admin_Users_Controller extends Admin_Controller {
         }
 
         $grid->add_action('Pokaż IP', 'admin/users/ip/%d', 'display-button');
-        $grid->add_action('Zbanuj/odbanuj', 'admin/users/ban/%d', 'lock-button');
+        $grid->add_action('Zbanuj/odbanuj', 'admin/users/ban/%d', 'lock-button', Ionic\Grid::ACTION_BOTH);
 
         if (Auth::can('admin_users_multi'))
         {
@@ -529,56 +551,54 @@ class Admin_Users_Controller extends Admin_Controller {
             $is_root = Auth::can('admin_root');
             $groups = ($is_root ? Model\Group::with_role('admin_root', false) : array());
 
-
             $grid->add_multi_action('ban', 'Zbanuj', function($ids) use ($id, $is_root, $groups) {
-                        if (!$is_root and !empty($groups))
-                        {
-                            $affected = DB::table('profiles')
-                                            ->join('users', 'profiles.user_id', '=', 'users.id')
-                                            ->where_not_in('users.group_id', $groups)->where_in('user_id', $ids)->update(array('is_banned' => '1'));
-                        }
-                        else
-                        {
-                            $affected = DB::table('profiles')->where_in('user_id', $ids)->update(array('is_banned' => '1'));
-                        }
+                if (!$is_root and !empty($groups))
+                {
+                    $affected = DB::table('profiles')
+                                    ->join('users', 'profiles.user_id', '=', 'users.id')
+                                    ->where_not_in('users.group_id', $groups)->where_in('user_id', $ids)->update(array('is_banned' => '1'));
+                }
+                else
+                {
+                    $affected = DB::table('profiles')->where_in('user_id', $ids)->update(array('is_banned' => '1'));
+                }
 
-                        if ($affected > 0)
-                            \Model\Log::add('Masowo zbanowano użytkowników ('.$affected.')', $id);
-                    });
+                if ($affected > 0)
+                    \Model\Log::add('Masowo zbanowano użytkowników ('.$affected.')', $id);
+            });
 
             $grid->add_multi_action('unban', 'Odbanuj', function($ids) use ($id, $is_root, $groups) {
-                        if (!$is_root and !empty($groups))
-                        {
-                            $affected = DB::table('profiles')
-                                            ->join('users', 'profiles.user_id', '=', 'users.id')
-                                            ->where_not_in('users.group_id', $groups)->where_in('user_id', $ids)->update(array('is_banned' => '0'));
-                        }
-                        else
-                        {
-                            $affected = DB::table('profiles')->where_in('user_id', $ids)->update(array('is_banned' => '0'));
-                        }
+                if (!$is_root and !empty($groups))
+                {
+                    $affected = DB::table('profiles')
+                                    ->join('users', 'profiles.user_id', '=', 'users.id')
+                                    ->where_not_in('users.group_id', $groups)->where_in('user_id', $ids)->update(array('is_banned' => '0'));
+                }
+                else
+                {
+                    $affected = DB::table('profiles')->where_in('user_id', $ids)->update(array('is_banned' => '0'));
+                }
 
-                        if ($affected > 0)
-                            \Model\Log::add('Masowo odbanowano użytkowników ('.$affected.')', $id);
-                    });
+                if ($affected > 0)
+                    \Model\Log::add('Masowo odbanowano użytkowników ('.$affected.')', $id);
+            });
 
             if (Auth::can('admin_users_delete'))
             {
                 $grid->add_multi_action('delete', 'Usuń', function($ids) use ($id, $is_root, $groups) {
+                    if (!$is_root and !empty($groups))
+                    {
+                        $affected = DB::table('users')
+                                        ->where_not_in('group_id', $groups)->where_in('id', $ids)->delete();
+                    }
+                    else
+                    {
+                        $affected = DB::table('users')->where_in('id', $ids)->delete();
+                    }
 
-                            if (!$is_root and !empty($groups))
-                            {
-                                $affected = DB::table('users')
-                                                ->where_not_in('group_id', $groups)->where_in('id', $ids)->delete();
-                            }
-                            else
-                            {
-                                $affected = DB::table('users')->where_in('id', $ids)->delete();
-                            }
-
-                            if ($affected > 0)
-                                \Model\Log::add('Masowo usunięto użytkowników ('.$affected.')', $id);
-                        });
+                    if ($affected > 0)
+                        \Model\Log::add('Masowo usunięto użytkowników ('.$affected.')', $id);
+                });
             }
         }
 
@@ -595,17 +615,17 @@ class Admin_Users_Controller extends Admin_Controller {
         $grid->add_selects(array('users.email'));
 
         $grid->add_filter_autocomplete('group', 'Grupa', function($str) {
-                    $groups = DB::table('groups')->take(20)->where('name', 'like', str_replace('%', '', $str).'%')->get('name');
+            $groups = DB::table('groups')->take(20)->where('name', 'like', str_replace('%', '', $str).'%')->get('name');
 
-                    $result = array();
+            $result = array();
 
-                    foreach ($groups as $g)
-                    {
-                        $result[] = $g->name;
-                    }
+            foreach ($groups as $g)
+            {
+                $result[] = $g->name;
+            }
 
-                    return $result;
-                }, 'groups.name');
+            return $result;
+        }, 'groups.name');
 
         return $grid;
     }

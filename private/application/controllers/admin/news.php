@@ -284,13 +284,20 @@ class Admin_News_Controller extends Admin_Controller {
         if ($id->user_id != $this->user->id and !Auth::can('admin_news_all'))
             return Response::error(403);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/news/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/news/index');
+            return Response::error(500);
         }
 
         DB::table('news')->where('id', '=', $id->id)->delete();
@@ -352,9 +359,17 @@ class Admin_News_Controller extends Admin_Controller {
 
         ionic_clear_cache('news-*');
 
-        $this->notice('Obiekt usunięty pomyślnie');
         $this->log(sprintf('Usunięto news: %s', $id->title));
-        return Redirect::to('admin/news/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('News usunięty pomyślnie');
+            return Redirect::to('admin/news/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     public function action_edit($id)
@@ -741,33 +756,53 @@ class Admin_News_Controller extends Admin_Controller {
         if ($id->user_id != $this->user->id and !Auth::can('admin_news_all'))
             return Response::error(403);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/news/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/news/index');
+            return Response::error(500);
         }
+
+        $ajax = Request::ajax();
 
         if ($id->is_published == 1)
         {
             DB::table('news')->where('id', '=', $id->id)->update(array('is_published' => 0));
 
-            $this->notice('Pomyślnie ukryto news');
+            if (!$ajax)
+                $this->notice('Pomyślnie ukryto news');
+
             $this->log(sprintf('Ukryto news: %s', $id->title));
         }
         else
         {
             DB::table('news')->where('id', '=', $id->id)->update(array('is_published' => 1, 'publish_at'   => '0000-00-00 00:00:00'));
 
-            $this->notice('Pomyślnie opublikowano news');
+            if (!$ajax)
+                $this->notice('Pomyślnie opublikowano news');
+
             $this->log(sprintf('Opublikowano news: %s', $id->title));
         }
 
         ionic_clear_cache('news-*');
 
-        return Redirect::to('admin/news/index');
+        if ($ajax)
+        {
+            return Response::json(array('status' => true));
+        }
+        else
+        {
+            return Redirect::to('admin/news/index');
+        }
     }
 
     public function action_sort($item)
@@ -786,10 +821,10 @@ class Admin_News_Controller extends Admin_Controller {
 
         $grid->add_column('id', 'ID', 'id', null, 'news.id');
         $grid->add_column('title', 'Tytuł', function($obj) {
-                    if ($obj->is_published == 0)
-                        return '<i>'.$obj->title.'</i>';
-                    return $obj->title;
-                }, 'news.title', 'news.title');
+            if ($obj->is_published == 0)
+                return '<i>'.$obj->title.'</i>';
+            return $obj->title;
+        }, 'news.title', 'news.title');
         $grid->add_column('display_name', 'Autor', 'display_name', 'users.display_name', 'users.display_name');
         $grid->add_column('created_at', 'Dodano', 'created_at', 'news.created_at', 'news.created_at');
         $grid->add_column('views', 'Odsłon', 'views', 'news.views', 'news.views');
@@ -799,13 +834,13 @@ class Admin_News_Controller extends Admin_Controller {
         if (Auth::can('admin_news_edit'))
             $grid->add_action('Edytuj', 'admin/news/edit/%d', 'edit-button');
 
-        $grid->add_action('Opublikuj/ukryj', 'admin/news/publish/%d', 'accept-button');
+        $grid->add_action('Opublikuj/ukryj', 'admin/news/publish/%d', 'accept-button', Ionic\Grid::ACTION_BOTH);
 
         if (Auth::can('admin_news_delete'))
-            $grid->add_action('Usuń', 'admin/news/delete/%d', 'delete-button');
+            $grid->add_action('Usuń', 'admin/news/delete/%d', 'delete-button', Ionic\Grid::ACTION_BOTH);
 
         $grid->add_filter_perpage(array(20, 30, 50));
-        $grid->add_filter_select('is_published', 'Opublikowany', array('_all_' => 'Wszystkie', 0       => 'Nie', 1       => 'Tak'), '_all_');
+        $grid->add_filter_select('is_published', 'Opublikowany', array('_all_' => 'Wszystkie', 0 => 'Nie', 1 => 'Tak'), '_all_');
 
         $grid->add_filter_date('created_at', 'Data utworzenia');
         $grid->add_filter_search('title', 'Tytuł');
@@ -817,17 +852,17 @@ class Admin_News_Controller extends Admin_Controller {
         else
         {
             $grid->add_filter_autocomplete('display_name', 'Użytkownik', function($str) {
-                        $us = DB::table('users')->take(20)->where('display_name', 'like', str_replace('%', '', $str).'%')->get('display_name');
+                $us = DB::table('users')->take(20)->where('display_name', 'like', str_replace('%', '', $str).'%')->get('display_name');
 
-                        $result = array();
+                $result = array();
 
-                        foreach ($us as $u)
-                        {
-                            $result[] = $u->display_name;
-                        }
+                foreach ($us as $u)
+                {
+                    $result[] = $u->display_name;
+                }
 
-                        return $result;
-                    }, 'users.display_name');
+                return $result;
+            }, 'users.display_name');
         }
 
         $grid->add_related('users', 'users.id', '=', 'news.user_id', array(), 'left');
@@ -841,115 +876,115 @@ class Admin_News_Controller extends Admin_Controller {
             $grid->enable_checkboxes(true);
 
             $grid->add_multi_action('publish', 'Opublikuj', function($ids) use ($id, $all) {
-                        if (!$all)
-                        {
-                            $new_ids = array();
+                if (!$all)
+                {
+                    $new_ids = array();
 
-                            foreach (DB::table('news')->where('user_id', '=', $id)->where_in('id', $ids)->get('id') as $n)
-                            {
-                                $new_ids[] = $n->id;
-                            }
+                    foreach (DB::table('news')->where('user_id', '=', $id)->where_in('id', $ids)->get('id') as $n)
+                    {
+                        $new_ids[] = $n->id;
+                    }
 
-                            $ids = $new_ids;
-                        }
+                    $ids = $new_ids;
+                }
 
-                        if (!empty($ids))
-                        {
-                            $affected = DB::table('news')->where_in('id', $ids)->update(array('is_published' => 1, 'publish_at'   => '0000-00-00 00:00:00'));
+                if (!empty($ids))
+                {
+                    $affected = DB::table('news')->where_in('id', $ids)->update(array('is_published' => 1, 'publish_at'   => '0000-00-00 00:00:00'));
 
-                            if ($affected > 0)
-                            {
-                                Model\Log::add('Opublikowano '.$affected.' newsów', $id);
-                                ionic_clear_cache('news-*');
-                            }
-                        }
-                    });
+                    if ($affected > 0)
+                    {
+                        Model\Log::add('Opublikowano '.$affected.' newsów', $id);
+                        ionic_clear_cache('news-*');
+                    }
+                }
+            });
 
 
             $grid->add_multi_action('hide', 'Ukryj', function($ids) use ($id, $all) {
-                        if (!$all)
-                        {
-                            $new_ids = array();
+                if (!$all)
+                {
+                    $new_ids = array();
 
-                            foreach (DB::table('news')->where('user_id', '=', $id)->where_in('id', $ids)->get('id') as $n)
-                            {
-                                $new_ids[] = $n->id;
-                            }
+                    foreach (DB::table('news')->where('user_id', '=', $id)->where_in('id', $ids)->get('id') as $n)
+                    {
+                        $new_ids[] = $n->id;
+                    }
 
-                            $ids = $new_ids;
-                        }
+                    $ids = $new_ids;
+                }
 
-                        if (!empty($ids))
-                        {
-                            $affected = DB::table('news')->where_in('id', $ids)->update(array('is_published' => 0));
+                if (!empty($ids))
+                {
+                    $affected = DB::table('news')->where_in('id', $ids)->update(array('is_published' => 0));
 
-                            if ($affected > 0)
-                            {
-                                Model\Log::add('Ukryto '.$affected.' newsów', $id);
-                                ionic_clear_cache('news-*');
-                            }
-                        }
-                    });
+                    if ($affected > 0)
+                    {
+                        Model\Log::add('Ukryto '.$affected.' newsów', $id);
+                        ionic_clear_cache('news-*');
+                    }
+                }
+            });
 
             if (Auth::can('admin_news_delete'))
             {
                 $grid->add_multi_action('delete_selected', 'Usuń zaznaczone', function($ids) use ($id, $all) {
-                            if (!$all)
+                    if (!$all)
+                    {
+                        $new_ids = array();
+
+                        foreach (DB::table('news')->where('user_id', '=', $id)->where_in('id', $ids)->get(array('id', 'user_id')) as $n)
+                        {
+                            $new_ids[] = $n->id;
+                        }
+
+                        $ids = $new_ids;
+                    }
+
+                    if (!empty($ids))
+                    {
+                        $affected = DB::table('news')->where_in('id', $ids)->delete();
+
+                        if ($affected > 0)
+                        {
+                            DB::table('karma')->where_in('content_id', $ids)->where('content_type', '=', 'news')->delete();
+
+                            $user_counts = array();
+                            $prepared_counts = array();
+
+                            foreach (DB::table('comments')->where_in('content_id', $ids)->where('content_type', '=', 'news')->get(array('user_id')) as $c)
                             {
-                                $new_ids = array();
-
-                                foreach (DB::table('news')->where('user_id', '=', $id)->where_in('id', $ids)->get(array('id', 'user_id')) as $n)
+                                if ($c->user_id != null)
                                 {
-                                    $new_ids[] = $n->id;
-                                }
+                                    if (!isset($user_counts[$c->user_id]))
+                                        $user_counts[$c->user_id] = 0;
 
-                                $ids = $new_ids;
-                            }
-
-                            if (!empty($ids))
-                            {
-                                $affected = DB::table('news')->where_in('id', $ids)->delete();
-
-                                if ($affected > 0)
-                                {
-                                    DB::table('karma')->where_in('content_id', $ids)->where('content_type', '=', 'news')->delete();
-
-                                    $user_counts = array();
-                                    $prepared_counts = array();
-
-                                    foreach (DB::table('comments')->where_in('content_id', $ids)->where('content_type', '=', 'news')->get(array('user_id')) as $c)
-                                    {
-                                        if ($c->user_id != null)
-                                        {
-                                            if (!isset($user_counts[$c->user_id]))
-                                                $user_counts[$c->user_id] = 0;
-
-                                            $user_counts[$c->user_id]++;
-                                        }
-                                    }
-
-                                    foreach ($user_counts as $idd => $c)
-                                    {
-                                        if (!isset($prepared_counts[$c]))
-                                            $prepared_counts[$c] = array();
-
-                                        $prepared_counts[$c][] = $idd;
-                                    }
-
-                                    foreach ($prepared_counts as $c => $uids)
-                                    {
-                                        DB::table('profiles')->where('comments_count', '>=', $c)->where_in('user_id', $uids)->update(array('comments_count' => DB::raw('comments_count - '.$c)));
-                                    }
-
-                                    DB::table('comments')->where_in('content_id', $ids)->where('content_type', '=', 'news')->delete();
-                                    DB::table('news_tags')->where_in('news_id', $ids)->delete();
-
-                                    ionic_clear_cache('news-*');
-
-                                    Model\Log::add('Usunięto '.$affected.' newsów', $id);
+                                    $user_counts[$c->user_id]++;
                                 }
                             }
-                        });
+
+                            foreach ($user_counts as $idd => $c)
+                            {
+                                if (!isset($prepared_counts[$c]))
+                                    $prepared_counts[$c] = array();
+
+                                $prepared_counts[$c][] = $idd;
+                            }
+
+                            foreach ($prepared_counts as $c => $uids)
+                            {
+                                DB::table('profiles')->where('comments_count', '>=', $c)->where_in('user_id', $uids)->update(array('comments_count' => DB::raw('comments_count - '.$c)));
+                            }
+
+                            DB::table('comments')->where_in('content_id', $ids)->where('content_type', '=', 'news')->delete();
+                            DB::table('news_tags')->where_in('news_id', $ids)->delete();
+
+                            ionic_clear_cache('news-*');
+
+                            Model\Log::add('Usunięto '.$affected.' newsów', $id);
+                        }
+                    }
+                });
             }
         }
 

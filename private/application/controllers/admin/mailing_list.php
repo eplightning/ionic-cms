@@ -40,20 +40,34 @@ class Admin_Mailing_list_Controller extends Admin_Controller {
         if (!$id)
             return Response::error(500);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/mailing_list/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/mailing_list/index');
+            return Response::error(500);
         }
 
         DB::table('mailing_list')->where('id', '=', $id->id)->delete();
-
-        $this->notice('Obiekt usunięty pomyślnie');
         $this->log(sprintf('Usunął z listy mailingowej: %s', $id->email));
-        return Redirect::to('admin/mailing_list/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Adres usunięty pomyślnie');
+            return Redirect::to('admin/mailing_list/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     /**
@@ -194,17 +208,17 @@ class Admin_Mailing_list_Controller extends Admin_Controller {
         $grid = new Ionic\Grid('mailing_list', 'Lista mailingowa', 'admin/mailing_list');
 
         $grid->add_button('Importuj adresy', 'admin/mailing_list/import', 'add-button');
-        $grid->add_action('Usuń', 'admin/mailing_list/delete/%d', 'delete-button');
+        $grid->add_action('Usuń', 'admin/mailing_list/delete/%d', 'delete-button', Ionic\Grid::ACTION_BOTH);
         $grid->enable_checkboxes(true);
 
         $id = $this->user->id;
 
         $grid->add_multi_action('delete_selected', 'Usuń zaznaczone', function($ids) use ($id) {
-                    $affected = DB::table('mailing_list')->where_in('id', $ids)->delete();
+            $affected = DB::table('mailing_list')->where_in('id', $ids)->delete();
 
-                    if ($affected)
-                        Model\Log::add('Masowo usunął z listy mailingowej ('.$affected.')', $id);
-                });
+            if ($affected)
+                Model\Log::add('Masowo usunął z listy mailingowej ('.$affected.')', $id);
+        });
 
         $grid->add_column('id', 'ID', 'id', null, 'mailing_list.id');
         $grid->add_column('email', 'Adres e-mail', 'email', 'mailing_list.email', 'mailing_list.mail');

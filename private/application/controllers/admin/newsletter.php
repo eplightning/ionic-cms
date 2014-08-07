@@ -152,20 +152,35 @@ class Admin_Newsletter_Controller extends Admin_Controller {
         if (!$id)
             return Response::error(500);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/newsletter/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/newsletter/index');
+            return Response::error(500);
         }
 
         DB::table('newsletter')->where('id', '=', $id->id)->delete();
 
-        $this->notice('Obiekt usunięty pomyślnie');
         $this->log(sprintf('Usunął newsletter: %s', $id->title));
-        return Redirect::to('admin/newsletter/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Newsletter usunięty pomyślnie');
+            return Redirect::to('admin/newsletter/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     /**
@@ -536,7 +551,7 @@ class Admin_Newsletter_Controller extends Admin_Controller {
 
         $grid->add_button('Dodaj newsletter', 'admin/newsletter/add', 'add-button');
         $grid->add_action('Edytuj', 'admin/newsletter/edit/%d', 'edit-button');
-        $grid->add_action('Usuń', 'admin/newsletter/delete/%d', 'delete-button');
+        $grid->add_action('Usuń', 'admin/newsletter/delete/%d', 'delete-button', Ionic\Grid::ACTION_BOTH);
 
         if (Auth::can('admin_newsletter_send'))
             $grid->add_action('Wyślij', 'admin/newsletter/send/%d', 'accept-button');

@@ -40,20 +40,35 @@ class Admin_Reports_Controller extends Admin_Controller {
         if (!$id)
             return Response::error(500);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/reports/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/reports/index');
+            return Response::error(500);
         }
 
         DB::table('reports')->where('id', '=', $id->id)->delete();
 
-        $this->notice('Obiekt usunięty pomyślnie');
         $this->log(sprintf('Usunięto zgłoszenie: %s', $id->title));
-        return Redirect::to('admin/reports/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Zgłoszenie usunięte pomyślnie');
+            return Redirect::to('admin/reports/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     /**
@@ -86,27 +101,6 @@ class Admin_Reports_Controller extends Admin_Controller {
 
         $this->page->set_title('Zgłoszenia');
         $this->page->breadcrumb_append('Zgłoszenia', 'admin/reports/index');
-
-        $this->page->add_footer_js("$(function() {
-	$('#grid-right-column').after($('<div id=\"dialog-preview-content\" style=\"display: none\"><div id=\"dialog-preview-content-in\"></div></div>'));
-	$('#dialog-preview-content').dialog({
-		autoOpen: false,
-		width: 600,
-		height: 400,
-		modal: true,
-		buttons: {
-			'Zamknij': function() { $(this).dialog('close'); }
-		},
-		title: 'Podgląd zgłoszenia'
-	});
-
-	$('a.preview').click(function(){
-		$.get(IONIC_BASE_URL+'admin/reports/preview/'+$(this).attr('name').replace('report-', ''), function(response) {
-			$('#dialog-preview-content-in').html(response);
-			$('#dialog-preview-content').dialog('open');
-		});
-	});
-});");
 
         $grid = $this->make_grid();
 
@@ -200,34 +194,33 @@ class Admin_Reports_Controller extends Admin_Controller {
             }
         }
 
+        $grid->add_preview('title', 'Podgląd zgłoszenia', 'admin/reports/preview/');
+
+        $grid->add_help('preview', 'Podgląd zgłoszonej zawartości jest dostępny poprzez kliknięcie na tytuł zgłoszenia.');
+
         $grid->add_column('id', 'ID', 'id', null, 'reports.id');
-        $grid->add_column('title', 'Tytuł', function($obj)
-                {
-                    return '<a style="cursor: pointer" class="preview" name="report-'.$obj->id.'" title="Podgląd">'.Str::limit($obj->title, 20).'</a>';
-                }, 'reports.title', 'reports.title');
+        $grid->add_column('title', 'Tytuł', 'title', 'reports.title', 'reports.title');
         $grid->add_column('user', 'Zgłosił', 'display_name', 'users.display_name', 'users.display_name');
         $grid->add_column('created_at', 'Data zgłoszenia', 'created_at', 'reports.created_at', 'reports.created_at');
-        $grid->add_column('type', 'Typ', function($obj) use ($types)
-                {
-                    return isset($types[$obj->item_type]) ? $types[$obj->item_type] : $obj->item_type;
-                }, 'reports.item_type', 'reports.item_type', 'reports.item_type');
+        $grid->add_column('type', 'Typ', function($obj) use ($types) {
+            return isset($types[$obj->item_type]) ? $types[$obj->item_type] : $obj->item_type;
+        }, 'reports.item_type', 'reports.item_type', 'reports.item_type');
 
         $grid->add_related('users', 'users.id', '=', 'reports.user_id');
 
         if (Auth::can('admin_reports_delete'))
         {
-            $grid->add_action('Usuń', 'admin/reports/delete/%d', 'delete-button');
+            $grid->add_action('Usuń', 'admin/reports/delete/%d', 'delete-button', Ionic\Grid::ACTION_BOTH);
             $grid->enable_checkboxes(true);
 
             $id = $this->user->id;
 
-            $grid->add_multi_action('delete_selected', 'Usuń zaznaczone', function($ids) use ($id)
-                    {
-                        $affected = DB::table('reports')->where_in('id', $ids)->delete();
+            $grid->add_multi_action('delete_selected', 'Usuń zaznaczone', function($ids) use ($id) {
+                $affected = DB::table('reports')->where_in('id', $ids)->delete();
 
-                        if ($affected)
-                            Model\Log::add('Masowo usunięto zgłoszenia ('.$affected.')', $id);
-                    });
+                if ($affected)
+                    Model\Log::add('Masowo usunięto zgłoszenia ('.$affected.')', $id);
+            });
         }
 
         $grid->add_filter_perpage(array(20, 30, 50));

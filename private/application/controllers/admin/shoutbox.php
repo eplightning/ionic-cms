@@ -21,20 +21,34 @@ class Admin_Shoutbox_Controller extends Admin_Controller {
         if (!$id)
             return Response::error(500);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/shoutbox/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/shoutbox/index');
+            return Response::error(500);
         }
 
         DB::table('shoutbox')->where('id', '=', $id->id)->delete();
-
-        $this->notice('Obiekt usunięty pomyślnie');
         $this->log(sprintf('Usunięto wpis w shoutboxie (#%d)', $id->id));
-        return Redirect::to('admin/shoutbox/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Wpis usunięty pomyślnie');
+            return Redirect::to('admin/shoutbox/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     public function action_filter($id, $value = null)
@@ -111,7 +125,7 @@ class Admin_Shoutbox_Controller extends Admin_Controller {
         $grid->add_column('ip', 'Adres IP', 'ip', 'shoutbox.ip', 'shoutbox.ip');
 
         if (Auth::can('admin_shoutbox_delete'))
-            $grid->add_action('Usuń', 'admin/shoutbox/delete/%d', 'delete-button');
+            $grid->add_action('Usuń', 'admin/shoutbox/delete/%d', 'delete-button', Ionic\Grid::ACTION_BOTH);
 
         if (Auth::can('admin_shoutbox_delete') and Auth::can('admin_shoutbox_multi'))
         {
@@ -120,11 +134,11 @@ class Admin_Shoutbox_Controller extends Admin_Controller {
             $id = $this->user->id;
 
             $grid->add_multi_action('delete_selected', 'Usuń zaznaczone', function($ids) use ($id) {
-                        $affected = DB::table('shoutbox')->where_in('id', $ids)->delete();
+                $affected = DB::table('shoutbox')->where_in('id', $ids)->delete();
 
-                        if ($affected)
-                            \Model\Log::add('Masowo usunięto wpisy w shoutboxie ('.$affected.')', $id);
-                    });
+                if ($affected)
+                    \Model\Log::add('Masowo usunięto wpisy w shoutboxie ('.$affected.')', $id);
+            });
         }
 
         $grid->add_filter_perpage(array(20, 30, 50));

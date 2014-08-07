@@ -21,20 +21,35 @@ class Admin_Submitted_content_Controller extends Admin_Controller {
         if (!$id)
             return Response::error(500);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/submitted_content/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/submitted_content/index');
+            return Response::error(500);
         }
 
         DB::table('submitted_content')->where('id', '=', $id->id)->delete();
 
-        $this->notice('Obiekt usunięty pomyślnie');
         $this->log(sprintf('Usunięto podesłany materiał: %s', $id->title));
-        return Redirect::to('admin/submitted_content/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Materiał usunięty pomyślnie');
+            return Redirect::to('admin/submitted_content/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     public function action_filter($id, $value = null)
@@ -54,27 +69,6 @@ class Admin_Submitted_content_Controller extends Admin_Controller {
 
         $this->page->set_title('Podesłane materiały');
         $this->page->breadcrumb_append('Podesłane materiały', 'admin/submitted_content/index');
-
-        $this->page->add_footer_js("$(function() {
-	$('#grid-right-column').after($('<div id=\"dialog-preview-content\" style=\"display: none\"><div id=\"dialog-preview-content-in\"></div></div>'));
-	$('#dialog-preview-content').dialog({
-		autoOpen: false,
-		width: 600,
-		height: 400,
-		modal: true,
-		buttons: {
-			'Zamknij': function() { $(this).dialog('close'); }
-		},
-		title: 'Podgląd podesłanego materiału'
-	});
-
-	$('a.preview').click(function(){
-		$.get(IONIC_BASE_URL+'admin/submitted_content/preview/'+$(this).attr('name').replace('preview-', ''), function(response) {
-			$('#dialog-preview-content-in').html(response);
-			$('#dialog-preview-content').dialog('open');
-		});
-	});
-});");
 
         $grid = $this->make_grid();
 
@@ -233,17 +227,19 @@ class Admin_Submitted_content_Controller extends Admin_Controller {
         }
 
         $grid->add_action('Opublikuj', 'admin/submitted_content/publish/%d', 'accept-button');
-        $grid->add_action('Usuń', 'admin/submitted_content/delete/%d', 'delete-button');
+        $grid->add_action('Usuń', 'admin/submitted_content/delete/%d', 'delete-button', Ionic\Grid::ACTION_BOTH);
+
+        $grid->add_preview('title', 'Podgląd materiału', 'admin/submitted_content/preview/');
+
+        $grid->add_help('preview', 'Podgląd materiału jest dostępny poprzez kliknięcie na tytuł.');
 
         $grid->add_column('id', 'ID', 'id', null, 'submitted_content.id');
-        $grid->add_column('title', 'Tytuł', function($obj) {
-                    return '<a class="preview" style="cursor: pointer" name="preview-'.$obj->id.'" title="Podgląd">'.Str::limit($obj->title, 30).'</a>';
-                }, 'submitted_content.title', 'submitted_content.title');
+        $grid->add_column('title', 'Tytuł', 'title', 'submitted_content.title', 'submitted_content.title');
         $grid->add_column('display_name', 'Użytkownik', 'display_name', 'users.display_name', 'users.display_name');
         $grid->add_column('created_at', 'Podesłano', 'created_at', 'submitted_content.created_at', 'submitted_content.created_at');
         $grid->add_column('type', 'Rodzaj', function($obj) use ($types) {
-                    return isset($types[$obj->type]) ? $types[$obj->type] : $obj->type;
-                }, 'submitted_content.type', 'submitted_content.type');
+            return isset($types[$obj->type]) ? $types[$obj->type] : $obj->type;
+        }, 'submitted_content.type', 'submitted_content.type');
 
         $grid->add_filter_perpage(array(20, 30, 50));
         $grid->add_filter_select('type', 'Rodzaj', $types, '_all_');
@@ -260,11 +256,11 @@ class Admin_Submitted_content_Controller extends Admin_Controller {
             $id = $this->user->id;
 
             $grid->add_multi_action('delete_selected', 'Usuń zaznaczone', function($ids) use ($id) {
-                        $affected = DB::table('submitted_content')->where_in('id', $ids)->delete();
+                $affected = DB::table('submitted_content')->where_in('id', $ids)->delete();
 
-                        if ($affected)
-                            \Model\Log::add('Masowo usunięto podesłane materiały ('.$affected.')', $id);
-                    });
+                if ($affected)
+                    \Model\Log::add('Masowo usunięto podesłane materiały ('.$affected.')', $id);
+            });
         }
 
         return $grid;

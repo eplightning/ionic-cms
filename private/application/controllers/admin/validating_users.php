@@ -88,20 +88,35 @@ class Admin_Validating_users_Controller extends Admin_Controller {
         if (!$id)
             return Response::error(500);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/validating_users/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/validating_users/index');
+            return Response::error(500);
         }
 
         DB::table('validating_users')->where('id', '=', $id->id)->delete();
 
-        $this->notice('Obiekt usunięty pomyślnie');
         $this->log(sprintf('Odrzucono nieaktywowanego użytkownika: %s', $id->display_name));
-        return Redirect::to('admin/validating_users/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Użytkownik usunięty pomyślnie');
+            return Redirect::to('admin/validating_users/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     /**
@@ -192,7 +207,7 @@ class Admin_Validating_users_Controller extends Admin_Controller {
 
         $grid->add_action('Akceptuj', 'admin/validating_users/accept/%d', 'accept-button');
         if (Auth::can('admin_validating_users_delete'))
-            $grid->add_action('Usuń', 'admin/validating_users/delete/%d', 'delete-button');
+            $grid->add_action('Usuń', 'admin/validating_users/delete/%d', 'delete-button', Ionic\Grid::ACTION_BOTH);
 
         $grid->add_filter_perpage(array(20, 30, 50));
         $grid->add_filter_date('created_at', 'Data założenia');
@@ -217,11 +232,11 @@ class Admin_Validating_users_Controller extends Admin_Controller {
             $id = $this->user->id;
 
             $grid->add_multi_action('delete_selected', 'Usuń zaznaczonych', function($ids) use ($id) {
-                        $affected = DB::table('validating_users')->where_in('id', $ids)->delete();
+                $affected = DB::table('validating_users')->where_in('id', $ids)->delete();
 
-                        if ($affected)
-                            \Model\Log::add('Masowo usunięto nieaktywowane konta ('.$affected.')', $id);
-                    });
+                if ($affected)
+                    \Model\Log::add('Masowo usunięto nieaktywowane konta ('.$affected.')', $id);
+            });
         }
 
         return $grid;

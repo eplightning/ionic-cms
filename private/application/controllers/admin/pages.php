@@ -154,21 +154,36 @@ class Admin_Pages_Controller extends Admin_Controller {
         if (!$id)
             return Response::error(500);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/pages/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/pages/index');
+            return Response::error(500);
         }
 
         DB::table('pages')->where('id', '=', $id->id)->delete();
         DB::table('page_content')->where('page_id', '=', $id->id)->delete();
 
-        $this->notice('Obiekt usunięty pomyślnie');
         $this->log(sprintf('Usunął podstronę: %s', $id->title));
-        return Redirect::to('admin/pages/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Podstrona usunięta pomyślnie');
+            return Redirect::to('admin/pages/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     /**
@@ -546,7 +561,7 @@ class Admin_Pages_Controller extends Admin_Controller {
         if (Auth::can('admin_page_versions'))
             $grid->add_action('Historia', 'admin/pages/versions/%d', 'time-button');
         if (Auth::can('admin_page_delete'))
-            $grid->add_action('Usuń', 'admin/pages/delete/%d', 'delete-button');
+            $grid->add_action('Usuń', 'admin/pages/delete/%d', 'delete-button', Ionic\Grid::ACTION_BOTH);
 
         if (Auth::can('admin_page_delete') and Auth::can('admin_page_multi'))
         {

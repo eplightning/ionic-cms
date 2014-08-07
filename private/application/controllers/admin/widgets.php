@@ -25,21 +25,36 @@ class Admin_Widgets_Controller extends Admin_Controller {
         if (!$id)
             return Response::error(500);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/widgets/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/widgets/index');
+            return Response::error(500);
         }
 
         DB::table('widgets')->where('id', '=', $id->id)->delete();
+        Cache::forget('widgets');
 
-        // Notice and redirect
-        $this->notice('Pomyślnie usunięto widżet');
         $this->log('Usunięto widżet: '.$id->title);
-        return Redirect::to('admin/widgets/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Pomyślnie usunięto widżet');
+            return Redirect::to('admin/widgets/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     /**
@@ -161,17 +176,19 @@ class Admin_Widgets_Controller extends Admin_Controller {
     {
         $grid = new Ionic\Grid('widgets', 'Widżety', 'admin/widgets');
 
+        $grid->add_help('widgets', 'Widżety są tworzone automatycznie przy użyciu na stronie.');
+
         $grid->add_column('id', 'ID', 'id', null, 'widgets.id');
         $grid->add_column('title', 'Tytuł', 'title', 'widgets.title', 'widgets.title');
         $grid->add_column('type', 'Rodzaj', function($data) {
-                    return Ionic\Widget::name($data->type);
-                }, 'widgets.type');
+            return Ionic\Widget::name($data->type);
+        }, 'widgets.type');
 
         $grid->add_filter_perpage(array(20, 30, 50));
         $grid->add_filter_search('title', 'Tytuł', 'widgets.title');
 
         $grid->add_action('Edytuj', 'admin/widgets/edit/%d', 'edit-button');
-        $grid->add_action('Usuń', 'admin/widgets/delete/%d', 'delete-button');
+        $grid->add_action('Usuń', 'admin/widgets/delete/%d', 'delete-button', Ionic\Grid::ACTION_BOTH);
 
         return $grid;
     }

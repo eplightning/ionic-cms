@@ -111,22 +111,37 @@ class Admin_Warnings_Controller extends Admin_Controller {
         if (!$id)
             return Response::error(500);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/warnings/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/warnings/index');
+            return Response::error(500);
         }
 
         DB::table('warnings')->where('id', '=', $id->id)->delete();
 
         Model\Warning::refresh_count($id->user_id);
 
-        $this->notice('Obiekt usunięty pomyślnie');
         $this->log(sprintf('Usunięto ostrzeżenie: %s', $id->id));
-        return Redirect::to('admin/warnings/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Obiekt usunięty pomyślnie');
+            return Redirect::to('admin/warnings/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     /**
@@ -279,14 +294,14 @@ class Admin_Warnings_Controller extends Admin_Controller {
         if (Auth::can('admin_warnings_edit'))
             $grid->add_action('Edytuj ostrzeżenie', 'admin/warnings/edit/%d', 'edit-button');
         if (Auth::can('admin_warnings_delete'))
-            $grid->add_action('Usuń ostrzeżenie', 'admin/warnings/delete/%d', 'delete-button');
+            $grid->add_action('Usuń ostrzeżenie', 'admin/warnings/delete/%d', 'delete-button', Ionic\Grid::ACTION_BOTH);
 
         $grid->add_column('id', 'ID', 'id', null, 'warnings.id');
         $grid->add_column('user', 'Użytkownik', 'display_name', 'users.display_name', 'users.display_name');
         $grid->add_column('mod', 'Wystawiający', 'mod_name', 'mod.display_name as mod_name', 'mod.display_name');
         $grid->add_column('reason', 'Powód', function($obj) {
-                    return Str::limit($obj->reason, 20);
-                }, 'warnings.reason', 'warnings.reason');
+            return Str::limit($obj->reason, 20);
+        }, 'warnings.reason', 'warnings.reason');
         $grid->add_column('created_at', 'Data', 'created_at', 'warnings.created_at', 'warnings.created_at');
 
         $grid->add_related('users', 'users.id', '=', 'warnings.user_id');
@@ -295,30 +310,30 @@ class Admin_Warnings_Controller extends Admin_Controller {
         $grid->add_filter_perpage(array(20, 30, 50));
 
         $grid->add_filter_autocomplete('display_name', 'Użytkownik', function($str) {
-                    $us = DB::table('users')->take(20)->where('display_name', 'like', str_replace('%', '', $str).'%')->get('display_name');
+            $us = DB::table('users')->take(20)->where('display_name', 'like', str_replace('%', '', $str).'%')->get('display_name');
 
-                    $result = array();
+            $result = array();
 
-                    foreach ($us as $u)
-                    {
-                        $result[] = $u->display_name;
-                    }
+            foreach ($us as $u)
+            {
+                $result[] = $u->display_name;
+            }
 
-                    return $result;
-                }, 'users.display_name');
+            return $result;
+        }, 'users.display_name');
 
         $grid->add_filter_autocomplete('moderator', 'Wystawiający', function($str) {
-                    $us = DB::table('users')->take(20)->where('display_name', 'like', str_replace('%', '', $str).'%')->get('display_name');
+            $us = DB::table('users')->take(20)->where('display_name', 'like', str_replace('%', '', $str).'%')->get('display_name');
 
-                    $result = array();
+            $result = array();
 
-                    foreach ($us as $u)
-                    {
-                        $result[] = $u->display_name;
-                    }
+            foreach ($us as $u)
+            {
+                $result[] = $u->display_name;
+            }
 
-                    return $result;
-                }, 'mod.display_name');
+            return $result;
+        }, 'mod.display_name');
 
         $grid->add_filter_date('created_at', 'Data wystawienia');
 
@@ -329,32 +344,31 @@ class Admin_Warnings_Controller extends Admin_Controller {
             $id = $this->user->id;
 
             $grid->add_multi_action('delete_selected', 'Usuń zaznaczone', function($ids) use ($id) {
+                $user_ids = array();
 
-                        $user_ids = array();
+                foreach (DB::table('warnings')->where_in('id', $ids)->get('user_id') as $u)
+                {
+                    if (isset($user_ids[$u->user_id]))
+                    {
+                        $user_ids[$u->user_id]['how_much']++;
+                        continue;
+                    }
 
-                        foreach (DB::table('warnings')->where_in('id', $ids)->get('user_id') as $u)
-                        {
-                            if (isset($user_ids[$u->user_id]))
-                            {
-                                $user_ids[$u->user_id]['how_much']++;
-                                continue;
-                            }
+                    $user_ids[$u->user_id] = array('user_id'  => $u->user_id, 'how_much' => 1);
+                }
 
-                            $user_ids[$u->user_id] = array('user_id'  => $u->user_id, 'how_much' => 1);
-                        }
+                $affected = DB::table('warnings')->where_in('id', $ids)->delete();
 
-                        $affected = DB::table('warnings')->where_in('id', $ids)->delete();
+                if ($affected)
+                {
+                    foreach ($user_ids as $u)
+                    {
+                        DB::table('profiles')->where('user_id', '=', $u['user_id'])->update(array('warnings_count' => DB::raw('warnings_count - '.$u['how_much'])));
+                    }
 
-                        if ($affected)
-                        {
-                            foreach ($user_ids as $u)
-                            {
-                                DB::table('profiles')->where('user_id', '=', $u['user_id'])->update(array('warnings_count' => DB::raw('warnings_count - '.$u['how_much'])));
-                            }
-
-                            \Model\Log::add('Masowo usunięto ostrzeżenia ('.$affected.')', $id);
-                        }
-                    });
+                    \Model\Log::add('Masowo usunięto ostrzeżenia ('.$affected.')', $id);
+                }
+            });
         }
 
         return $grid;
