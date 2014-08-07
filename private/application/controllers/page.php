@@ -30,8 +30,8 @@ class Page_Controller extends Base_Controller {
 
         if (Request::method() == 'POST' and !Request::forged() and Input::has('message') and Input::has('email') and Input::has('subject'))
         {
-            $message = HTML::specialchars(Input::get('message'));
-            $subject = HTML::specialchars(Input::get('subject'));
+            $message = Input::get('message');
+            $subject = strip_tags(Input::get('subject'));
             $email = HTML::specialchars(Input::get('email'));
 
             if (strlen($email) > 70 or filter_var($email, FILTER_VALIDATE_EMAIL) === false)
@@ -47,7 +47,7 @@ class Page_Controller extends Base_Controller {
             $msg->setTo($targetEmail);
             $msg->setReplyTo($email);
             $msg->setSubject($subject);
-            $msg->setBody($message);
+            $msg->setBody($message, 'text/plain');
 
             $mailer->send($msg);
 
@@ -89,6 +89,7 @@ class Page_Controller extends Base_Controller {
             $links['Główne']['Lista użytkowników'] = 'users/list';
             $links['Główne']['Użytkownicy online'] = 'users/online';
             $links['Główne']['Biblioteka video'] = 'video';
+            $links['Główne']['Formularz kontaktowy'] = 'page/contact';
 
             foreach (DB::table('news')->order_by('id', 'desc')->take(100)->get(array('title', 'slug')) as $p)
             {
