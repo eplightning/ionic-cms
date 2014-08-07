@@ -121,6 +121,7 @@ class Core_Package extends \Ionic\Package {
         if ($version == '1.2.1')
         {
             $api->add_config(2, 'E-mail kontaktowy', 'Na ten adres e-mail będą wysyłane wiadomości napisane przez formularz kontaktowy.', 'Ogólne', 'example@gmail.com', 'text', '', 'string', 'contact_email');
+            $api->add_config(12, 'Dynamiczne akcje w panelu', 'Wyłącz, aby przywrócić okienko potwierdzenia operacji z poprzednich wersji.', 'Panel administracyjny', '1', 'yesno', '', 'bool', 'admin_prefer_ajax');
 
             $version = '1.3';
         }

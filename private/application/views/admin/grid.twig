@@ -301,6 +301,29 @@ $(function(){
 	{% endif %}
 	{% endfor %}
 
+	$('#grid-view').on('click', 'a.grid-action-ajax', function(event) {
+		event.preventDefault();
+
+		var answer = confirm('Czy jesteś pewien, że chcesz wykonać wybraną operację?');
+
+		if (answer)
+		{
+			$.ajax({
+				type: 'POST',
+				url: $(this).prop('href'),
+				data: {csrf_token: IonicAdmin.csrfToken},
+				dataType: 'json',
+				success: function(response) {
+					if (response.status == true)
+					{
+						paginate($('#slider').slider('value'));
+					}
+				},
+				global: false
+			});
+		}
+	});
+
 	{% if draw_checkboxes %}
 	{% for ma in multi_actions %}
 	$('#multiaction-{{ ma.name }}').click(function(){

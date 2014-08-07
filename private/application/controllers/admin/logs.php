@@ -68,13 +68,21 @@ class Admin_Logs_Controller extends Admin_Controller {
         if (!Auth::can('admin_logs_delete') or !ctype_digit($log))
             return Response::error(403);
 
-        if (!($status = $this->confirm()))
+        // Type
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/logs/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/logs/index');
+            return Response::error(500);
         }
 
         $log = DB::table('logs')->join('users', 'users.id', '=', 'logs.user_id')->where('logs.id', '=', (int) $log)->first(array('logs.id', 'users.display_name'));
@@ -84,10 +92,17 @@ class Admin_Logs_Controller extends Admin_Controller {
 
         DB::table('logs')->where('id', '=', $log->id)->delete();
 
-        // Notice and redirect
-        $this->notice('Pomyślnie usunięto wpis');
         $this->log('Usunął wpis w logach użytkownika '.$log->display_name);
-        return Redirect::to('admin/logs/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Pomyślnie usunięto wpis');
+            return Redirect::to('admin/logs/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     /**
@@ -198,17 +213,17 @@ class Admin_Logs_Controller extends Admin_Controller {
         if (Auth::can('admin_logs_delete'))
         {
             $grid->add_button('Wyczyść logi', 'admin/logs/clear', 'clear-button');
-            $grid->add_action('Usuń', 'admin/logs/delete/%d', 'delete-button');
+            $grid->add_action('Usuń', 'admin/logs/delete/%d', 'delete-button', Ionic\Grid::ACTION_BOTH);
             $grid->enable_checkboxes();
 
             $id = $this->user->id;
 
             $grid->add_multi_action('delete_selected', 'Usuń zaznaczone', function(array $ids) use ($id) {
-                        $affected = DB::table('logs')->where_in('id', $ids)->delete();
+                $affected = DB::table('logs')->where_in('id', $ids)->delete();
 
-                        if ($affected)
-                            \Model\Log::add('Masowo usunięto logi ('.$affected.')', $id);
-                    });
+                if ($affected)
+                    \Model\Log::add('Masowo usunięto logi ('.$affected.')', $id);
+            });
         }
 
         $grid->add_filter_perpage(array(20, 30, 50));

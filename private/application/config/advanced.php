@@ -20,5 +20,6 @@ return array(
     'og_fulltitle' => false,
     'og_defaultimage' => 'opengraph.png',
     'thumbnail_expires' => 86400,
-    'cookie_policy' => true
+    'cookie_policy' => true,
+    'admin_prefer_ajax' => true
 );

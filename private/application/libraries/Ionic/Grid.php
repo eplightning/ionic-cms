@@ -16,6 +16,11 @@ use \Input;
  */
 class Grid {
 
+    // Action type enum
+    const ACTION_STANDARD = 0;
+    const ACTION_AJAX     = 1;
+    const ACTION_BOTH     = 2;
+
     /**
      * @var array
      */
@@ -67,6 +72,11 @@ class Grid {
     protected $perpage = 20;
 
     /**
+     * @var bool
+     */
+    protected $prefer_ajax = true;
+
+    /**
      * @var array
      */
     protected $related = array();
@@ -103,21 +113,27 @@ class Grid {
      * @param array $selects
      * @param number $perpage
      */
-    public function __construct($table, $title, $url, array $selects = array(), $perpage = 20)
+    public function __construct($table, $title, $url, array $selects = array(), $perpage = 20, $prefer_ajax = null)
     {
         $this->table = $table;
         $this->selects = array_merge($selects, array($table.'.id'));
         $this->perpage = $perpage;
         $this->title = $title;
         $this->url = $url;
+        $this->prefer_ajax = is_null($prefer_ajax) ? \Config::get('advanced.admin_prefer_ajax', true) : $prefer_ajax;
     }
 
     /**
      * Add action
      */
-    public function add_action($title, $link, $class = '')
+    public function add_action($title, $link, $class = '', $type = 0)
     {
-        $this->actions[] = array('title' => $title, 'link'  => \URL::to($link), 'class' => $class);
+        if ($type == 1 or ($type == 2 and $this->prefer_ajax))
+        {
+            $class = $class ? $class.' grid-action-ajax' : 'grid-action-ajax';
+        }
+        
+        $this->actions[] = array('title' => $title, 'link'  => \URL::to($link), 'class' => $class, 'type' => $type);
     }
 
     /**
