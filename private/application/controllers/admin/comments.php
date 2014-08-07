@@ -17,7 +17,10 @@ class Admin_Comments_Controller extends Admin_Controller {
         if (!Auth::can('admin_comments_delete') or !ctype_digit($id))
             return Response::error(403);
 
-        $id = DB::table('comments')->where('id', '=', (int) $id)->first('*');
+        $id = DB::table('comments')->left_join('users', 'users.id', '=', 'comments.user_id')
+                                   ->where('comments.id', '=', (int) $id)
+                                   ->first(array('comments.*', 'users.display_name'));
+
         if (!$id)
             return Response::error(500);
 
@@ -38,7 +41,15 @@ class Admin_Comments_Controller extends Admin_Controller {
         }
 
         Model\Comment::delete($id);
-        $this->log(sprintf('Usunięto komentarz: %d', $id->id));
+
+        if (!$id->user_id or empty($id->display_name))
+        {
+            $this->log('Usunięto komentarz gościa '.$id->guest_name);
+        }
+        else
+        {
+            $this->log('Usunięto komentarz użytkownika '.$id->display_name);
+        }
 
         if (!Request::ajax())
         {
