@@ -138,27 +138,6 @@ class Admin_Comments_Controller extends Admin_Controller {
         $this->page->set_title('Komentarze');
         $this->page->breadcrumb_append('Komentarze', 'admin/comments/index');
 
-        $this->page->add_footer_js("$(function() {
-	$('#grid-right-column').after($('<div id=\"dialog-preview-content\" style=\"display: none\"><div id=\"dialog-preview-content-in\"></div></div>'));
-	$('#dialog-preview-content').dialog({
-		autoOpen: false,
-		width: 600,
-		height: 400,
-		modal: true,
-		buttons: {
-			'Zamknij': function() { $(this).dialog('close'); }
-		},
-		title: 'Podgląd komentarza'
-	});
-
-	$('a.preview').click(function(){
-		$.get(IONIC_BASE_URL+'admin/comments/preview/'+$(this).attr('name').replace('preview-', ''), function(response) {
-			$('#dialog-preview-content-in').html(response);
-			$('#dialog-preview-content').dialog('open');
-		});
-	});
-});");
-
         $grid = $this->make_grid();
 
         $result = $grid->handle_index($id);
@@ -230,17 +209,19 @@ class Admin_Comments_Controller extends Admin_Controller {
 
         $grid->add_related('users', 'users.id', '=', 'comments.user_id', array('comments.guest_name'), true);
 
+        $grid->add_preview('display_name', 'Podgląd komentarza', 'admin/comments/preview/');
+
         $grid->add_column('id', 'ID', 'id', null, 'comments.id');
         $grid->add_column('display_name', 'Autor', function($obj) {
-                    if ($obj->display_name)
-                    {
-                        return '<a class="preview" style="cursor: pointer" name="preview-'.$obj->id.'" title="Podgląd">'.$obj->display_name.'</a>';
-                    }
-                    else
-                    {
-                        return '<a class="preview" style="cursor: pointer" name="preview-'.$obj->id.'" title="Podgląd">Anonimowy <small>('.$obj->guest_name.')</small></a>';
-                    }
-                }, 'users.display_name', 'users.display_name');
+            if ($obj->display_name)
+            {
+                return $obj->display_name;
+            }
+            else
+            {
+                return 'Anonimowy <small>('.$obj->guest_name.')</small>';
+            }
+        }, 'users.display_name', 'users.display_name');
         $grid->add_column('created_at', 'Dodano', 'created_at', 'comments.created_at', 'comments.created_at');
         $grid->add_column('content_type', 'Gdzie', function($obj) use ($types) {
                     return isset($types[$obj->content_type]) ? $types[$obj->content_type] : $obj->content_type;

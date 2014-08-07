@@ -79,6 +79,11 @@ class Grid {
     /**
      * @var array
      */
+    protected $preview = array();
+
+    /**
+     * @var array
+     */
     protected $related = array();
 
     /**
@@ -294,6 +299,18 @@ class Grid {
     public function add_multi_action($name, $title, Closure $action)
     {
         $this->multi_actions[$name] = array('name'   => $name, 'title'  => $title, 'action' => $action);
+    }
+
+    /**
+     * Add preview
+     *
+     * @param string $name
+     * @param string $title
+     * @param string $url
+     */
+    public function add_preview($name, $title, $url)
+    {
+        $this->preview[$name] = array('title' => $title, 'url' => $url);
     }
 
     /**
@@ -837,6 +854,10 @@ class Grid {
                 {
                     $d[$c['name']] = '<span id="inline-edit-'.$c['name'].'-'.$d['id'].'" class="inline-edit">'.$d[$c['name']].'</span>';
                 }
+                elseif (isset($this->preview[$c['name']]))
+                {
+                    $d[$c['name']] = '<a class="preview-'.$c['name'].'" data-param="'.$d['id'].'" style="cursor: pointer" title="'.$this->preview[$c['name']]['title'].'">'.$d[$c['name']].'</a>';
+                }
             }
 
             $data[] = $d;
@@ -893,6 +914,7 @@ class Grid {
             $view->with('grid_title', $this->title);
             $view->with('grid_url', $this->url);
             $view->with('inline_edit', !empty($this->inline_edit));
+            $view->with('previews', $this->preview);
 
             if (!empty($this->inline_edit))
             {

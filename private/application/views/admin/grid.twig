@@ -177,6 +177,11 @@
 	{% endif %}
 </div>
 {% endif %}
+{% for preview_name, preview_data in previews %}
+<div id="dialog-preview-content-{{ preview_name }}" style="display: none">
+	<div id="dialog-preview-content-{{ preview_name }}-in"></div>
+</div>
+{% endfor %}
 <script type="text/javascript">
 {% if draw_checkboxes %}
 function initCheckboxes()
@@ -354,5 +359,25 @@ $(function(){
 	});
 	{% endfor %}
 	{% endif %}
+
+	{% for preview_name, preview_data in previews %}
+	$('#dialog-preview-content-{{ preview_name }}').dialog({
+		autoOpen: false,
+		width: 600,
+		height: 400,
+		modal: true,
+		buttons: {
+			'Zamknij': function() { $(this).dialog('close'); }
+		},
+		title: '{{ preview_data.title }}'
+	});
+
+	$('#grid-view').on('click', 'a.preview-{{ preview_name }}', function(){
+		$.get(IONIC_BASE_URL+'{{ preview_data.url }}'+$(this).data('param'), function(response) {
+			$('#dialog-preview-content-{{ preview_name }}-in').html(response);
+			$('#dialog-preview-content-{{ preview_name }}').dialog('open');
+		});
+	});
+	{% endfor %}
 });
 </script>

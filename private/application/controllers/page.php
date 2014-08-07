@@ -16,9 +16,9 @@ class Page_Controller extends Base_Controller {
      */
     public function action_contact()
     {
-        $targetEmail = Config::get('email.contact_email', '');
+        $target_email = Config::get('email.contact_email', '');
 
-        if (!$targetEmail)
+        if (!$target_email)
         {
             $this->notice('Formularz kontaktowy jest wyłączony');
             return Redirect::to('index');
@@ -44,7 +44,7 @@ class Page_Controller extends Base_Controller {
 
             $msg = \Swift_Message::newInstance();
             $msg->setFrom(array(Config::get('email.from') => Config::get('email.from_name')));
-            $msg->setTo($targetEmail);
+            $msg->setTo($target_email);
             $msg->setReplyTo($email);
             $msg->setSubject($subject);
             $msg->setBody($message, 'text/plain');
