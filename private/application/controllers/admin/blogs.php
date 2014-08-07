@@ -28,22 +28,37 @@ class Admin_Blogs_Controller extends Admin_Controller {
         if (!$id)
             return Response::error(500);
         
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
-        } //!($status = $this->confirm())
-        elseif ($status == 2)
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/blogs/index');
+            }
+        }
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/blogs/index');
-        } //$status == 2
-        
+            return Response::error(500);
+        }
+
         DB::table('blogs')->where('id', '=', $id->id)->delete();
         DB::table('karma')->where('content_id', '=', $id->id)->where('content_type', '=', 'blog')->delete();
         Model\Comment::delete_comments_for($id->id, 'blog');
         
-        $this->notice('Obiekt usunięty pomyślnie');
         $this->log('Usunięto wpis w blogu: ' . $id->title);
-        return Redirect::to('admin/blogs/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Obiekt usunięty pomyślnie');
+            return Redirect::to('admin/blogs/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
     
     public function action_edit($id)
@@ -185,7 +200,7 @@ class Admin_Blogs_Controller extends Admin_Controller {
         if (Auth::can('admin_blogs_edit'))
             $grid->add_action('Edytuj', 'admin/blogs/edit/%d', 'edit-button');
         if (Auth::can('admin_blogs_delete'))
-            $grid->add_action('Usuń', 'admin/blogs/delete/%d', 'delete-button');
+            $grid->add_action('Usuń', 'admin/blogs/delete/%d', 'delete-button', Ionic\Grid::ACTION_BOTH);
         
         $grid->add_related('users', 'users.id', '=', 'blogs.user_id');
         

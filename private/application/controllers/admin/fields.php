@@ -141,20 +141,34 @@ class Admin_Fields_Controller extends Admin_Controller {
         if (!$id)
             return Response::error(500);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/fields/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/fields/index');
+            return Response::error(500);
         }
 
         DB::table('fields')->where('id', '=', $id->id)->delete();
-
-        $this->notice('Obiekt usunięty pomyślnie');
         $this->log(sprintf('Usunął pole: %s', $id->title));
-        return Redirect::to('admin/fields/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Obiekt usunięty pomyślnie');
+            return Redirect::to('admin/fields/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     /**
@@ -387,7 +401,7 @@ class Admin_Fields_Controller extends Admin_Controller {
 
         if (Auth::can('admin_fields_delete'))
         {
-            $grid->add_action('Usuń', 'admin/fields/delete/%d', 'delete-button');
+            $grid->add_action('Usuń', 'admin/fields/delete/%d', 'delete-button', Ionic\Grid::ACTION_BOTH);
         }
 
         $grid->add_column('id', 'ID', 'id', null, 'fields.id');

@@ -21,20 +21,34 @@ class Admin_Comments_Controller extends Admin_Controller {
         if (!$id)
             return Response::error(500);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/comments/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/comments/index');
+            return Response::error(500);
         }
 
         Model\Comment::delete($id);
-
-        $this->notice('Obiekt usunięty pomyślnie');
         $this->log(sprintf('Usunięto komentarz: %d', $id->id));
-        return Redirect::to('admin/comments/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Obiekt usunięty pomyślnie');
+            return Redirect::to('admin/comments/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     public function action_edit($id)
@@ -197,7 +211,7 @@ class Admin_Comments_Controller extends Admin_Controller {
         if (Auth::can('admin_comments_edit'))
             $grid->add_action('Edytuj', 'admin/comments/edit/%d', 'edit-button');
         if (Auth::can('admin_comments_delete'))
-            $grid->add_action('Usuń', 'admin/comments/delete/%d', 'delete-button');
+            $grid->add_action('Usuń', 'admin/comments/delete/%d', 'delete-button', Ionic\Grid::ACTION_BOTH);
 
         $types = array();
         $types['_all_'] = 'Wszystkie';
