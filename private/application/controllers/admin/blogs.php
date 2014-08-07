@@ -203,9 +203,12 @@ class Admin_Blogs_Controller extends Admin_Controller {
             $grid->add_action('Usuń', 'admin/blogs/delete/%d', 'delete-button', Ionic\Grid::ACTION_BOTH);
         
         $grid->add_related('users', 'users.id', '=', 'blogs.user_id');
+        $grid->add_selects(array('blogs.slug'));
         
         $grid->add_column('id', 'ID', 'id', null, 'blogs.id');
-        $grid->add_column('title', 'Tytuł', 'title', 'blogs.title', 'blogs.title');
+        $grid->add_column('title', 'Tytuł', function ($obj) {
+            return '<a href="blog/post/'.$obj->slug.'">'.$obj->title.'</a>';
+        }, 'blogs.title', 'blogs.title');
         $grid->add_column('display_name', 'Autor', 'display_name', 'users.display_name', 'users.display_name');
         $grid->add_column('created_at', 'Data dodania', 'created_at', 'blogs.created_at', 'blogs.created_at');
         
