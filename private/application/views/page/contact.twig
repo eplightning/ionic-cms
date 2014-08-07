@@ -1,11 +1,15 @@
 <div class="ionic-box">
-	<h2>Wysyłanie wiadomości</h2>
-	<form action="users/email/{{ user.slug }}" method="post">
+	<h2>Formularz kontaktowy</h2>
+	<form action="page/contact" method="post">
 	<div class="ionic-form">
 		<div class="ionic-form-legend">Wiadomość</div>
 		<div class="ionic-form-elem">
-			<label>Użytkownik:</label>
-			{{ user.display_name }}
+			<label for="subject">Temat:</label>
+			<input type="text" name="subject" id="subject" maxlength="127" value="" />
+		</div>
+		<div class="ionic-form-elem">
+			<label for="email">Adres e-mail:</label>
+			<input type="text" name="email" id="email" maxlength="70" value="" />
 		</div>
 		<div class="ionic-form-elem">
 			<label for="message">Wiadomość:</label>

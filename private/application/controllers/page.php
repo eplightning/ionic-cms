@@ -10,7 +10,58 @@
 class Page_Controller extends Base_Controller {
 
     /**
+     * Contact
+     *
+     * @return Response
+     */
+    public function action_contact()
+    {
+        $targetEmail = Config::get('email.contact_email', '');
+
+        if (!$targetEmail)
+        {
+            $this->notice('Formularz kontaktowy jest wyłączony');
+            return Redirect::to('index');
+        }
+
+        $this->page->set_title('Formularz kontaktowy');
+        $this->page->breadcrumb_append('Formularz kontaktowy', 'page/contact');
+        $this->online('Formularz kontaktowy', 'page/contact');
+
+        if (Request::method() == 'POST' and !Request::forged() and Input::has('message') and Input::has('email') and Input::has('subject'))
+        {
+            $message = HTML::specialchars(Input::get('message'));
+            $subject = HTML::specialchars(Input::get('subject'));
+            $email = HTML::specialchars(Input::get('email'));
+
+            if (strlen($email) > 70 or filter_var($email, FILTER_VALIDATE_EMAIL) === false)
+            {
+                $this->notice('Podany adres e-mail jest nieprawidłowy');
+                return Redirect::to('page/contact');
+            }
+
+            $mailer = IoC::resolve('mailer');
+
+            $msg = \Swift_Message::newInstance();
+            $msg->setFrom(array(Config::get('email.from') => Config::get('email.from_name')));
+            $msg->setTo($targetEmail);
+            $msg->setReplyTo($email);
+            $msg->setSubject($subject);
+            $msg->setBody($message);
+
+            $mailer->send($msg);
+
+            $this->notice('Wiadomość e-mail została wysłana pomyślnie');
+            return Redirect::to('page/contact');
+        }
+
+        $this->view = View::make('page.contact');
+    }
+
+    /**
      * Site map
+     *
+     * @return Response
      */
     public function action_map($format = 'html')
     {

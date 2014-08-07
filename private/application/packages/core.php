@@ -65,7 +65,7 @@ class Core_Package extends \Ionic\Package {
      */
     public function get_version()
     {
-        return '1.2.1';
+        return '1.3';
     }
 
     /**
@@ -115,6 +115,14 @@ class Core_Package extends \Ionic\Package {
             $api->add_config(12, 'Polityka cookie', 'Czy generować komunikat o polityce cookie?', 'Optymalizacje', '1', 'yesno', '', 'bool', 'cookie_policy');
 
             $version = '1.2.1';
+        }
+
+        // 1.2.1 -> 1.3
+        if ($version == '1.2.1')
+        {
+            $api->add_config(2, 'E-mail kontaktowy', 'Na ten adres e-mail będą wysyłane wiadomości napisane przez formularz kontaktowy.', 'Ogólne', 'example@gmail.com', 'text', '', 'string', 'contact_email');
+
+            $version = '1.3';
         }
 
         $api->update_package('core', $this->get_version());

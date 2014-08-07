@@ -4,6 +4,7 @@ return array(
 'type' => 'smtp',
 'from' => 'example@gmail.com',
 'from_name' => 'Example',
+'contact_email' => 'example@gmail.com',
 
 // sendmail only options
 'sendmail' => '/usr/sbin/sendmail -bs',
