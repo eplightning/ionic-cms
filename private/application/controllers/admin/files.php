@@ -180,13 +180,20 @@ class Admin_Files_Controller extends Admin_Controller {
         if (!$id)
             return Response::error(500);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/files/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/files/index');
+            return Response::error(500);
         }
 
         if (file_exists(path('storage').'files'.DS.$id->filelocation))
@@ -257,9 +264,17 @@ class Admin_Files_Controller extends Admin_Controller {
 
         ionic_clear_cache('files-*');
 
-        $this->notice('Obiekt usunięty pomyślnie');
         $this->log(sprintf('Usunięto plik: %s', $id->title));
-        return Redirect::to('admin/files/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Plik usunięty pomyślnie');
+            return Redirect::to('admin/files/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     public function action_edit($id)
@@ -489,12 +504,14 @@ class Admin_Files_Controller extends Admin_Controller {
 
         $grid->add_related('users', 'users.id', '=', 'files.user_id');
 
+        $grid->add_help('category', 'Aby filtrować według kategorii należy wejść w zarządzanie kategoriami oraz wybrać odpowiednią opcję po kliknięciu PPM na kategorię.');
+
         if (Auth::can('admin_files_add'))
             $grid->add_button('Dodaj plik', 'admin/files/add', 'add-button');
         if (Auth::can('admin_files_edit'))
             $grid->add_action('Edytuj', 'admin/files/edit/%d', 'edit-button');
         if (Auth::can('admin_files_delete'))
-            $grid->add_action('Usuń', 'admin/files/delete/%d', 'delete-button');
+            $grid->add_action('Usuń', 'admin/files/delete/%d', 'delete-button', Ionic\Grid::ACTION_BOTH);
 
         $grid->add_column('id', 'ID', 'id', null, 'files.id');
         $grid->add_column('title', 'Tytuł', 'title', 'files.title', 'files.title');

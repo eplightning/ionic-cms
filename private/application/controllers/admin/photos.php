@@ -247,13 +247,20 @@ class Admin_Photos_Controller extends Admin_Controller {
         if (!$id)
             return Response::error(500);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/photos/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/photos/index');
+            return Response::error(500);
         }
 
         if (is_file(path('public').'upload'.DS.'photos'.DS.$id->image))
@@ -290,9 +297,17 @@ class Admin_Photos_Controller extends Admin_Controller {
 
         ionic_clear_cache('photos-*');
 
-        $this->notice('Obiekt usunięty pomyślnie');
         $this->log(sprintf('Usunięto zdjęcie: %s', $id->title));
-        return Redirect::to('admin/photos/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Zdjęcie usunięte pomyślnie');
+            return Redirect::to('admin/photos/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     public function action_edit($id)
@@ -512,12 +527,14 @@ class Admin_Photos_Controller extends Admin_Controller {
 
         $grid->add_related('users', 'users.id', '=', 'photos.user_id');
 
+        $grid->add_help('category', 'Aby filtrować według kategorii należy wejść w zarządzanie kategoriami oraz wybrać odpowiednią opcję po kliknięciu PPM na kategorię.');
+
         if (Auth::can('admin_photos_add'))
             $grid->add_button('Dodaj zdjęcia', 'admin/photos/add', 'add-button');
         if (Auth::can('admin_photos_edit'))
             $grid->add_action('Edytuj', 'admin/photos/edit/%d', 'edit-button');
         if (Auth::can('admin_photos_delete'))
-            $grid->add_action('Usuń', 'admin/photos/delete/%d', 'delete-button');
+            $grid->add_action('Usuń', 'admin/photos/delete/%d', 'delete-button', Ionic\Grid::ACTION_BOTH);
 
         $grid->add_selects(array('photos.image'));
 

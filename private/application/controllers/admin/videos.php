@@ -159,13 +159,20 @@ class Admin_Videos_Controller extends Admin_Controller {
         if (!$id)
             return Response::error(500);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/videos/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/videos/index');
+            return Response::error(500);
         }
 
         DB::table('videos')->where('id', '=', $id->id)->delete();
@@ -225,9 +232,17 @@ class Admin_Videos_Controller extends Admin_Controller {
 
         ionic_clear_cache('videos-*');
 
-        $this->notice('Obiekt usunięty pomyślnie');
         $this->log(sprintf('Usunięto video: %s', $id->title));
-        return Redirect::to('admin/videos/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Film usunięty pomyślnie');
+            return Redirect::to('admin/videos/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     public function action_edit($id)
@@ -442,12 +457,14 @@ class Admin_Videos_Controller extends Admin_Controller {
 
         $grid->add_selects(array('videos.link'));
 
+        $grid->add_help('category', 'Aby filtrować według kategorii należy wejść w zarządzanie kategoriami oraz wybrać odpowiednią opcję po kliknięciu PPM na kategorię.');
+
         if (Auth::can('admin_videos_add'))
             $grid->add_button('Dodaj film', 'admin/videos/add', 'add-button');
         if (Auth::can('admin_videos_edit'))
             $grid->add_action('Edytuj', 'admin/videos/edit/%d', 'edit-button');
         if (Auth::can('admin_videos_delete'))
-            $grid->add_action('Usuń', 'admin/videos/delete/%d', 'delete-button');
+            $grid->add_action('Usuń', 'admin/videos/delete/%d', 'delete-button', Ionic\Grid::ACTION_BOTH);
 
         $grid->add_column('id', 'ID', 'id', null, 'videos.id');
         $grid->add_column('title', 'Tytuł', function($obj) {
