@@ -114,13 +114,72 @@
 		</div>
 		<div class="section-content">
 			<ul class="section-list">
+				{% if prefer_ajax %}
+				{% for k,cf in custom_filters %}
+				<li>{{ cf.type }} <small><a style="cursor: pointer" class="grid-disable-custom" data-custom="{{ k }}">(wyłącz)</a></small></li>
+				{% endfor %}
+				{% else %}
 				{% for k,cf in custom_filters %}
 				<li>{{ cf.type }} <small><a href="{{ (grid_url~"/filter/_customdel/"~k)|url }}">(wyłącz)</a></small></li>
 				{% endfor %}
+				{% endif %}
 			</ul>
 		</div>
 	</div>
 	{% endif %}
+	{% if prefer_ajax %}
+	{% for filter in filters %}
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">
+				{{ filter.title }}
+			</div>
+		</div>
+		<div class="section-content{% if filter.type == 'perpage' or filter.type == 'select' %} filter{% endif %}">
+			{% if filter.type == 'perpage' %}
+				<ul class="filter-list" data-filter="{{ filter.name }}">
+				{% for option in filter.options %}
+					<li{% if option == perpage  %} class="active"{% endif %}><a style="cursor: pointer" data-option="{{ option }}">{{ option }}</a></li>
+				{% endfor %}
+				</ul>
+			{% elseif filter.type == 'select' %}
+				<ul class="filter-list" data-filter="{{ filter.name }}">
+				{% for k, option in filter.options %}
+					{# ugly hack but well, it works #}
+					{% if (filter_values[filter.name] == '0' and k == '0') or (filter_values[filter.name] == k and k != '0') %}
+					<li class="active"><a style="cursor: pointer" data-option="{{ k }}">{{ option }}</a></li>
+					{% else %}
+					<li><a style="cursor: pointer" data-option="{{ k }}">{{ option }}</a></li>
+					{% endif %}
+				{% endfor %}
+				</ul>
+			{% elseif filter.type == 'search' %}
+			<div class="search-filter" data-filter="{{ filter.name }}">
+				<select name="how">
+					<option value="startswith"{% if filter_values[filter.name].type == 'startswith' %} selected="selected"{% endif %}>Zaczyna się na</option>
+					<option value="endswith"{% if filter_values[filter.name].type == 'endswith' %} selected="selected"{% endif %}>Kończy się na</option>
+					<option value="contains"{% if filter_values[filter.name].type == 'contains' %} selected="selected"{% endif %}>Zawiera</option>
+					<option value="exact"{% if filter_values[filter.name].type == 'exact' %} selected="selected"{% endif %}>To</option>
+				</select>
+				<input type="text" name="query" value="{{ filter_values[filter.name].query|e }}"/>
+				<input type="submit" style="width: auto" value="Szukaj" class="search-button" />
+			</div>
+			{% elseif filter.type == 'date' %}
+			<div class="date-filter" data-filter="{{ filter.name }}">
+				Od: <input type="text" name="from" value="{{ filter_values[filter.name].from }}" class="datepicker" /><br />
+				Do: <input type="text" name="to" value="{{ filter_values[filter.name].to }}" class="datepicker" />
+				<input type="submit" style="width: auto" value="Szukaj" class="search-button" />
+			</div>
+			{% elseif filter.type == 'autocomplete' %}
+			<div class="autocomplete-filter" data-filter="{{ filter.name }}">
+				<input type="text" name="query" id="autocomplete-{{ filter.name }}" value="{{ filter_values[filter.name]|e }}" />
+				<input type="submit" style="width: auto" value="Szukaj" class="search-button" />
+			</div>
+			{% endif %}
+		</div>
+	</div>
+	{% endfor %}
+	{% else %}
 	{% for filter in filters %}
 	<div class="section">
 		<div class="theader">
@@ -185,6 +244,7 @@
 		</div>
 	</div>
 	{% endfor %}
+	{% endif %}
 </div>
 {% endif %}
 {% for preview_name, preview_data in previews %}
@@ -222,58 +282,89 @@ function initCheckboxes()
 	});
 }
 {% endif %}
+var filtering_in_progress = false;
+var paginating_in_progress = false;
+
 function paginate(page)
 {
+	if (paginating_in_progress) return;
+	paginating_in_progress = true;
+
 	$('#grid-view .grid-column').remove();
 
-	$.get(IONIC_BASE_URL+'{{ grid_url }}/index/'+page, function(response) {
-		html = response.view;
+	$.ajax({
+		type: 'GET',
+		url: IONIC_BASE_URL+'{{ grid_url }}/index/'+page,
+		success: function(response) {
+			html = response.view;
 
-		$('#grid-view').append(html);
+			$('#grid-view').append(html);
 
-		$('#grid-view .delete-button').button({text: false, icons: {primary: 'ui-icon-trash'}});
-		$('#grid-view .edit-button').button({text: false, icons: {primary: 'ui-icon-pencil'}});
-		$('#grid-view .lock-button').button({text: false, icons: {primary: 'ui-icon-locked'}});
-		$('#grid-view .unlock-button').button({text: false, icons: {primary: 'ui-icon-unlocked'}});
-		$('#grid-view .display-button').button({text: false, icons: {primary: 'ui-icon-search'}});
-		$('#grid-view .case-button').button({text: false, icons: {primary: 'ui-icon-suitcase'}});
-		$('#grid-view .accept-button').button({text: false, icons: {primary: 'ui-icon-check'}});
-		$('#grid-view .time-button').button({text: false, icons: {primary: 'ui-icon-clock'}});
+			$('#grid-view .delete-button').button({text: false, icons: {primary: 'ui-icon-trash'}});
+			$('#grid-view .edit-button').button({text: false, icons: {primary: 'ui-icon-pencil'}});
+			$('#grid-view .lock-button').button({text: false, icons: {primary: 'ui-icon-locked'}});
+			$('#grid-view .unlock-button').button({text: false, icons: {primary: 'ui-icon-unlocked'}});
+			$('#grid-view .display-button').button({text: false, icons: {primary: 'ui-icon-search'}});
+			$('#grid-view .case-button').button({text: false, icons: {primary: 'ui-icon-suitcase'}});
+			$('#grid-view .accept-button').button({text: false, icons: {primary: 'ui-icon-check'}});
+			$('#grid-view .time-button').button({text: false, icons: {primary: 'ui-icon-clock'}});
 
-		{% if draw_checkboxes %}
-		$('.grid-checkbox:not(.checkbox-all)').each(function() {
-			$(this).prop('checked', IonicAdmin.isCheckboxAdded($(this).prop('name')));
-		});
+			{% if draw_checkboxes %}
+			$('.grid-checkbox:not(.checkbox-all)').each(function() {
+				$(this).prop('checked', IonicAdmin.isCheckboxAdded($(this).prop('name')));
+			});
 
-		initCheckboxes();
-		{% endif %}
-		{% if inline_edit %}
-		$('.inline-edit').editable(IONIC_BASE_URL+'{{ grid_url }}/inline', {
-			tooltip: 'Kliknij, aby edytować',
-			submitdata: { {{ csrf_key }}: IonicAdmin.csrfToken },
-			onblur: 'submit'
-		});
-		{% endif %}
+			initCheckboxes();
+			{% endif %}
+			{% if inline_edit %}
+			$('.inline-edit').editable(IONIC_BASE_URL+'{{ grid_url }}/inline', {
+				tooltip: 'Kliknij, aby edytować',
+				submitdata: { {{ csrf_key }}: IonicAdmin.csrfToken },
+				onblur: 'submit'
+			});
+			{% endif %}
 
-		if (response.records == 1)
-		{
-			$('#grid-elements-count').text('1 element');
-		}
-		else if (response.records > 1 && response.records < 5)
-		{
-			$('#grid-elements-count').text(response.records+' elementy');
-		}
-		else
-		{
-			$('#grid-elements-count').text(response.records+' elementów');
-		}
+			if (response.records == 1)
+			{
+				$('#grid-elements-count').text('1 element');
+			}
+			else if (response.records > 1 && response.records < 5)
+			{
+				$('#grid-elements-count').text(response.records+' elementy');
+			}
+			else
+			{
+				$('#grid-elements-count').text(response.records+' elementów');
+			}
 
-		if ($('#slider').slider('value') != response.page)
-		{
-			$('#grid-pagination-title select').val(response.page);
-			$('#slider').slider('value', response.page);
-		}
-	}, 'json');
+			if ($('#slider').slider('option', 'max') != response.pages)
+			{
+				$('#slider').slider('option', 'max', response.pages);
+
+				var select = $('#grid-pagination-title select');
+
+				select.html('');
+
+				var options = [];
+
+				for (i = 1; i <= response.pages; i++) {
+					options.push($("<option />", {value: i, text: i}));
+				}
+
+				select.append(options);
+			}
+
+			if ($('#slider').slider('value') != response.page)
+			{
+				$('#grid-pagination-title select').val(response.page);
+				$('#slider').slider('value', response.page);
+			}
+
+			paginating_in_progress = false;
+		},
+		dataType: 'json',
+		async: false
+	});
 }
 
 $(function(){
@@ -359,6 +450,109 @@ $(function(){
 			});
 		}
 	});
+
+	{% if prefer_ajax %}
+	$('.grid-disable-custom').click(function() {
+		if (filtering_in_progress) return;
+		filtering_in_progress = true;
+
+		var elem = $(this);
+
+		$.get(IONIC_BASE_URL+'{{ grid_url }}/filter/_customdel/'+elem.data('custom'), function(response) {
+			filter_in_progress = false;
+
+			if (response.status)
+			{
+				paginate(1);
+				elem.parent().parent().remove();
+			}
+		});
+	});
+
+	$('.filter-list li a').click(function() {
+		if (filtering_in_progress) return;
+		filtering_in_progress = true;
+
+		var elem = $(this);
+		var item = elem.parent();
+		var list = item.parent();
+
+		var filter = list.data('filter');
+		var option = elem.data('option');
+
+		$.get(IONIC_BASE_URL+'{{ grid_url }}/filter/'+filter+'/'+option, function(response) {
+			filtering_in_progress = false;
+			if (response.status)
+			{
+				paginate(1);
+				list.children('li.active').removeClass('active');
+				item.addClass('active');
+			}
+		}, 'json');
+	});
+
+	$('.search-filter .search-button').click(function() {
+		if (filtering_in_progress) return;
+		filtering_in_progress = true;
+
+		var item = $(this).parent();
+
+		var filter = item.data('filter');
+
+		$.post(IONIC_BASE_URL+'{{ grid_url }}/filter/'+filter, {
+			csrf_token: IonicAdmin.csrfToken,
+			how: item.children('select').val(),
+			query: item.children('input').first().val()
+		}, function(response) {
+			filtering_in_progress = false;
+			if (response.status)
+			{
+				paginate(1);
+			}
+		}, 'json');
+	});
+
+	$('.date-filter .search-button').click(function() {
+		if (filtering_in_progress) return;
+		filtering_in_progress = true;
+
+		var item = $(this).parent();
+
+		var filter = item.data('filter');
+
+		$.post(IONIC_BASE_URL+'{{ grid_url }}/filter/'+filter, {
+			csrf_token: IonicAdmin.csrfToken,
+			from: item.children('input').first().val(),
+			to: item.children('input').eq(1).val()
+		}, function(response) {
+			filtering_in_progress = false;
+			if (response.status)
+			{
+				paginate(1);
+			}
+		}, 'json');
+	});
+
+	$('.autocomplete-filter .search-button').click(function() {
+		if (filtering_in_progress) return;
+		filtering_in_progress = true;
+
+		var item = $(this).parent();
+
+		var filter = item.data('filter');
+
+		$.post(IONIC_BASE_URL+'{{ grid_url }}/filter/'+filter, {
+			csrf_token: IonicAdmin.csrfToken,
+			query: item.children('input').first().val()
+		}, function(response) {
+			filtering_in_progress = false;
+			if (response.status)
+			{
+				paginate(1);
+			}
+		}, 'json');
+	});
+	{% endif %}
 
 	{% if draw_checkboxes %}
 	{% for ma in multi_actions %}

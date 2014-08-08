@@ -458,11 +458,13 @@ class Grid {
      */
     public function handle_filter($name, $value)
     {
+        $is_ajax = Request::ajax();
+
         if ($name == '_clear_all')
         {
             \Session::put($this->table.'_filters', array());
             \Session::put($this->table.'_cfilters', array());
-            return Redirect::to($this->url.'/index');
+            return $is_ajax ? Response::json(array('status' => true)) : Redirect::to($this->url.'/index');
         }
 
         if ($name == '_customdel')
@@ -479,7 +481,7 @@ class Grid {
                 }
             }
 
-            return Redirect::to($this->url.'/index');
+            return $is_ajax ? Response::json(array('status' => true)) : Redirect::to($this->url.'/index');
         }
 
         if (!isset($this->filters[$name]))
@@ -596,7 +598,7 @@ class Grid {
             \Session::put($this->table.'_filters', $applied);
         }
 
-        return Redirect::to($this->url.'/index');
+        return $is_ajax ? Response::json(array('status' => true)) : Redirect::to($this->url.'/index');
     }
 
     /**
@@ -914,7 +916,8 @@ class Grid {
             return \Response::json(array(
                 'view' => $view->render(),
                 'records' => $records,
-                'page' => $id
+                'page' => $id,
+                'pages' => $pages
             ));
         }
         else
@@ -949,6 +952,7 @@ class Grid {
                 'grid_title' => $this->title,
                 'grid_url' => $this->url,
                 'inline_edit' => !empty($this->inline_edit),
+                'prefer_ajax' => $this->prefer_ajax,
                 'previews' => $this->preview,
                 'help' => $this->help
             ));
