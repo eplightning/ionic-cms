@@ -140,22 +140,37 @@ class Admin_Players_Controller extends Admin_Controller {
         if (!$id)
             return Response::error(500);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/players/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/players/index');
+            return Response::error(500);
         }
 
         DB::table('players')->where('id', '=', $id->id)->delete();
 
         ionic_clear_cache('birthdays-*');
 
-        $this->notice('Obiekt usunięty pomyślnie');
         $this->log(sprintf('Usunięto zawodnika: %s', $id->name));
-        return Redirect::to('admin/players/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Zawodnik usunięty pomyślnie');
+            return Redirect::to('admin/players/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     public function action_edit($id)
@@ -382,7 +397,7 @@ class Admin_Players_Controller extends Admin_Controller {
         if (Auth::can('admin_players_edit'))
             $grid->add_action('Edytuj', 'admin/players/edit/%d', 'edit-button');
         if (Auth::can('admin_players_delete'))
-            $grid->add_action('Usuń', 'admin/players/delete/%d', 'delete-button');
+            $grid->add_action('Usuń', 'admin/players/delete/%d', 'delete-button', Ionic\Grid::ACTION_BOTH);
 
         if (Auth::can('admin_players_delete') and Auth::can('admin_players_multi'))
         {
@@ -391,13 +406,13 @@ class Admin_Players_Controller extends Admin_Controller {
             $id = $this->user->id;
 
             $grid->add_multi_action('delete_selected', 'Usuń zaznaczone', function($ids) use ($id) {
-                        $affected = DB::table('players')->where_in('id', $ids)->delete();
+                $affected = DB::table('players')->where_in('id', $ids)->delete();
 
-                        if ($affected > 0)
-                            Model\Log::add('Masowo usunięto zawodników ('.$affected.')', $id);
+                if ($affected > 0)
+                    Model\Log::add('Masowo usunięto zawodników ('.$affected.')', $id);
 
-                        ionic_clear_cache('birthdays-*');
-                    });
+                ionic_clear_cache('birthdays-*');
+            });
         }
 
         $grid->add_filter_perpage(array(20, 30, 50));
@@ -405,23 +420,23 @@ class Admin_Players_Controller extends Admin_Controller {
         $grid->add_filter_search('name', 'Imię i nazwisko', 'players.name');
 
         $grid->add_filter_autocomplete('team_name', 'Klub', function($str) {
-                    $us = DB::table('teams')->take(20)->where('name', 'like', str_replace('%', '', $str).'%')->get('name');
+            $us = DB::table('teams')->take(20)->where('name', 'like', str_replace('%', '', $str).'%')->get('name');
 
-                    $result = array();
+            $result = array();
 
-                    foreach ($us as $u)
-                    {
-                        $result[] = $u->name;
-                    }
+            foreach ($us as $u)
+            {
+                $result[] = $u->name;
+            }
 
-                    return $result;
-                }, 'teams.name');
+            return $result;
+        }, 'teams.name');
 
         $grid->add_filter_select('is_distinct', 'Wyróżniony klub', array(
             '_all_' => 'Wszystkie',
             1       => 'Tak',
             0       => 'Nie'
-                ), '_all_', 'teams.is_distinct');
+        ), '_all_', 'teams.is_distinct');
 
 
         return $grid;

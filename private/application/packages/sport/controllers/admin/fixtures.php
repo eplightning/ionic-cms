@@ -13,20 +13,19 @@ class Admin_Fixtures_Controller extends Admin_Controller {
             $raw_data = array_merge($raw_data, Input::only(array('name', 'number', 'competition_id', 'season_id')));
 
             Validator::register('uniquefixture', function($attribute, $value, $parameters) use ($raw_data) {
+                // it's error anyway
+                if (!ctype_digit($raw_data['competition_id']) or !ctype_digit($raw_data['season_id']))
+                    return true;
 
-                        // it's error anyway
-                        if (!ctype_digit($raw_data['competition_id']) or !ctype_digit($raw_data['season_id']))
-                            return true;
+                if (DB::table('fixtures')->where('competition_id', '=', (int) $raw_data['competition_id'])
+                                ->where('season_id', '=', (int) $raw_data['season_id'])
+                                ->where('name', '=', $value)->get('id'))
+                {
+                    return false;
+                }
 
-                        if (DB::table('fixtures')->where('competition_id', '=', (int) $raw_data['competition_id'])
-                                        ->where('season_id', '=', (int) $raw_data['season_id'])
-                                        ->where('name', '=', $value)->get('id'))
-                        {
-                            return false;
-                        }
-
-                        return true;
-                    });
+                return true;
+            });
 
             $rules = array(
                 'name'           => 'required|max:127|uniquefixture',
@@ -119,20 +118,35 @@ class Admin_Fixtures_Controller extends Admin_Controller {
         if (!$id)
             return Response::error(500);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/fixtures/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/fixtures/index');
+            return Response::error(500);
         }
 
         DB::table('fixtures')->where('id', '=', $id->id)->delete();
 
-        $this->notice('Obiekt usunięty pomyślnie');
         $this->log(sprintf('Usunięto kolejkę: %s', $id->name));
-        return Redirect::to('admin/fixtures/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Kolejka usunięta pomyślnie');
+            return Redirect::to('admin/fixtures/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     public function action_edit($id)
@@ -150,20 +164,19 @@ class Admin_Fixtures_Controller extends Admin_Controller {
             $raw_data = array_merge($raw_data, Input::only(array('name', 'number', 'competition_id', 'season_id')));
 
             Validator::register('uniquefixture', function($attribute, $value, $parameters) use ($raw_data) {
+                // it's error anyway
+                if (!ctype_digit($raw_data['competition_id']) or !ctype_digit($raw_data['season_id']) or !isset($parameters[0]))
+                    return true;
 
-                        // it's error anyway
-                        if (!ctype_digit($raw_data['competition_id']) or !ctype_digit($raw_data['season_id']) or !isset($parameters[0]))
-                            return true;
+                if (DB::table('fixtures')->where('competition_id', '=', (int) $raw_data['competition_id'])
+                                ->where('season_id', '=', (int) $raw_data['season_id'])
+                                ->where('name', '=', $value)->where('id', '<>', (int) $parameters[0])->get('id'))
+                {
+                    return false;
+                }
 
-                        if (DB::table('fixtures')->where('competition_id', '=', (int) $raw_data['competition_id'])
-                                        ->where('season_id', '=', (int) $raw_data['season_id'])
-                                        ->where('name', '=', $value)->where('id', '<>', (int) $parameters[0])->get('id'))
-                        {
-                            return false;
-                        }
-
-                        return true;
-                    });
+                return true;
+            });
 
             $rules = array(
                 'name'           => 'required|max:127|uniquefixture:'.$id->id,
@@ -312,12 +325,10 @@ class Admin_Fixtures_Controller extends Admin_Controller {
             $grid->add_action('Edytuj', 'admin/fixtures/edit/%d', 'edit-button');
 
         if (Auth::can('admin_tables'))
-        {
             $grid->add_action('Terminarz', 'admin/matches/fixture/%d', 'display-button');
-        }
 
         if (Auth::can('admin_fixtures_delete'))
-            $grid->add_action('Usuń', 'admin/fixtures/delete/%d', 'delete-button');
+            $grid->add_action('Usuń', 'admin/fixtures/delete/%d', 'delete-button', Ionic\Grid::ACTION_BOTH);
 
         if (Auth::can('admin_fixtures_delete') and Auth::can('admin_fixtures_multi'))
         {
@@ -326,32 +337,32 @@ class Admin_Fixtures_Controller extends Admin_Controller {
             $id = $this->user->id;
 
             $grid->add_multi_action('delete_selected', 'Usuń zaznaczone', function($ids) use ($id) {
-                        $affected = DB::table('fixtures')->where_in('id', $ids)->delete();
+                $affected = DB::table('fixtures')->where_in('id', $ids)->delete();
 
-                        if ($affected > 0)
-                            Model\Log::add('Masowo usunięto kolejki ('.$affected.')', $id);
-                    });
+                if ($affected > 0)
+                    Model\Log::add('Masowo usunięto kolejki ('.$affected.')', $id);
+            });
         }
 
         $grid->add_filter_perpage(array(20, 30, 50));
         $grid->add_filter_search('name', 'Nazwa kolejki', 'fixtures.name');
 
         $grid->add_filter_autocomplete('comp_name', 'Rozgrywki', function($str) {
-                    $us = DB::table('competitions')->take(20)->where('name', 'like', str_replace('%', '', $str).'%')->get('name');
+            $us = DB::table('competitions')->take(20)->where('name', 'like', str_replace('%', '', $str).'%')->get('name');
 
-                    $result = array();
+            $result = array();
 
-                    foreach ($us as $u)
-                    {
-                        $result[] = $u->name;
-                    }
+            foreach ($us as $u)
+            {
+                $result[] = $u->name;
+            }
 
-                    return $result;
-                }, 'competitions.name');
+            return $result;
+        }, 'competitions.name');
 
         $seasons = array('_all_' => 'Wszystkie');
 
-        foreach (DB::table('seasons')->get('year') as $s)
+        foreach (DB::table('seasons')->order_by('year', 'desc')->get('year') as $s)
         {
             $seasons[$s->year] = $s->year.' / '.($s->year + 1);
         }

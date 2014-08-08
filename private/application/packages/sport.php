@@ -304,8 +304,7 @@ class Sport_Package extends \Ionic\Package {
                  FOREIGN KEY (season_id) REFERENCES ".DB::prefix()."seasons (id) ON DELETE CASCADE ON UPDATE CASCADE"
             ), true);
 
-
-            // todo: aktualizacja competition_teams
+            $version = '1.3';
         }
 
         $api->update_package('sport', $this->get_version());

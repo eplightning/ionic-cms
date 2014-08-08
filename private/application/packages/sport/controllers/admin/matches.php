@@ -179,7 +179,7 @@ class Admin_Matches_Controller extends Admin_Controller {
 
         $related = array();
 
-        foreach (DB::table('seasons')->get(array('id', 'year')) as $v)
+        foreach (DB::table('seasons')->order_by('year', 'desc')->get(array('id', 'year')) as $v)
         {
             $related[$v->id] = $v->year.' / '.($v->year + 1);
         }
@@ -343,7 +343,7 @@ class Admin_Matches_Controller extends Admin_Controller {
 
         $related = array();
 
-        foreach (DB::table('seasons')->get(array('id', 'year')) as $v)
+        foreach (DB::table('seasons')->order_by('year', 'desc')->get(array('id', 'year')) as $v)
         {
             $related[$v->id] = $v->year.' / '.($v->year + 1);
         }
@@ -425,13 +425,20 @@ class Admin_Matches_Controller extends Admin_Controller {
         if (!$id)
             return Response::error(500);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/matches/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/matches/index');
+            return Response::error(500);
         }
 
         DB::table('matches')->where('id', '=', $id->id)->delete();
@@ -461,9 +468,17 @@ class Admin_Matches_Controller extends Admin_Controller {
         ionic_clear_cache('match-*');
         ionic_clear_cache('timetable-*');
 
-        $this->notice('Obiekt usunięty pomyślnie');
         $this->log(sprintf('Usunięto mecz: %s', $match_name));
-        return Redirect::to('admin/matches/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Mecz usunięty pomyślnie');
+            return Redirect::to('admin/matches/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     public function action_edit($id)
@@ -642,7 +657,7 @@ class Admin_Matches_Controller extends Admin_Controller {
 
         $related = array();
 
-        foreach (DB::table('seasons')->get(array('id', 'year')) as $v)
+        foreach (DB::table('seasons')->order_by('year', 'desc')->get(array('id', 'year')) as $v)
         {
             $related[$v->id] = $v->year.' / '.($v->year + 1);
         }
@@ -1062,6 +1077,8 @@ class Admin_Matches_Controller extends Admin_Controller {
         $grid->add_related('competitions', 'competitions.id', '=', 'fixtures.competition_id');
         $grid->add_related('seasons', 'seasons.id', '=', 'fixtures.season_id');
 
+        $grid->add_help('score', 'Wynik spotkania może zostać zmodyfikowany bez wchodzenia w edycje - wystarczy kliknąć na wynik przy wybranym meczu');
+
         $grid->add_column('id', 'ID', 'id', null, 'matches.id');
         $grid->add_column('match', 'Mecz', function($obj)
                 {
@@ -1085,78 +1102,76 @@ class Admin_Matches_Controller extends Admin_Controller {
 
             $id = $this->user->id;
 
-            $grid->add_inline_edit('score', function($object, $new_value) use ($id)
+            $grid->add_inline_edit('score', function($object, $new_value) use ($id) {
+                if ($new_value == '-:-' or !preg_match("/^[0-9]{1,2}[\-\:][0-9]{1,2}$/", $new_value))
+                    $new_value = '';
+
+                $new_value = str_replace('-', ':', $new_value);
+
+                \DB::table('matches')->where('id', '=', $object->id)->update(array(
+                    'score' => $new_value));
+
+                if ($new_value != $object->score)
+                {
+                    $fixture = DB::table('fixtures')->where('id', '=', $object->fixture_id)->first(array(
+                        'competition_id', 'season_id'));
+
+                    if (!$fixture)
+                        return Response::make('');
+
+                    foreach (DB::table('tables')->where('competition_id', '=', $fixture->competition_id)
+                            ->where('season_id', '=', $fixture->season_id)
+                            ->where('auto_generation', '=', 1)->get('id') as $t)
                     {
-                        if ($new_value == '-:-' or !preg_match("/^[0-9]{1,2}[\-\:][0-9]{1,2}$/", $new_value))
-                            $new_value = '';
+                        Ionic\TableManager::generate($t->id);
+                    }
 
-                        $new_value = str_replace('-', ':', $new_value);
+                    ionic_clear_cache('match-*');
+                    ionic_clear_cache('timetable-*');
 
-                        \DB::table('matches')->where('id', '=', $object->id)->update(array(
-                            'score' => $new_value));
+                    \Model\Log::add('Zaaktualizowano wynik meczu', $id);
+                }
 
-                        if ($new_value != $object->score)
-                        {
-                            $fixture = DB::table('fixtures')->where('id', '=', $object->fixture_id)->first(array(
-                                'competition_id', 'season_id'));
-
-                            if (!$fixture)
-                                return Response::make('');
-
-                            foreach (DB::table('tables')->where('competition_id', '=', $fixture->competition_id)
-                                    ->where('season_id', '=', $fixture->season_id)
-                                    ->where('auto_generation', '=', 1)->get('id') as $t)
-                            {
-                                Ionic\TableManager::generate($t->id);
-                            }
-
-                            ionic_clear_cache('match-*');
-                            ionic_clear_cache('timetable-*');
-
-                            \Model\Log::add('Zaaktualizowano wynik meczu', $id);
-                        }
-
-                        return Response::make($new_value ? : '-:-');
-                    });
+                return Response::make($new_value ? : '-:-');
+            });
         }
+
         if (Auth::can('admin_matches_delete'))
-            $grid->add_action('Usuń', 'admin/matches/delete/%d', 'delete-button');
+            $grid->add_action('Usuń', 'admin/matches/delete/%d', 'delete-button', Ionic\Grid::ACTION_BOTH);
 
         $grid->add_filter_perpage(array(20, 30, 50));
         $grid->add_filter_date('date', 'Data meczu');
         $grid->add_filter_search('fixture', 'Kolejka', 'fixtures.name');
 
-        $grid->add_filter_autocomplete('team', 'Klub', function($str)
-                {
-                    $us = DB::table('teams')->take(20)->where('name', 'like', str_replace('%', '', $str).'%')->get('name');
+        $grid->add_filter_autocomplete('team', 'Klub', function($str) {
+            $us = DB::table('teams')->take(20)->where('name', 'like', str_replace('%', '', $str).'%')->get('name');
 
-                    $result = array();
+            $result = array();
 
-                    foreach ($us as $u)
-                    {
-                        $result[] = $u->name;
-                    }
+            foreach ($us as $u)
+            {
+                $result[] = $u->name;
+            }
 
-                    return $result;
-                }, array('home.name', 'away.name'));
+            return $result;
+        }, array('home.name', 'away.name'));
 
-        $grid->add_filter_autocomplete('comp_name', 'Rozgrywki', function($str)
-                {
-                    $us = DB::table('competitions')->take(20)->where('name', 'like', str_replace('%', '', $str).'%')->get('name');
+        $grid->add_filter_autocomplete('comp_name', 'Rozgrywki', function($str) {
+            $us = DB::table('competitions')->take(20)->where('name', 'like', str_replace('%', '', $str).'%')->get('name');
 
-                    $result = array();
+            $result = array();
 
-                    foreach ($us as $u)
-                    {
-                        $result[] = $u->name;
-                    }
+            foreach ($us as $u)
+            {
+                $result[] = $u->name;
+            }
 
-                    return $result;
-                }, 'competitions.name');
+            return $result;
+        }, 'competitions.name');
 
         $seasons = array('_all_' => 'Wszystkie');
 
-        foreach (DB::table('seasons')->get('year') as $s)
+        foreach (DB::table('seasons')->order_by('year', 'desc')->get('year') as $s)
         {
             $seasons[$s->year] = $s->year.' / '.($s->year + 1);
         }
@@ -1169,16 +1184,15 @@ class Admin_Matches_Controller extends Admin_Controller {
 
             $id = $this->user->id;
 
-            $grid->add_multi_action('delete_selected', 'Usuń zaznaczone', function($ids) use ($id)
-                    {
-                        $affected = DB::table('matches')->where_in('id', $ids)->delete();
+            $grid->add_multi_action('delete_selected', 'Usuń zaznaczone', function($ids) use ($id) {
+                $affected = DB::table('matches')->where_in('id', $ids)->delete();
 
-                        if ($affected > 0)
-                            Model\Log::add('Masowo usunięto mecze ('.$affected.')', $id);
+                if ($affected > 0)
+                    Model\Log::add('Masowo usunięto mecze ('.$affected.')', $id);
 
-                        ionic_clear_cache('match-*');
-                        ionic_clear_cache('timetable-*');
-                    });
+                ionic_clear_cache('match-*');
+                ionic_clear_cache('timetable-*');
+            });
         }
 
         return $grid;

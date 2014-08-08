@@ -11,13 +11,20 @@ class Admin_Seasons_Controller extends Admin_Controller {
         if (!$id)
             return Response::error(500);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/seasons/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/seasons/index');
+            return Response::error(500);
         }
 
         DB::table('seasons')->where('is_active', '=', 1)->update(array('is_active' => 0));
@@ -25,9 +32,17 @@ class Admin_Seasons_Controller extends Admin_Controller {
 
         Cache::forget('current-season');
 
-        $this->notice('Operacja wykonana pomyślnie');
         $this->log(sprintf('Ustawiono sezon jako obecny: %s', $id->year));
-        return Redirect::to('admin/seasons/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Operacja wykonana pomyślnie');
+            return Redirect::to('admin/seasons/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     public function action_add()
@@ -96,22 +111,37 @@ class Admin_Seasons_Controller extends Admin_Controller {
         if (!$id)
             return Response::error(500);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/seasons/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/seasons/index');
+            return Response::error(500);
         }
 
         DB::table('seasons')->where('id', '=', $id->id)->delete();
 
         Cache::forget('current-season');
 
-        $this->notice('Obiekt usunięty pomyślnie');
         $this->log(sprintf('Usunięto sezon: %s', $id->year));
-        return Redirect::to('admin/seasons/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Obiekt usunięty pomyślnie');
+            return Redirect::to('admin/seasons/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     public function action_edit($id)
@@ -238,16 +268,18 @@ class Admin_Seasons_Controller extends Admin_Controller {
 
         if (Auth::can('admin_seasons_edit'))
             $grid->add_action('Edytuj', 'admin/seasons/edit/%d', 'edit-button');
-        $grid->add_action('Ustaw jako obecny', 'admin/seasons/active/%d', 'accept-button');
+
+        $grid->add_action('Ustaw jako obecny', 'admin/seasons/active/%d', 'accept-button', Ionic\Grid::ACTION_BOTH);
+
         if (Auth::can('admin_seasons_delete'))
-            $grid->add_action('Usuń', 'admin/seasons/delete/%d', 'delete-button');
+            $grid->add_action('Usuń', 'admin/seasons/delete/%d', 'delete-button', Ionic\Grid::ACTION_BOTH);
 
         $grid->add_filter_perpage(array(20, 30, 50));
         $grid->add_filter_select('is_active', 'Obecny sezon', array(
             '_all_' => 'Wszystkie',
             1       => 'Tak',
             0       => 'Nie'
-                ), '_all_');
+        ), '_all_');
 
         return $grid;
     }
