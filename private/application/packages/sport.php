@@ -286,6 +286,25 @@ class Sport_Package extends \Ionic\Package {
         // 1.2.1 -> 1.3
         if ($version == '1.2.1')
         {
+            // competition_teams
+            $api->execute_queries(array(
+                "ALTER TABLE ".DB::prefix()."competition_teams
+                ADD season_id int(10) unsigned NOT NULL DEFAULT '0'",
+
+                "UPDATE ".DB::prefix()."competition_teams
+                 SET season_id = ".IoC::resolve('current_season')->id,
+
+                "ALTER TABLE ".DB::prefix()."competition_teams
+                 ADD INDEX season_id (season_id)",
+
+                "ALTER TABLE ".DB::prefix()."competition_teams
+                 DROP PRIMARY KEY, ADD PRIMARY KEY (competition_id, team_id, season_id)",
+
+                "ALTER TABLE ".DB::prefix()."competition_teams ADD CONSTRAINT ".DB::prefix()."competition_teams_ibfk_3
+                 FOREIGN KEY (season_id) REFERENCES ".DB::prefix()."seasons (id) ON DELETE CASCADE ON UPDATE CASCADE"
+            ), true);
+
+
             // todo: aktualizacja competition_teams
         }
 
