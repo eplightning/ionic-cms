@@ -140,8 +140,10 @@ CREATE TABLE IF NOT EXISTS `{dbp}competitions` (
 CREATE TABLE IF NOT EXISTS `{dbp}competition_teams` (
   `competition_id` int(10) unsigned NOT NULL DEFAULT '0',
   `team_id` int(10) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`competition_id`,`team_id`),
-  KEY `team_id` (`team_id`)
+  `season_id` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`competition_id`,`team_id`,`season_id`),
+  KEY `team_id` (`team_id`),
+  KEY `season_id` (`season_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `{dbp}config` (
@@ -1188,7 +1190,8 @@ ALTER TABLE `{dbp}comments`
 
 ALTER TABLE `{dbp}competition_teams`
   ADD CONSTRAINT `{dbp}competition_teams_ibfk_1` FOREIGN KEY (`competition_id`) REFERENCES `{dbp}competitions` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `{dbp}competition_teams_ibfk_2` FOREIGN KEY (`team_id`) REFERENCES `{dbp}teams` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `{dbp}competition_teams_ibfk_2` FOREIGN KEY (`team_id`) REFERENCES `{dbp}teams` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `{dbp}competition_teams_ibfk_3` FOREIGN KEY (`season_id`) REFERENCES `{dbp}seasons` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE `{dbp}config`
   ADD CONSTRAINT `{dbp}config_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `{dbp}config_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;

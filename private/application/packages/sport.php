@@ -79,7 +79,7 @@ class Sport_Package extends \Ionic\Package {
      */
     public function get_version()
     {
-        return '1.2.1';
+        return '1.3';
     }
 
     /**
@@ -281,6 +281,12 @@ class Sport_Package extends \Ionic\Package {
             ), true);
 
             $version = '1.2.1';
+        }
+
+        // 1.2.1 -> 1.3
+        if ($version == '1.2.1')
+        {
+            // todo: aktualizacja competition_teams
         }
 
         $api->update_package('sport', $this->get_version());

@@ -27,6 +27,7 @@ class Competition_Controller extends Base_Controller {
             return Response::error(404);
 
         $teams = DB::table('competition_teams')->where('competition_id', '=', $competition->id)
+                ->where('season_id', '=', $season->id)
                 ->join('teams', 'teams.id', '=', 'team_id')
                 ->get(array('id', 'name', 'slug', 'image'));
 

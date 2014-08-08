@@ -2,6 +2,22 @@
 <div class="section">
 	<div class="theader">
 		<div class="theader2">
+			Wybierz sezon
+		</div>
+	</div>
+	<div class="section-content">
+		<div class="elem">
+			<select id="seasons" style="width: 100%">
+			{% for s in seasons %}
+				<option value="{{ s.id }}"{% if s.id == season.id %} selected="selected"{% endif %}>{{ s.year }} / {{ s.year + 1 }}</option>
+			{% endfor %}
+			</select>
+		</div>
+	</div>
+</div>
+<div class="section">
+	<div class="theader">
+		<div class="theader2">
 			Lista klubów
 		</div>
 	</div>
@@ -19,7 +35,7 @@
 			<td class="centered">{{ k }}</td>
 			<td>{{ v }}</td>
 			<td>
-				<a href="admin/competitions/teams_delete/{{ comp.id }}/{{ k }}" class="delete">Usuń z listy</a>
+				<a href="admin/competitions/teams_delete/{{ comp.id }}/{{ k }}/{{ season.id }}" class="delete">Usuń z listy</a>
 			</td>
 		</tr>
 		{% endfor %}
@@ -29,7 +45,7 @@
 	</table>
 </div>
 {% if select|length > 0 %}
-<form action="admin/competitions/teams/{{ comp.id }}" method="post">
+<form action="admin/competitions/teams/{{ comp.id }}/{{ season.id }}" method="post">
 	<div class="section">
 		<div class="theader">
 			<div class="theader2">
@@ -57,5 +73,8 @@ $(function() {
 	$('input[type="submit"]').button();
 	$('a.delete').button({ text: false, icons: { primary: 'ui-icon-trash' } });
 	$('#teams').select2({closeOnSelect: false});
+	$('#seasons').change(function() {
+		window.location.href = '{{ ("admin/competitions/teams/"~comp.id)|url }}/'+$('#seasons').val();
+	});
 });
 </script>

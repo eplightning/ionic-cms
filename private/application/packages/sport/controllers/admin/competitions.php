@@ -194,7 +194,7 @@ class Admin_Competitions_Controller extends Admin_Controller {
         return $grid->handle_sort($item);
     }
 
-    public function action_teams($id)
+    public function action_teams($id, $season = '')
     {
         if (!Auth::can('admin_competitions_edit') or !ctype_digit($id))
             return Response::error(403);
@@ -202,6 +202,18 @@ class Admin_Competitions_Controller extends Admin_Controller {
         $id = DB::table('competitions')->where('id', '=', (int) $id)->first('*');
         if (!$id)
             return Response::error(500);
+
+        if (!$season or !ctype_digit($season))
+        {
+            $season = IoC::resolve('current_season');
+        }
+        else
+        {
+            $season = DB::table('seasons')->where('id', '=', (int) $season)->first(array('id', 'year'));
+
+            if (!$season)
+                return Response::error(404);
+        }
 
         $this->page->set_title('Rozgrywki');
         $this->page->breadcrumb_append('Rozgrywki', 'admin/competitions/index');
@@ -212,6 +224,7 @@ class Admin_Competitions_Controller extends Admin_Controller {
 
         foreach (DB::table('competition_teams')
                 ->where('competition_teams.competition_id', '=', $id->id)
+                ->where('competition_teams.season_id', '=', $season->id)
                 ->join('teams', 'teams.id', '=', 'competition_teams.team_id')->get(array('teams.name', 'teams.id')) as $t)
         {
             $current[$t->id] = $t->name;
@@ -235,7 +248,7 @@ class Admin_Competitions_Controller extends Admin_Controller {
                 if (!isset($select[$v]))
                     continue;
 
-                DB::table('competition_teams')->insert(array('competition_id' => $id->id, 'team_id'        => $v));
+                DB::table('competition_teams')->insert(array('competition_id' => $id->id, 'team_id' => $v, 'season_id' => $season->id));
 
                 unset($select[$v]); // Prevents duplicates
             }
@@ -243,24 +256,33 @@ class Admin_Competitions_Controller extends Admin_Controller {
             $this->log('Przypisano kluby do rozgrywek: '.$id->name);
             $this->notice('Operacja wykonana pomyślnie');
 
-            return Redirect::to('admin/competitions/teams/'.$id->id);
+            return Redirect::to('admin/competitions/teams/'.$id->id.'/'.$season->id);
         }
 
         Asset::add('select2', 'public/css/select2.css');
         Asset::add('select2', 'public/js/select2.min.js', 'jquery');
 
-        $this->view = View::make('admin.competitions.teams', array('comp'    => $id, 'current' => $current, 'select'  => $select));
+        $this->view = View::make('admin.competitions.teams', array(
+            'comp' => $id,
+            'current' => $current,
+            'select' => $select,
+            'season' => $season,
+            'seasons' => DB::table('seasons')->order_by('year', 'desc')->get(array('id', 'year'))
+        ));
     }
 
-    public function action_teams_delete($competition, $team)
+    public function action_teams_delete($competition, $team, $season)
     {
         if (!Auth::can('admin_competitions_edit'))
             return Response::error(403);
 
-        if (!ctype_digit($competition) or !ctype_digit($team))
+        if (!ctype_digit($competition) or !ctype_digit($team) or !ctype_digit($season))
             return Response::error(500);
 
-        $entry = DB::table('competition_teams')->where('competition_id', '=', (int) $competition)->where('team_id', '=', (int) $team)->first(array('team_id'));
+        $entry = DB::table('competition_teams')->where('competition_id', '=', (int) $competition)
+                                               ->where('team_id', '=', (int) $team)
+                                               ->where('season_id', '=', (int) $season)
+                                               ->first(array('team_id'));
 
         if (!$entry)
         {
@@ -273,15 +295,17 @@ class Admin_Competitions_Controller extends Admin_Controller {
         }
         elseif ($status == 2)
         {
-            return Redirect::to('admin/competitions/teams/'.$competition);
+            return Redirect::to('admin/competitions/teams/'.$competition.'/'.$season);
         }
 
-        DB::table('competition_teams')->where('competition_id', '=', (int) $competition)->where('team_id', '=', (int) $team)->delete();
+        DB::table('competition_teams')->where('competition_id', '=', (int) $competition)
+                                      ->where('season_id', '=', (int) $season)
+                                      ->where('team_id', '=', (int) $team)->delete();
 
         $this->notice('Drużyna usunięta z rozgrywek');
         $this->log('Usunięto klub z rozgrywek');
 
-        return Redirect::to('admin/competitions/teams/'.$competition);
+        return Redirect::to('admin/competitions/teams/'.$competition.'/'.$season);
     }
 
     protected function make_grid()
