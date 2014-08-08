@@ -15,6 +15,7 @@
 var IONIC_BASE_URL = "{{ base() }}/";
 </script>
 <link rel="icon" href="{{ base() }}/public/img/admin/icon.png" type="image/png" />
+<link href="{{ base() }}/public/css/{{ admin_skin }}" media="all" type="text/css" rel="stylesheet" id="skin-selector-css" />
 {{ scripts }}
 {{ styles }}
 <script type="text/javascript">
@@ -42,6 +43,11 @@ $(document).ready(function() {
 			});
 		});
 	});
+
+	$('#skin-selector').change(function() {
+		$('#skin-selector-css').prop('href', '{{ base() }}/public/css/' + $(this).val());
+		$.cookie('ionic-admin-skin', $(this).val(), { expires: 365, path: '/' });
+	});
 });
 </script>
 </head>
@@ -63,6 +69,10 @@ $(document).ready(function() {
 		</div>
 		<div id="ninfo">
 			Zalogowany jako: <strong>{{ current_user.display_name }}</strong> ({{ current_user.group_name }})
+			<select id="skin-selector">
+				<option value="admin.css"{% if admin_skin == 'admin.css' %} selected="selected"{% endif %}>Klasyczny</option>
+				<option value="admin_flat.css"{% if admin_skin == 'admin_flat.css' %} selected="selected"{% endif %}>Płaski</option>
+			</select>
 		</div>
 	</div>
 	<ul id="menuleft">

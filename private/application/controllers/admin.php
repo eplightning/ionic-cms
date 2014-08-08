@@ -58,6 +58,19 @@ class Admin_Controller extends Controller {
         $this->page->breadcrumb_prepend('Panel administracyjny', 'admin/dashboard/index');
         $this->page->breadcrumb_prepend('Strona główna', 'index');
 
+        // Select skin
+        if (Cookie::has('ionic-admin-skin'))
+        {
+            if (Cookie::get('ionic-admin-skin') == 'admin_flat.css')
+            {
+                $response->content->with('admin_skin', 'admin_flat.css');
+            }
+            else
+            {
+                $response->content->with('admin_skin', 'admin.css');
+            }
+        }
+
         // JS and CSS
         $response->content->with('styles', Asset::styles());
         $response->content->with('scripts', Asset::scripts());
@@ -136,10 +149,10 @@ class Admin_Controller extends Controller {
         Asset::add('jquery', 'public/js/jquery.min.js');
         Asset::add('jquery-ui', 'public/js/jquery-ui.custom.min.js', 'jquery');
         Asset::add('admin', 'public/js/admin.js', 'jquery');
+        Asset::add('cookie', 'public/js/jquery.cookie.js', 'jquery');
 
         // Styles
         Asset::add('jquery-ui', 'public/css/flick/jquery-ui.custom.css');
-        Asset::add('admin-css', 'public/css/admin.css');
 
         // User
         $this->user = Auth::get_user();

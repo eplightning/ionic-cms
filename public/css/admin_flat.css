@@ -1,15 +1,19 @@
 html {
-	height: 100%;
+    height: 100%;
 }
 
 body {
-	padding: 0px;
-	margin: 0px;
-	font-family: Verdana, Tahoma, Arial, sans-serif;
-	font-size: 12px;
-	height: 100%;
-	background: #fff url(../img/admin/main_bg.png) repeat-y;
+    padding: 0px;
+    margin: 0px;
+    font-family: sans-serif;
+    font-size: 1.0em;
+    height: 100%;
+    background: #fff;
 }
+
+a img { border: none }
+a { color: #38C; text-decoration: none; }
+a:hover { color: #1B67A3 }
 
 #skin-selector {
     width: auto;
@@ -19,22 +23,19 @@ body {
     height: 28px;
 }
 
-a img { border: none }
-a { color: #222; padding-bottom: 1px; border-bottom: 1px dashed #222; text-decoration: none; }
-
 #header {
-	height: 31px;
-	background-image: url(../img/admin/top_bg.gif);
-	background-repeat: repeat-x;
-	padding-top : 7px;
+	background: #fff;
+	padding: 20px;
+    border-top: 4px solid #455E80;
+    border-bottom: 1px solid #EDEDED;
+    overflow: hidden;
 }
 
 #header h1 {
+    font-size: 1.3em;
 	padding: 0px;
 	margin: 0px;
-	font-size: 19px;
-	color: #fff;
-	padding-left: 20px;
+	color: #000;
 }
 
 #header #hleft {
@@ -45,7 +46,6 @@ a { color: #222; padding-bottom: 1px; border-bottom: 1px dashed #222; text-decor
 	float: right;
 	text-align: right;
 	padding-top: 2px;
-	padding-right: 20px;
 }
 
 #header #hright a {
@@ -62,11 +62,9 @@ a { color: #222; padding-bottom: 1px; border-bottom: 1px dashed #222; text-decor
 
 #navbar {
 	height: 26px;
-	background-image: url(../img/admin/login_bg.gif);
-	background-repeat: repeat-x;
-	padding-top : 12px;
-	padding-left: 20px;
-	padding-right: 20px;
+	background: #F9F9F9;
+	padding: 12px 20px;
+    box-shadow: 10px 10px 10px -4px #efefef;
     overflow: hidden;
 }
 
@@ -80,38 +78,23 @@ a { color: #222; padding-bottom: 1px; border-bottom: 1px dashed #222; text-decor
 	float: right;
 }
 
-#footer {
-	clear: both;
-	margin: 20px auto;
-	width: 90%;
-	padding: 10px;
-	color: #555;
-	text-align: right;
-	border-top: 1px solid #555;
-}
-
 #menuleft {
 	float: left;
 	width: 170px;
 	min-height: 100%;
-	background: #ecf4ff url(../img/admin/menu_bg.png) repeat-x;
-	background-position: 0% 100%;
-	border-right: 1px solid #ccc;
+	background: #F9F9F9;
+	border-right: 1px solid #EDEDED;
 	margin: 0px;
 	padding: 0px;
 	list-style: none;
 }
 
 #menuleft li a.img-c {
-	position: absolute;
-	border: none;
-	padding: 0px;
+	display: none;
 }
 
 #menuleft li img {
-	position: relative;
-	top: 11px;
-	left: 10px;
+	display: none;
 }
 
 #menuleft li.active {
@@ -121,14 +104,12 @@ a { color: #222; padding-bottom: 1px; border-bottom: 1px dashed #222; text-decor
 #menuleft li span {
 	display: block;
 	width: 150px;
-	height: 16px;
 	padding: 10px;
 	margin: 0px;
 	padding-top: 12px;
-	text-align: center;
-	background: url(../img/admin/login_bg.gif);
+	text-align: left;
 	cursor: pointer;
-	border-bottom: 1px solid #ccc;
+	border-bottom: 1px solid #dfdfdf;
 }
 
 #menuleft li ul {
@@ -141,29 +122,21 @@ a { color: #222; padding-bottom: 1px; border-bottom: 1px dashed #222; text-decor
 #menuleft li ul li {
 	background: none;
 	padding: 5px;
-	height: 20px;
 	width: 160px;
-	border-bottom: 1px solid #ccc;
+	border-bottom: 1px solid #dfdfdf;
 }
 
-#menuleft li ul li:hover, #menuleft li ul li.active {
-	background-image: url(../img/admin/top_bg.gif);
-	background-repeat: repeat-x;
+#menuleft li ul li.active {
+    box-shadow: #38C 0px 0px 12px 0px;
 }
 
 #menuleft li ul li a {
-	background-image: url(../img/admin/item/dashboard.png);
-	background-repeat: no-repeat;
-	background-position: 5px 50%;
-	padding-left: 35px;
+	background-image: none !important;
+	padding-left: 20px;
 	padding-top: 2px;
 	border: none;
 	font-weight: normal;
 	display: block;
-}
-
-#menuleft li ul li:hover a, #menuleft li ul li.active a {
-	color: #fff;
 }
 
 #page-container {
@@ -172,36 +145,14 @@ a { color: #222; padding-bottom: 1px; border-bottom: 1px dashed #222; text-decor
 }
 
 .theader {
-	-moz-border-radius-topleft: 5px;
-	-webkit-border-top-left-radius: 5px;
-	-khtml-border-top-left-radius: 5px;
-	border-top-left-radius: 5px;
-	-moz-border-radius-topright: 5px;
-	-webkit-border-top-right-radius: 5px;
-	-khtml-border-top-right-radius: 5px;
-	border-top-right-radius: 5px;
-	height: 24px;
 	background: #fff;
-	padding: 1px;
-	border: 1px solid #92a5bc;
-	border-bottom: none;
 	margin-top: 10px;
 }
 
 .theader2 {
-	-moz-border-radius-topleft: 5px;
-	-webkit-border-top-left-radius: 5px;
-	-khtml-border-top-left-radius: 5px;
-	border-top-left-radius: 5px;
-	-moz-border-radius-topright: 5px;
-	-webkit-border-top-right-radius: 5px;
-	-khtml-border-top-right-radius: 5px;
-	border-top-right-radius: 5px;
-	background: #1b3559 url(../img/admin/table_bg.gif) repeat-x;
+	background: #455E80;
 	color: #fff;
-	height: 20px;
-	padding-top: 4px;
-	padding-left: 15px;
+    padding: 6px 15px;
 }
 
 .theader2 a {
@@ -240,16 +191,9 @@ a { color: #222; padding-bottom: 1px; border-bottom: 1px dashed #222; text-decor
 
 table.itable {
 	width: 100%;
-	-moz-border-radius-bottomleft: 5px;
-	-webkit-border-bottom-left-radius: 5px;
-	-khtml-border-bottom-left-radius: 5px;
-	border-bottom-left-radius: 5px;
-	-moz-border-radius-bottomright: 5px;
-	-webkit-border-bottom-right-radius: 5px;
-	-khtml-border-bottom-right-radius: 5px;
-	border-bottom-right-radius: 5px;
-	border-spacing: 1px;
+	border-spacing: 0px;
 	border: 1px solid #92a5bc;
+    border-top: 0px;
 	color: #173155;
 	margin-bottom: 10px;
 }
@@ -288,13 +232,11 @@ h2 {
 	font-size: 16px;
 	font-weight: bold;
 	margin-top: 0px;
+    font-size: 1.1em;
 }
 
 h2.with-icon {
-	padding-left: 25px;
-	background-image: url(../img/admin/item/dashboard.png);
-	background-repeat: no-repeat;
-	background-position: 0% 60%;
+	background-image: none !important;
 }
 
 fieldset {
@@ -315,15 +257,15 @@ input, textarea, select {
 	font-family: inherit;
 	color: inherit;
 	font-size: inherit;
+    background: #fff;
 }
 
 .section-subheader {
-	border-left: 1px solid #92a5bc;
-	border-right: 1px solid #92a5bc;
-	background-image: url(../img/admin/login_bg.gif);
-	background-repeat: repeat-x;
-	max-height: 38px;
+	border: 1px solid #92a5bc;
+    border-top: 0px;
+	background: #F5F5F4;
 	overflow: hidden;
+    padding: 5px 0px;
 }
 
 .section-content div.elem {
