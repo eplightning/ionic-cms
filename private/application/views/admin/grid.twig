@@ -459,13 +459,13 @@ $(function(){
 		var elem = $(this);
 
 		$.get(IONIC_BASE_URL+'{{ grid_url }}/filter/_customdel/'+elem.data('custom'), function(response) {
-			filter_in_progress = false;
-
 			if (response.status)
 			{
 				paginate(1);
 				elem.parent().parent().remove();
 			}
+
+			filtering_in_progress = false;
 		});
 	});
 
@@ -481,13 +481,14 @@ $(function(){
 		var option = elem.data('option');
 
 		$.get(IONIC_BASE_URL+'{{ grid_url }}/filter/'+filter+'/'+option, function(response) {
-			filtering_in_progress = false;
 			if (response.status)
 			{
 				paginate(1);
 				list.children('li.active').removeClass('active');
 				item.addClass('active');
 			}
+
+			filtering_in_progress = false;
 		}, 'json');
 	});
 
@@ -504,11 +505,12 @@ $(function(){
 			how: item.children('select').val(),
 			query: item.children('input').first().val()
 		}, function(response) {
-			filtering_in_progress = false;
 			if (response.status)
 			{
 				paginate(1);
 			}
+
+			filtering_in_progress = false;
 		}, 'json');
 	});
 
@@ -525,11 +527,12 @@ $(function(){
 			from: item.children('input').first().val(),
 			to: item.children('input').eq(1).val()
 		}, function(response) {
-			filtering_in_progress = false;
 			if (response.status)
 			{
 				paginate(1);
 			}
+
+			filtering_in_progress = false;
 		}, 'json');
 	});
 
@@ -545,11 +548,12 @@ $(function(){
 			csrf_token: IonicAdmin.csrfToken,
 			query: item.children('input').first().val()
 		}, function(response) {
-			filtering_in_progress = false;
 			if (response.status)
 			{
 				paginate(1);
 			}
+
+			filtering_in_progress = false;
 		}, 'json');
 	});
 	{% endif %}
