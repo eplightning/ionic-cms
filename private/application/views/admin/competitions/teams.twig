@@ -30,12 +30,12 @@
 		</tr>
 		{% if current|length > 0 %}
 		{% for k,v in current %}
-		<tr>
+		<tr id="team-id-{{ k }}">
 			<td><img src="public/img/admin/item/teams.png" alt="" /></td>
 			<td class="centered">{{ k }}</td>
 			<td>{{ v }}</td>
 			<td>
-				<a href="admin/competitions/teams_delete/{{ comp.id }}/{{ k }}/{{ season.id }}" class="delete">Usuń z listy</a>
+				<a style="cursor: pointer" class="delete">Usuń z listy</a>
 			</td>
 		</tr>
 		{% endfor %}
@@ -71,7 +71,22 @@
 <script type="text/javascript">
 $(function() {
 	$('input[type="submit"]').button();
-	$('a.delete').button({ text: false, icons: { primary: 'ui-icon-trash' } });
+	$('a.delete').button({ text: false, icons: { primary: 'ui-icon-trash' } }).click(function() {
+		var link = $(this);
+		var tr = link.parent().parent();
+		var id = tr.prop('id').replace('team-id-', '');
+
+		$.post(IONIC_BASE_URL+'admin/competitions/teams_delete/{{ comp.id }}/'+id+'/{{ season.id }}', {csrf_token: IonicAdmin.csrfToken}, function(response){
+			if (response.status)
+			{
+				tr.slideUp().delete();
+			}
+			else
+			{
+				alert(response.error);
+			}
+		});
+	});
 	$('#teams').select2({closeOnSelect: false});
 	$('#seasons').change(function() {
 		window.location.href = '{{ ("admin/competitions/teams/"~comp.id)|url }}/'+$('#seasons').val();

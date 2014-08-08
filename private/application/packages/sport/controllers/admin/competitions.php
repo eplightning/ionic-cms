@@ -71,20 +71,35 @@ class Admin_Competitions_Controller extends Admin_Controller {
         if (!$id)
             return Response::error(500);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/competitions/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/competitions/index');
+            return Response::error(500);
         }
 
         DB::table('competitions')->where('id', '=', $id->id)->delete();
 
-        $this->notice('Obiekt usunięty pomyślnie');
         $this->log(sprintf('Usunięto rozgrywki: %s', $id->name));
-        return Redirect::to('admin/competitions/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Rozgrywki usunięte pomyślnie');
+            return Redirect::to('admin/competitions/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     public function action_edit($id)
@@ -273,11 +288,14 @@ class Admin_Competitions_Controller extends Admin_Controller {
 
     public function action_teams_delete($competition, $team, $season)
     {
+        if (!Request::ajax() or Request::forged())
+            return Response::error(500);
+
         if (!Auth::can('admin_competitions_edit'))
-            return Response::error(403);
+            return Response::json(array('status' => false, 'error' => 'Brak odpowiednich uprawnień'));
 
         if (!ctype_digit($competition) or !ctype_digit($team) or !ctype_digit($season))
-            return Response::error(500);
+            return Response::json(array('status' => false, 'error' => 'Błąd systemu'));
 
         $entry = DB::table('competition_teams')->where('competition_id', '=', (int) $competition)
                                                ->where('team_id', '=', (int) $team)
@@ -286,26 +304,16 @@ class Admin_Competitions_Controller extends Admin_Controller {
 
         if (!$entry)
         {
-            return Response::error(404);
-        }
-
-        if (!($status = $this->confirm()))
-        {
-            return;
-        }
-        elseif ($status == 2)
-        {
-            return Redirect::to('admin/competitions/teams/'.$competition.'/'.$season);
+            return Response::json(array('status' => false, 'error' => 'Przypisanie nie istnieje, możliwe ,że zostało już usunięte'));
         }
 
         DB::table('competition_teams')->where('competition_id', '=', (int) $competition)
                                       ->where('season_id', '=', (int) $season)
                                       ->where('team_id', '=', (int) $team)->delete();
 
-        $this->notice('Drużyna usunięta z rozgrywek');
         $this->log('Usunięto klub z rozgrywek');
 
-        return Redirect::to('admin/competitions/teams/'.$competition.'/'.$season);
+        return Response::json(array('status' => true, 'error' => ''));
     }
 
     protected function make_grid()
@@ -327,7 +335,7 @@ class Admin_Competitions_Controller extends Admin_Controller {
         }
 
         if (Auth::can('admin_competitions_delete'))
-            $grid->add_action('Usuń', 'admin/competitions/delete/%d', 'delete-button');
+            $grid->add_action('Usuń', 'admin/competitions/delete/%d', 'delete-button', Ionic\Grid::ACTION_BOTH);
 
         $grid->add_column('id', 'ID', 'id', null, 'competitions.id');
         $grid->add_column('name', 'Nazwa rozgrywek', 'name', 'competitions.name', 'competitions.name');
