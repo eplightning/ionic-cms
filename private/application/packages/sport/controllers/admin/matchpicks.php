@@ -11,13 +11,20 @@ class Admin_Matchpicks_Controller extends Admin_Controller {
         if (!$id)
             return Response::error(500);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/matchpicks/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/matchpicks/index');
+            return Response::error(500);
         }
 
         if ($id->is_active == 0)
@@ -32,9 +39,17 @@ class Admin_Matchpicks_Controller extends Admin_Controller {
 
         \Cache::forget('matchpick');
 
-        $this->notice('Operacja wykonana pomyślnie');
         $this->log(sprintf('Aktywowano/deaktywowano głosowanie: %s', $id->title));
-        return Redirect::to('admin/matchpicks/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Operacja wykonana pomyślnie');
+            return Redirect::to('admin/matchpicks/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     public function action_add()
@@ -216,22 +231,37 @@ class Admin_Matchpicks_Controller extends Admin_Controller {
         if (!$id)
             return Response::error(500);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/matchpicks/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/matchpicks/index');
+            return Response::error(500);
         }
 
         DB::table('matchpicks')->where('id', '=', $id->id)->delete();
 
         \Cache::forget('matchpick');
 
-        $this->notice('Obiekt usunięty pomyślnie');
         $this->log(sprintf('Usunięto głosowanie: %s', $id->title));
-        return Redirect::to('admin/matchpicks/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Obiekt usunięty pomyślnie');
+            return Redirect::to('admin/matchpicks/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     public function action_edit($id)
@@ -475,21 +505,21 @@ class Admin_Matchpicks_Controller extends Admin_Controller {
             $grid->add_button('Dodaj głosowanie', 'admin/matchpicks/add', 'add-button');
         if (Auth::can('admin_matchpicks_edit'))
         {
-            $grid->add_action('Aktywuj/deaktywuj', 'admin/matchpicks/active/%d', 'accept-button');
+            $grid->add_action('Aktywuj/deaktywuj', 'admin/matchpicks/active/%d', 'accept-button', Ionic\Grid::ACTION_BOTH);
             $grid->add_action('Edytuj', 'admin/matchpicks/edit/%d', 'edit-button');
         }
         if (Auth::can('admin_matchpicks_delete'))
-            $grid->add_action('Usuń', 'admin/matchpicks/delete/%d', 'delete-button');
+            $grid->add_action('Usuń', 'admin/matchpicks/delete/%d', 'delete-button', Ionic\Grid::ACTION_BOTH);
 
         $grid->add_column('id', 'ID', 'id', null, 'matchpicks.id');
         $grid->add_column('title', 'Tytuł', 'title', 'matchpicks.title', 'matchpicks.title');
         $grid->add_column('created_at', 'Dodano', 'created_at', 'matchpicks.created_at', 'matchpicks.created_at');
         $grid->add_column('votes', 'Głosów', 'votes', 'matchpicks.votes', 'matchpicks.votes');
         $grid->add_column('is_active', 'Aktywne', function($obj) {
-                    if ($obj->is_active == 1)
-                        return '<img style="margin: 0px auto; display: block" src="public/img/icons/accept.png" alt="" />';
-                    return '';
-                }, 'matchpicks.is_active', 'matchpicks.is_active');
+            if ($obj->is_active == 1)
+                return '<img style="margin: 0px auto; display: block" src="public/img/icons/accept.png" alt="" />';
+            return '';
+        }, 'matchpicks.is_active', 'matchpicks.is_active');
 
         $grid->add_filter_perpage(array(20, 30, 50));
         $grid->add_filter_search('title', 'Tytuł');
@@ -502,14 +532,14 @@ class Admin_Matchpicks_Controller extends Admin_Controller {
             $id = $this->user->id;
 
             $grid->add_multi_action('delete_selected', 'Usuń zaznaczone', function($ids) use ($id) {
-                        $affected = DB::table('matchpicks')->where_in('id', $ids)->delete();
+                $affected = DB::table('matchpicks')->where_in('id', $ids)->delete();
 
-                        if ($affected > 0)
-                        {
-                            Model\Log::add('Masowo usunięto głosowania ('.$affected.')', $id);
-                            \Cache::forget('matchpick');
-                        }
-                    });
+                if ($affected > 0)
+                {
+                    Model\Log::add('Masowo usunięto głosowania ('.$affected.')', $id);
+                    \Cache::forget('matchpick');
+                }
+            });
         }
 
         return $grid;

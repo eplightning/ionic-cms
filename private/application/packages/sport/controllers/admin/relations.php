@@ -132,20 +132,35 @@ class Admin_Relations_Controller extends Admin_Controller {
         if (!$id)
             return Response::error(500);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/relations/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/relations/index');
+            return Response::error(500);
         }
 
         DB::table('relations')->where('id', '=', $id->id)->delete();
 
-        $this->notice('Obiekt usunięty pomyślnie');
         $this->log('Usunięto relacje live');
-        return Redirect::to('admin/relations/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Obiekt usunięty pomyślnie');
+            return Redirect::to('admin/relations/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     public function action_edit($id)
@@ -1215,17 +1230,17 @@ class Admin_Relations_Controller extends Admin_Controller {
         }
 
         if (Auth::can('admin_relations_delete'))
-            $grid->add_action('Usuń', 'admin/relations/delete/%d', 'delete-button');
+            $grid->add_action('Usuń', 'admin/relations/delete/%d', 'delete-button', Ionic\Grid::ACTION_BOTH);
 
         $grid->add_column('id', 'ID', 'id', null, 'relations.id');
         $grid->add_column('match', 'Mecz', function($obj) {
-                    return $obj->home_name.' vs. '.$obj->away_name;
-                }, null, 'home.name');
+            return $obj->home_name.' vs. '.$obj->away_name;
+        }, null, 'home.name');
         $grid->add_column('is_finished', 'Zakończona', function($obj) {
-                    if ($obj->is_finished == 1)
-                        return '<img style="margin: 0px auto; display: block" src="public/img/icons/accept.png" alt="" />';
-                    return '';
-                }, 'relations.is_finished', 'relations.is_finished');
+            if ($obj->is_finished == 1)
+                return '<img style="margin: 0px auto; display: block" src="public/img/icons/accept.png" alt="" />';
+            return '';
+        }, 'relations.is_finished', 'relations.is_finished');
 
         $grid->add_filter_perpage(array(20, 30, 50));
 
@@ -1235,20 +1250,20 @@ class Admin_Relations_Controller extends Admin_Controller {
             '_all_' => 'Wszystkie',
             1       => 'Tak',
             0       => 'Nie'
-                ), '_all_');
+        ), '_all_');
 
         $grid->add_filter_autocomplete('team', 'Klub', function($str) {
-                    $us = DB::table('teams')->take(20)->where('name', 'like', str_replace('%', '', $str).'%')->get('name');
+            $us = DB::table('teams')->take(20)->where('name', 'like', str_replace('%', '', $str).'%')->get('name');
 
-                    $result = array();
+            $result = array();
 
-                    foreach ($us as $u)
-                    {
-                        $result[] = $u->name;
-                    }
+            foreach ($us as $u)
+            {
+                $result[] = $u->name;
+            }
 
-                    return $result;
-                }, array('home.name', 'away.name'));
+            return $result;
+        }, array('home.name', 'away.name'));
 
         if (Auth::can('admin_relations_delete') and Auth::can('admin_relations_multi'))
         {
@@ -1257,11 +1272,11 @@ class Admin_Relations_Controller extends Admin_Controller {
             $id = $this->user->id;
 
             $grid->add_multi_action('delete_selected', 'Usuń zaznaczone', function($ids) use ($id) {
-                        $affected = DB::table('relations')->where_in('id', $ids)->delete();
+                $affected = DB::table('relations')->where_in('id', $ids)->delete();
 
-                        if ($affected > 0)
-                            Model\Log::add('Masowo usunięto relacje live ('.$affected.')', $id);
-                    });
+                if ($affected > 0)
+                    Model\Log::add('Masowo usunięto relacje live ('.$affected.')', $id);
+            });
         }
 
         return $grid;

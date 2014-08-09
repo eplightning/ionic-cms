@@ -197,20 +197,35 @@ class Admin_Bet_matches_Controller extends Admin_Controller {
         if (!$id)
             return Response::error(500);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/bet_matches/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/bet_matches/index');
+            return Response::error(500);
         }
 
         DB::table('bet_matches')->where('id', '=', $id->id)->delete();
 
-        $this->notice('Obiekt usunięty pomyślnie');
         $this->log(sprintf('Usunięto mecz typera: %s', $id->home.' vs. '.$id->away));
-        return Redirect::to('admin/bet_matches/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Mecz usunięty pomyślnie');
+            return Redirect::to('admin/bet_matches/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     public function action_autocomplete_fixture()
@@ -521,29 +536,32 @@ class Admin_Bet_matches_Controller extends Admin_Controller {
             $id = $this->user->id;
 
             $grid->add_inline_edit('score', function($object, $new_value) use ($id) {
-                        if ($new_value == '-:-' or !preg_match("/^[0-9]{1,2}[\-\:][0-9]{1,2}$/", $new_value))
-                            $new_value = '';
-                        $archive = $object->archive;
+                if ($new_value == '-:-' or !preg_match("/^[0-9]{1,2}[\-\:][0-9]{1,2}$/", $new_value))
+                    $new_value = '';
+                $archive = $object->archive;
 
-                        if ($object->score != $new_value)
-                        {
-                            $handler = new Ionic\BetHandler($object->score, $new_value, $object->id);
-                            $handler->set_ratios($object->ratio_home, $object->ratio_draw, $object->ratio_away);
+                if ($object->score != $new_value)
+                {
+                    $handler = new Ionic\BetHandler($object->score, $new_value, $object->id);
+                    $handler->set_ratios($object->ratio_home, $object->ratio_draw, $object->ratio_away);
 
-                            $archive = $handler->handle($archive);
-                        }
+                    $archive = $handler->handle($archive);
+                }
 
-                        DB::table('bet_matches')->where('id', '=', $object->id)->update(array('score'   => $new_value, 'archive' => $archive));
+                DB::table('bet_matches')->where('id', '=', $object->id)->update(array('score'   => $new_value, 'archive' => $archive));
 
-                        return Response::make($new_value ? : '-:-');
-                    });
+                return Response::make($new_value ? : '-:-');
+            });
         }
+
         if (Auth::can('admin_bet_matches_delete'))
         {
-            $grid->add_action('Usuń', 'admin/bet_matches/delete/%d', 'delete-button');
+            $grid->add_action('Usuń', 'admin/bet_matches/delete/%d', 'delete-button', Ionic\Grid::ACTION_BOTH);
 
             $grid->add_button('Reset typera', 'admin/bet_matches/reset', 'clear-button');
         }
+
+        $grid->add_help('score', 'Wynik meczu może zostać zaaktualizowany poprzez kliknięcie na wynik w tabeli.');
 
         $grid->add_column('id', 'ID', 'id', null, 'bet_matches.id');
         $grid->add_column('home', 'Gospodarz', 'home', 'bet_matches.home', 'bet_matches.home');
@@ -575,11 +593,11 @@ class Admin_Bet_matches_Controller extends Admin_Controller {
             $id = $this->user->id;
 
             $grid->add_multi_action('delete_selected', 'Usuń zaznaczone', function($ids) use ($id) {
-                        $affected = DB::table('bet_matches')->where_in('id', $ids)->delete();
+                $affected = DB::table('bet_matches')->where_in('id', $ids)->delete();
 
-                        if ($affected > 0)
-                            Model\Log::add('Masowo usunięto mecze typera ('.$affected.')', $id);
-                    });
+                if ($affected > 0)
+                    Model\Log::add('Masowo usunięto mecze typera ('.$affected.')', $id);
+            });
         }
 
         return $grid;

@@ -252,12 +252,18 @@ fieldset label {
 
 input, textarea, select {
 	width: 95%;
-	border: 1px solid #eaeaea;
+	border: 1px solid #aaaaaa;
 	padding: 5px;
 	font-family: inherit;
 	color: inherit;
 	font-size: inherit;
     background: #fff;
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, color-stop(1%, #eeeeee), color-stop(15%, #ffffff));
+    background-image: -webkit-linear-gradient(top, #eeeeee 1%, #ffffff 15%);
+    background-image: -moz-linear-gradient(top, #eeeeee 1%, #ffffff 15%);
+    background-image: -o-linear-gradient(top, #eeeeee 1%, #ffffff 15%);
+    background-image: -ms-linear-gradient(top, #eeeeee 1%, #ffffff 15%);
+    background-image: linear-gradient(top, #eeeeee 1%, #ffffff 15%);
 }
 
 .section-subheader {
@@ -337,6 +343,10 @@ input.checkbox {
 .section .filter {
 	padding: 5px;
 	padding-left: 0px;
+}
+
+.section .search-filter input, .section .search-filter select, .section .date-filter input, .section .autocomplete-filter input {
+    margin-bottom: 5px;
 }
 
 ul.filter-list {

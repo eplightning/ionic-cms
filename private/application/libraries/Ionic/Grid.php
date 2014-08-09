@@ -926,11 +926,26 @@ class Grid {
 
             $colspan = count($this->columns);
 
-            if (count($this->actions))
+            $action_width = count($this->actions);
+
+            if ($action_width)
                 $colspan++;
 
             if ($this->checkbox)
                 $colspan++;
+
+            if (\Cookie::has('ionic-admin-skin'))
+            {
+                if (\Cookie::get('ionic-admin-skin') == 'admin_flat.css')
+                {
+                    $action_width *= 48;
+                    $action_width++;
+                }
+                else
+                {
+                    $action_width *= 39;
+                }
+            }
 
             $view->with(array(
                 'table' => $this->table,
@@ -938,6 +953,7 @@ class Grid {
                 'data' => $data,
                 'colspan' => $colspan,
                 'actions' => $this->actions,
+                'action_width' => $action_width,
                 'buttons' => $this->buttons,
                 'draw_checkboxes' => $this->checkbox,
                 'draw_pagination' => $this->pagination,

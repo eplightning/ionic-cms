@@ -109,7 +109,7 @@ class Admin_Player_stats_Controller extends Admin_Controller {
 
         $related = array();
 
-        foreach (DB::table('seasons')->get(array('id', 'year')) as $v)
+        foreach (DB::table('seasons')->order_by('year', 'desc')->get(array('id', 'year')) as $v)
         {
             $related[$v->id] = $v->year.' / '.($v->year + 1);
         }
@@ -297,7 +297,7 @@ class Admin_Player_stats_Controller extends Admin_Controller {
         $this->view->with('related_competition_id', $related);
         $related = array();
 
-        foreach (DB::table('seasons')->get(array('id', 'year')) as $v)
+        foreach (DB::table('seasons')->order_by('year', 'desc')->get(array('id', 'year')) as $v)
         {
             $related[$v->id] = $v->year.' / '.($v->year + 1);
         }
@@ -324,22 +324,37 @@ class Admin_Player_stats_Controller extends Admin_Controller {
         if (!$id)
             return Response::error(500);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/player_stats/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/player_stats/index');
+            return Response::error(500);
         }
 
         DB::table('player_stats')->where('id', '=', $id->id)->delete();
 
         ionic_clear_cache('stats-*');
 
-        $this->notice('Obiekt usunięty pomyślnie');
         $this->log(sprintf('Usunięto statystyki: %s', $id->name));
-        return Redirect::to('admin/player_stats/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Statystyki usunięte pomyślnie');
+            return Redirect::to('admin/player_stats/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     public function action_edit($id)
@@ -433,7 +448,7 @@ class Admin_Player_stats_Controller extends Admin_Controller {
         $this->view->with('related_competition_id', $related);
         $related = array();
 
-        foreach (DB::table('seasons')->get(array('id', 'year')) as $v)
+        foreach (DB::table('seasons')->order_by('year', 'desc')->get(array('id', 'year')) as $v)
         {
             $related[$v->id] = $v->year.' / '.($v->year + 1);
         }
@@ -501,11 +516,14 @@ class Admin_Player_stats_Controller extends Admin_Controller {
         $grid->add_related('seasons', 'seasons.id', '=', 'player_stats.season_id');
         $grid->add_related('competitions', 'competitions.id', '=', 'player_stats.competition_id');
 
+        $grid->add_help('update', 'Aby masowo zaaktualizować statystyki wybierz opcję `Aktualizacja`.');
+        $grid->add_help('live', 'Przy kończeniu relacji live istnieje możliwość automatycznej aktualizacji statystyk.');
+
         $grid->add_column('id', 'ID', 'id', null, 'player_stats.id');
         $grid->add_column('name', 'Zawodnik', 'name', 'players.name', 'players.name');
         $grid->add_column('season', 'Sezon', function($obj) {
-                    return $obj->year.' / '.($obj->year + 1);
-                }, 'seasons.year', 'seasons.year');
+            return $obj->year.' / '.($obj->year + 1);
+        }, 'seasons.year', 'seasons.year');
         $grid->add_column('competition', 'Rozgrywki', 'comp_name', 'competitions.name as comp_name', 'competitions.name');
         $grid->add_column('goals', 'Bramek', 'goals', 'player_stats.goals', 'player_stats.goals');
 
@@ -522,7 +540,7 @@ class Admin_Player_stats_Controller extends Admin_Controller {
         if (Auth::can('admin_player_stats_edit'))
             $grid->add_action('Edytuj', 'admin/player_stats/edit/%d', 'edit-button');
         if (Auth::can('admin_player_stats_delete'))
-            $grid->add_action('Usuń', 'admin/player_stats/delete/%d', 'delete-button');
+            $grid->add_action('Usuń', 'admin/player_stats/delete/%d', 'delete-button', Ionic\Grid::ACTION_BOTH);
 
         if (Auth::can('admin_player_stats_delete') and Auth::can('admin_player_stats_multi'))
         {
@@ -531,48 +549,48 @@ class Admin_Player_stats_Controller extends Admin_Controller {
             $id = $this->user->id;
 
             $grid->add_multi_action('delete_selected', 'Usuń zaznaczone', function($ids) use ($id) {
-                        $affected = DB::table('player_stats')->where_in('id', $ids)->delete();
+                $affected = DB::table('player_stats')->where_in('id', $ids)->delete();
 
-                        if ($affected > 0)
-                            Model\Log::add('Masowo usunięto statystyki ('.$affected.')', $id);
+                if ($affected > 0)
+                    Model\Log::add('Masowo usunięto statystyki ('.$affected.')', $id);
 
-                        ionic_clear_cache('stats-*');
-                    });
+                ionic_clear_cache('stats-*');
+            });
         }
 
         $grid->add_filter_perpage(array(20, 30, 50));
 
         $grid->add_filter_autocomplete('name', 'Zawodnik', function($str) {
-                    $us = DB::table('players')->take(20)->where('name', 'like', '%'.str_replace('%', '', $str).'%')->get('name');
+            $us = DB::table('players')->take(20)->where('name', 'like', '%'.str_replace('%', '', $str).'%')->get('name');
 
-                    $result = array();
+            $result = array();
 
-                    foreach ($us as $u)
-                    {
-                        $result[] = $u->name;
-                    }
+            foreach ($us as $u)
+            {
+                $result[] = $u->name;
+            }
 
-                    return $result;
-                }, 'players.name');
+            return $result;
+        }, 'players.name');
 
         $seasons = array('_all_' => 'Wszystkie');
 
         $grid->add_filter_autocomplete('comp_name', 'Rozgrywki', function($str) {
-                    $us = DB::table('competitions')->take(20)->where('name', 'like', str_replace('%', '', $str).'%')->get('name');
+            $us = DB::table('competitions')->take(20)->where('name', 'like', str_replace('%', '', $str).'%')->get('name');
 
-                    $result = array();
+            $result = array();
 
-                    foreach ($us as $u)
-                    {
-                        $result[] = $u->name;
-                    }
+            foreach ($us as $u)
+            {
+                $result[] = $u->name;
+            }
 
-                    return $result;
-                }, 'competitions.name');
+            return $result;
+        }, 'competitions.name');
 
         $seasons = array('_all_' => 'Wszystkie');
 
-        foreach (DB::table('seasons')->get('year') as $s)
+        foreach (DB::table('seasons')->order_by('year', 'desc')->get('year') as $s)
         {
             $seasons[$s->year] = $s->year.' / '.($s->year + 1);
         }

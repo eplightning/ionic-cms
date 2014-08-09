@@ -11,13 +11,20 @@ class Admin_Monthpicks_Controller extends Admin_Controller {
         if (!$id)
             return Response::error(500);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/monthpicks/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/monthpicks/index');
+            return Response::error(500);
         }
 
         if ($id->is_active == 0)
@@ -32,9 +39,17 @@ class Admin_Monthpicks_Controller extends Admin_Controller {
 
         \Cache::forget('monthpick');
 
-        $this->notice('Operacja wykonana pomyślnie');
         $this->log(sprintf('Aktywowano/deaktywowano głosowanie: %s', $id->title));
-        return Redirect::to('admin/monthpicks/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Operacja wykonana pomyślnie');
+            return Redirect::to('admin/monthpicks/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     public function action_add()
@@ -144,22 +159,37 @@ class Admin_Monthpicks_Controller extends Admin_Controller {
         if (!$id)
             return Response::error(500);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/monthpicks/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/monthpicks/index');
+            return Response::error(500);
         }
 
         DB::table('monthpicks')->where('id', '=', $id->id)->delete();
 
         \Cache::forget('monthpick');
 
-        $this->notice('Obiekt usunięty pomyślnie');
         $this->log(sprintf('Usunięto głosowanie: %s', $id->title));
-        return Redirect::to('admin/monthpicks/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Głosowanie usunięte pomyślnie');
+            return Redirect::to('admin/monthpicks/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     public function action_edit($id)
@@ -374,21 +404,21 @@ class Admin_Monthpicks_Controller extends Admin_Controller {
             $grid->add_button('Dodaj głosowanie', 'admin/monthpicks/add', 'add-button');
         if (Auth::can('admin_monthpicks_edit'))
         {
-            $grid->add_action('Aktywuj/deaktywuj', 'admin/monthpicks/active/%d', 'accept-button');
+            $grid->add_action('Aktywuj/deaktywuj', 'admin/monthpicks/active/%d', 'accept-button', Ionic\Grid::ACTION_BOTH);
             $grid->add_action('Edytuj', 'admin/monthpicks/edit/%d', 'edit-button');
         }
         if (Auth::can('admin_monthpicks_delete'))
-            $grid->add_action('Usuń', 'admin/monthpicks/delete/%d', 'delete-button');
+            $grid->add_action('Usuń', 'admin/monthpicks/delete/%d', 'delete-button', Ionic\Grid::ACTION_BOTH);
 
         $grid->add_column('id', 'ID', 'id', null, 'monthpicks.id');
         $grid->add_column('title', 'Tytuł', 'title', 'monthpicks.title', 'monthpicks.title');
         $grid->add_column('created_at', 'Dodano', 'created_at', 'monthpicks.created_at', 'monthpicks.created_at');
         $grid->add_column('votes', 'Głosów', 'votes', 'monthpicks.votes', 'monthpicks.votes');
         $grid->add_column('is_active', 'Aktywne', function($obj) {
-                    if ($obj->is_active == 1)
-                        return '<img style="margin: 0px auto; display: block" src="public/img/icons/accept.png" alt="" />';
-                    return '';
-                }, 'monthpicks.is_active', 'monthpicks.is_active');
+            if ($obj->is_active == 1)
+                return '<img style="margin: 0px auto; display: block" src="public/img/icons/accept.png" alt="" />';
+            return '';
+        }, 'monthpicks.is_active', 'monthpicks.is_active');
 
         $grid->add_filter_perpage(array(20, 30, 50));
         $grid->add_filter_search('title', 'Tytuł');
@@ -401,14 +431,14 @@ class Admin_Monthpicks_Controller extends Admin_Controller {
             $id = $this->user->id;
 
             $grid->add_multi_action('delete_selected', 'Usuń zaznaczone', function($ids) use ($id) {
-                        $affected = DB::table('monthpicks')->where_in('id', $ids)->delete();
+                $affected = DB::table('monthpicks')->where_in('id', $ids)->delete();
 
-                        if ($affected > 0)
-                        {
-                            Model\Log::add('Masowo usunięto głosowania ('.$affected.')', $id);
-                            \Cache::forget('monthpick');
-                        }
-                    });
+                if ($affected > 0)
+                {
+                    Model\Log::add('Masowo usunięto głosowania ('.$affected.')', $id);
+                    \Cache::forget('monthpick');
+                }
+            });
         }
 
         return $grid;

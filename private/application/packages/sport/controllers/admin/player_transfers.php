@@ -191,22 +191,37 @@ class Admin_Player_transfers_Controller extends Admin_Controller {
         if (!$id)
             return Response::error(500);
 
-        if (!($status = $this->confirm()))
+        if (!Request::ajax() or !Config::get('advanced.admin_prefer_ajax', true))
         {
-            return;
+            if (!($status = $this->confirm()))
+            {
+                return;
+            }
+            elseif ($status == 2)
+            {
+                return Redirect::to('admin/player_transfers/index');
+            }
         }
-        elseif ($status == 2)
+        elseif (Request::forged())
         {
-            return Redirect::to('admin/player_transfers/index');
+            return Response::error(500);
         }
 
         DB::table('player_transfers')->where('id', '=', $id->id)->delete();
 
         ionic_clear_cache('transfers-*');
 
-        $this->notice('Obiekt usunięty pomyślnie');
         $this->log(sprintf('Usunięto transfer: %s', $id->name));
-        return Redirect::to('admin/player_transfers/index');
+
+        if (!Request::ajax())
+        {
+            $this->notice('Transfer usunięty pomyślnie');
+            return Redirect::to('admin/player_transfers/index');
+        }
+        else
+        {
+            return Response::json(array('status' => true));
+        }
     }
 
     public function action_edit($id)
@@ -350,7 +365,7 @@ class Admin_Player_transfers_Controller extends Admin_Controller {
         if (Auth::can('admin_player_transfers_edit'))
             $grid->add_action('Edytuj', 'admin/player_transfers/edit/%d', 'edit-button');
         if (Auth::can('admin_player_transfers_delete'))
-            $grid->add_action('Usuń', 'admin/player_transfers/delete/%d', 'delete-button');
+            $grid->add_action('Usuń', 'admin/player_transfers/delete/%d', 'delete-button', Ionic\Grid::ACTION_BOTH);
 
         if (Auth::can('admin_player_transfers_delete') and Auth::can('admin_player_transfers_multi'))
         {
@@ -359,49 +374,49 @@ class Admin_Player_transfers_Controller extends Admin_Controller {
             $id = $this->user->id;
 
             $grid->add_multi_action('delete_selected', 'Usuń zaznaczone', function($ids) use ($id) {
-                        $affected = DB::table('player_transfers')->where_in('id', $ids)->delete();
+                $affected = DB::table('player_transfers')->where_in('id', $ids)->delete();
 
-                        if ($affected > 0)
-                            Model\Log::add('Masowo usunięto transfery ('.$affected.')', $id);
+                if ($affected > 0)
+                    Model\Log::add('Masowo usunięto transfery ('.$affected.')', $id);
 
-                        ionic_clear_cache('transfers-*');
-                    });
+                ionic_clear_cache('transfers-*');
+            });
         }
 
         $grid->add_filter_perpage(array(20, 30, 50));
 
         $grid->add_filter_autocomplete('name', 'Zawodnik', function($str) {
-                    $us = DB::table('players')->take(20)->where('name', 'like', '%'.str_replace('%', '', $str).'%')->get('name');
+            $us = DB::table('players')->take(20)->where('name', 'like', '%'.str_replace('%', '', $str).'%')->get('name');
 
-                    $result = array();
+            $result = array();
 
-                    foreach ($us as $u)
-                    {
-                        $result[] = $u->name;
-                    }
+            foreach ($us as $u)
+            {
+                $result[] = $u->name;
+            }
 
-                    return $result;
-                }, 'players.name');
+            return $result;
+        }, 'players.name');
 
         $grid->add_filter_autocomplete('team', 'Klub', function($str) {
-                    $us = DB::table('teams')->take(20)->where('name', 'like', '%'.str_replace('%', '', $str).'%')->get('name');
+            $us = DB::table('teams')->take(20)->where('name', 'like', '%'.str_replace('%', '', $str).'%')->get('name');
 
-                    $result = array();
+            $result = array();
 
-                    foreach ($us as $u)
-                    {
-                        $result[] = $u->name;
-                    }
+            foreach ($us as $u)
+            {
+                $result[] = $u->name;
+            }
 
-                    return $result;
-                }, array('teams.name', 'fromteam.name'));
+            return $result;
+        }, array('teams.name', 'fromteam.name'));
 
         $grid->add_filter_select('type', 'Rodzaj', array(
             '_all_' => 'Wszystkie',
             0       => 'Zwykłe',
             1       => 'Wypożyczenie',
             2       => 'Powrót z wyp.'
-                ), '_all_');
+        ), '_all_');
 
         return $grid;
     }
