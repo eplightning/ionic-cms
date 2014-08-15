@@ -122,6 +122,11 @@ class Core_Package extends \Ionic\Package {
         {
             $api->add_config(2, 'E-mail kontaktowy', 'Na ten adres e-mail będą wysyłane wiadomości napisane przez formularz kontaktowy.', 'Ogólne', 'example@gmail.com', 'text', '', 'string', 'contact_email');
             $api->add_config(12, 'Dynamiczne akcje w panelu', 'Wyłącz, aby przywrócić okienko potwierdzenia operacji z poprzednich wersji.', 'Panel administracyjny', '1', 'yesno', '', 'bool', 'admin_prefer_ajax');
+            
+            $api->execute_queries(array(
+                 "ALTER TABLE ".DB::prefix()."news
+                  ADD INDEX created_at (created_at)",
+            ), true);
 
             $version = '1.3';
         }

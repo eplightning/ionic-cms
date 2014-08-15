@@ -532,6 +532,7 @@ CREATE TABLE IF NOT EXISTS `{dbp}news` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `slug` (`slug`),
   KEY `user_id` (`user_id`),
+  KEY `created_at` (`created_at`),
   FULLTEXT KEY `title` (`content`,`title`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
