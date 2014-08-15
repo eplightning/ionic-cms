@@ -20,7 +20,7 @@ class News_Controller extends Base_Controller {
                 ->or_where('news.publish_at', '<=', date('Y-m-d H:i:s'))
                 ->where('news.publish_at', '<>', '0000-00-00 00:00:00')
                 ->paginate(20, array('news.id', 'news.created_at', 'news.title', 'news.comments_count', 'news.slug', 'news.external_url',
-            'users.display_name', 'users.slug as user_slug'));
+            'news.big_image', 'news.small_image', 'users.display_name', 'users.slug as user_slug'));
 
         $grouped_news = array();
 
@@ -405,7 +405,7 @@ class News_Controller extends Base_Controller {
                             $q->where('news.publish_at', '<>', '0000-00-00 00:00:00');
                         })
                 ->where('news_tags.tag_id', '=', $tag->id)
-                ->paginate(20, array('news.id', 'news.created_at', 'news.title', 'news.comments_count', 'news.slug', 'news.external_url',
+                ->paginate(20, array('news.id', 'news.created_at', 'news.title', 'news.comments_count', 'news.slug', 'news.external_url', 'news.content_intro', 'news.big_image', 'news.small_image',
             'users.display_name', 'users.slug as user_slug'));
 
         $grouped_news = array();

@@ -1,6 +1,5 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="pl" lang="pl">
+<!DOCTYPE html>
+<html lang="pl">
 <head>
 <base href="{{ base() }}/" />
 <meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
@@ -21,14 +20,7 @@ var IONIC_BASE_URL = "{{ base() }}/";
 {{ styles }}
 <link rel="stylesheet" href="{{ base() }}/style.css" media="all" />
 <link rel="stylesheet" href="{{ base() }}/public/css/ionic.css" media="all" />
-<link rel="alternate" type="application/rss+xml" title="RSS" href="{{ base() }}/news/rss" />
-<script type="text/javascript">
-$(function() {
-	$('.ionic-block-title').click(function(){
-		$(this).next().slideToggle('slow');
-	});
-});
-</script>
+<link rel="alternate" type="application/rss+xml" title="RSS" href="news/rss" />
 </head>
 <body>
 {% if notifications|length > 0 %}
@@ -64,31 +56,21 @@ $(function() {
 		</li>
 		{% endfor %}
 	</ul>
-	<ul id="page-breadcrumb">
-		{% for item in page.breadcrumb %}
-		<li><a href="{{ item.link }}">{{ item.title }}</a> &raquo;</li>
-		{% endfor %}
-	</ul>
-	{% if notice %}
-	<div class="ionic-notice">
-		{{ notice }}
-	</div>
-	{% endif %}
 	<div id="page-columns">
 		<div id="page-column-left">
-			<div class="ionic-block">
-				<div class="ionic-block-title">
+			<div class="block">
+				<div class="block-title">
 					Panel użytkownika
 				</div>
-				<div class="ionic-block-content">
+				<div class="block-content loginbox">
 					{{ widget('Panel logowania', 'loginbox') }}
 				</div>
 			</div>
-			<div class="ionic-block">
-				<div class="ionic-block-title">
+			<div class="block">
+				<div class="block-title">
 					Newsletter
 				</div>
-				<div class="ionic-block-content">
+				<div class="block-content newsletter">
 					<form action="page/newsletter" method="post">
 						<div>
 							<input type="text" name="email" value="" />
@@ -97,11 +79,11 @@ $(function() {
 					</form>
 				</div>
 			</div>
-			<div class="ionic-block">
-				<div class="ionic-block-title">
+			<div class="block">
+				<div class="block-title">
 					Wyszukiwarka
 				</div>
-				<div class="ionic-block-content">
+				<div class="block-content search">
 					<form action="page/search" method="post">
 						<div>
 							<input type="text" name="query" value="" />
@@ -110,169 +92,181 @@ $(function() {
 					</form>
 				</div>
 			</div>
-			<div class="ionic-block">
-				<div class="ionic-block-title">
+			<div class="block">
+				<div class="block-title">
 					Shoutbox (<a href="shoutbox">Archiwum</a>)
 				</div>
-				<div class="ionic-block-content">
+				<div class="block-content">
 					{{ widget('Shoutbox', 'shoutbox') }}
 				</div>
 			</div>
-			<div class="ionic-block">
-				<div class="ionic-block-title">
+			<div class="block">
+				<div class="block-title">
 					Sonda
 				</div>
-				<div class="ionic-block-content" style="display: none">
+				<div class="block-content">
 					{{ widget('Sonda', 'poll') }}
 				</div>
 			</div>
-			<div class="ionic-block">
-				<div class="ionic-block-title">
+			<div class="block">
+				<div class="block-title">
 					Piłkarz miesiąca
 				</div>
-				<div class="ionic-block-content" style="display: none">
+				<div class="block-content">
 					{{ widget('Piłkarz miesiąca', 'monthpick') }}
 				</div>
 			</div>
-			<div class="ionic-block">
-				<div class="ionic-block-title">
+			<div class="block">
+				<div class="block-title">
 					Piłkarz meczu
 				</div>
-				<div class="ionic-block-content" style="display: none">
+				<div class="block-content">
 					{{ widget('Piłkarz meczu', 'matchpick') }}
 				</div>
 			</div>
-			<div class="ionic-block">
-				<div class="ionic-block-title">
+			<div class="block">
+				<div class="block-title">
 					Urodziny
 				</div>
-				<div class="ionic-block-content" style="display: none">
+				<div class="block-content">
 					{{ widget('Urodziny', 'birthdays', {'limit': 2}) }}
 				</div>
 			</div>
-			<div class="ionic-block">
-				<div class="ionic-block-title">
+			<div class="block">
+				<div class="block-title">
 					Buttony
 				</div>
-				<div class="ionic-block-content" style="display: none">
+				<div class="block-content">
 					{{ widget('Buttony', 'buttons') }}
 				</div>
 			</div>
-			<div class="ionic-block">
-				<div class="ionic-block-title">
+			<div class="block">
+				<div class="block-title">
 					Ostatnie komentarze
 				</div>
-				<div class="ionic-block-content" style="display: none">
+				<div class="block-content">
 					{{ widget('Komentarze', 'comments') }}
 				</div>
 			</div>
-			<div class="ionic-block">
-				<div class="ionic-block-title">
+			<div class="block">
+				<div class="block-title">
 					Ostatnie pliki
 				</div>
-				<div class="ionic-block-content" style="display: none">
+				<div class="block-content">
 					{{ widget('Pliki', 'files') }}
 				</div>
 			</div>
-			<div class="ionic-block">
-				<div class="ionic-block-title">
+			<div class="block">
+				<div class="block-title">
 					Ostatnie video
 				</div>
-				<div class="ionic-block-content" style="display: none">
+				<div class="block-content">
 					{{ widget('Videos', 'videos') }}
 				</div>
 			</div>
-			<div class="ionic-block">
-				<div class="ionic-block-title">
+			<div class="block">
+				<div class="block-title">
 					Ostatnie zdjęcia
 				</div>
-				<div class="ionic-block-content" style="display: none">
+				<div class="block-content">
 					{{ widget('Zdjęcia', 'photos') }}
 				</div>
 			</div>
-			<div class="ionic-block">
-				<div class="ionic-block-title">
+			<div class="block">
+				<div class="block-title">
 					Kontuzje
 				</div>
-				<div class="ionic-block-content" style="display: none">
+				<div class="block-content">
 					{{ widget('Kontuzje', 'injuries') }}
 				</div>
 			</div>
-			<div class="ionic-block">
-				<div class="ionic-block-title">
+			<div class="block">
+				<div class="block-title">
 					Następny mecz
 				</div>
-				<div class="ionic-block-content" style="display: none">
+				<div class="block-content">
 					{{ widget('Mecz', 'match', { 'type': 'next' }) }}
 				</div>
 			</div>
-			<div class="ionic-block">
-				<div class="ionic-block-title">
+			<div class="block">
+				<div class="block-title">
 					Statystyki strony
 				</div>
-				<div class="ionic-block-content" style="display: none">
+				<div class="block-content">
 					{{ widget('Statystyki strony', 'pagestats') }}
 				</div>
 			</div>
-			<div class="ionic-block">
-				<div class="ionic-block-title">
+			<div class="block">
+				<div class="block-title">
 					Relacja
 				</div>
-				<div class="ionic-block-content" style="display: none">
+				<div class="block-content">
 					{{ widget('Relacja', 'relation') }}
 				</div>
 			</div>
-			<div class="ionic-block">
-				<div class="ionic-block-title">
+			<div class="block">
+				<div class="block-title">
 					Newsy
 				</div>
-				<div class="ionic-block-content" style="display: none">
+				<div class="block-content">
 					{{ widget('Newsy', 'news') }}
 				</div>
 			</div>
-			<div class="ionic-block">
-				<div class="ionic-block-title">
+			<div class="block">
+				<div class="block-title">
 					Bramki
 				</div>
-				<div class="ionic-block-content" style="display: none">
+				<div class="block-content">
 					{{ widget('Statystyki', 'stats') }}
 				</div>
 			</div>
-			<div class="ionic-block">
-				<div class="ionic-block-title">
+			<div class="block">
+				<div class="block-title">
 					Tabela
 				</div>
-				<div class="ionic-block-content" style="display: none">
+				<div class="block-content">
 					{{ widget('Tabela', 'table') }}
 				</div>
 			</div>
-			<div class="ionic-block">
-				<div class="ionic-block-title">
+			<div class="block">
+				<div class="block-title">
 					Następne mecze
 				</div>
-				<div class="ionic-block-content" style="display: none">
+				<div class="block-content">
 					{{ widget('Terminarz', 'timetable') }}
 				</div>
 			</div>
-			<div class="ionic-block">
-				<div class="ionic-block-title">
+			<div class="block">
+				<div class="block-title">
 					Transfery
 				</div>
-				<div class="ionic-block-content" style="display: none">
+				<div class="block-content">
 					{{ widget('Transfery', 'transfers') }}
 				</div>
 			</div>
-			<div class="ionic-block">
-				<div class="ionic-block-title">
+			<div class="block">
+				<div class="block-title">
 					Typer
 				</div>
-				<div class="ionic-block-content" style="display: none">
+				<div class="block-content">
 					{{ widget('Użytkownicy', 'users') }}
 				</div>
 			</div>
 		</div>
 		<div id="page-column-right">
-			{{ content }}
+			<ul id="page-breadcrumb">
+				{% for item in page.breadcrumb %}
+				<li><a href="{{ item.link }}">{{ item.title }}</a> &raquo;</li>
+				{% endfor %}
+			</ul>
+			<div id="page-column-right-pad">
+				{% if notice %}
+				<div class="ionic-notice">
+					{{ notice }}
+				</div>
+				{% endif %}
+				{{ content }}
+			</div>
 		</div>
 	</div>
 </div>

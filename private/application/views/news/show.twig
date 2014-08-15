@@ -1,32 +1,32 @@
-<div class="ionic-box">
-	<h2>{{ news.title }}</h2>
-	<div style="font-size: 0.8em">
-		<div class="ionic-left">
-			Napisane {{ news.created_at|date }} przez <a href="{{ make('user', news.user_slug) }}">{{ news.display_name }}</a>
-		</div>
-		<div class="ionic-right">
-			Źródło: {{ news.source ? news.source : 'n\\a' }}
-		</div>
-	</div>
-	<div class="ionic-karma">
-		Karma: {% if news.karma >= 0 %}<span id="karma-indicator" style="color: green">+{{ news.karma }}</span>{% else %}<span id="karma-indicator" style="color: red">{{ news.karma }}</span>{% endif %}
-		{% if can_karma %}<span id="karma-options">( <a id="karma-add">[+]</a> / <a id="karma-minus">[-]</a> )</span>{% endif %}
-	</div>
-</div>
-<div class="ionic-box">
-	<div class="ionic-post-content">
+<div class="ionic-news-view">
+	<div class="ionic-news-left">
 		{% if news.big_image %}
-		<img src="public/upload/images/{{ news.big_image }}" style="margin-right: 10px; float: left" alt="" />
+		<img src="public/upload/images/{{ news.big_image }}" title="{{ news.image_text }}" alt="{{ news.image_text }}" />
 		{% elseif news.small_image %}
-		<img src="public/upload/images/{{ news.small_image }}" style="margin-right: 10px; float: left" alt="" />
+		<img src="public/upload/images/{{ news.small_image }}" title="{{ news.image_text }}" alt="{{ news.image_text }}" />
 		{% endif %}
-		{{ news.content }}
 	</div>
-	<div class="ionic-post-statusblock">
-		Tagi:
-		{% for tag in tags %}{% if loop.index0 != 0 %}, {% endif %}
-		<a href="news/tag/{{ tag.slug }}">{{ tag.title }}</a>
-		{% endfor %}
+	<div class="ionic-news-right">
+		<h2><a href="{{ make('news', news.slug, news.external_url) }}">{{ news.title }}</a></h2>
+		<div class="ionic-news-info">
+			<span class="ionic-news-date">{{ news.created_at|date }}</span>
+			<span class="ionic-news-comments">{{ news.comments_count }} komentarzy</span>
+			<span class="ionic-news-author"><a href="users/profile/{{ news.user_slug }}">{{ news.display_name }}</a></span>
+			<span class="ionic-news-source">źródło: {{ news.source ? news.source : 'brak' }}</span>
+		</div>
+		{{ news.content }}
+		<div class="ionic-news-foot">
+			<div class="ionic-karma">
+				Karma: {% if news.karma >= 0 %}<span id="karma-indicator" style="color: green">+{{ news.karma }}</span>{% else %}<span id="karma-indicator" style="color: red">{{ news.karma }}</span>{% endif %}
+				{% if can_karma %}<span id="karma-options">( <a id="karma-add">[+]</a> / <a id="karma-minus">[-]</a> )</span>{% endif %}
+			</div>
+			<div class="ionic-tags">
+				Tagi:
+				{% for tag in tags %}{% if loop.index0 != 0 %}, {% endif %}
+				<a href="news/tag/{{ tag.slug }}">{{ tag.title }}</a>
+				{% endfor %}
+			</div>
+		</div>
 	</div>
 </div>
 <div class="ionic-news-panels">

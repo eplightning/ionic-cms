@@ -19,11 +19,7 @@ a img {
 .ionic-notice, .pagination {
 	padding: 15px;
 	margin: 10px 0px;
-	border: 1px solid #CAD7E1;
-	border-radius: 5px;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	-khtml-border-radius: 5px;
+	border: 1px solid #EDEDED;
 	overflow: hidden;
 }
 
@@ -97,6 +93,21 @@ img.ionic-right {
 
 .ionic-form-elem input.submit {
 	width: auto;
+    background: #429ab5;
+    background: -moz-linear-gradient(top,  #429ab5 0%, #455e80 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#429ab5), color-stop(100%,#455e80));
+    background: -webkit-linear-gradient(top,  #429ab5 0%,#455e80 100%);
+    background: -o-linear-gradient(top,  #429ab5 0%,#455e80 100%);
+    background: -ms-linear-gradient(top,  #429ab5 0%,#455e80 100%);
+    background: linear-gradient(to bottom,  #429ab5 0%,#455e80 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#429ab5', endColorstr='#455e80',GradientType=0 );
+    color: #fff;
+    font-weight: bold;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
 }
 
 .ionic-form-elem label {
@@ -124,15 +135,11 @@ img.ionic-right {
 }
 
 .ionic-list li {
-	background: #fff;
+	background: #F9F9F9;
 	margin-bottom: 5px;
-	border: 1px solid #CAD7E1;
+	border: 1px solid #EDEDED;
 	padding: 5px;
-	border-left-width: 3px;
-	border-radius: 5px;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	-khtml-border-radius: 5px;
+	box-shadow: 10px 10px 10px -13px #BBB;
 }
 
 .ionic-list li .title {
@@ -142,24 +149,16 @@ img.ionic-right {
 	display: inline-block;
 }
 
-.ionic-list li:hover {
-	border-left-color: #96a7b5;
-}
-
 .ionic-list li a {
 	text-decoration: none;
 }
 
 .ionic-box {
-	padding: 10px;
+	padding: 8px;
 	margin-bottom: 10px;
 	overflow: hidden;
 	clear: both;
-	border: 1px solid #CAD7E1;
-	border-radius: 5px;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	-khtml-border-radius: 5px;
+	border: 1px solid #EDEDED;
 }
 
 .ionic-karma {
@@ -180,12 +179,18 @@ img.ionic-right {
 	color: red;
 }
 
-.ionic-box h2, .ionic-notice h2 {
+.ionic-box h2, .ionic-notice h2, .ionic-news-view h2 {
 	font-size: 1.3em;
+	margin-top: 0px;
+}
+
+.ionic-news-small h2, .ionic-news-tiny h2 {
+    font-size: 1.15em;
 }
 
 .ionic-box h3, .ionic-notice h3 {
 	font-size: 1.15em;
+	margin-top: 0px;
 }
 
 .ionic-toolbar {
@@ -198,7 +203,7 @@ img.ionic-right {
 	background: #fafafa;
 	padding: 10px;
 	color: #555;
-	border: 1px solid #eaeaea;
+	border: 1px solid #EDEDED;
 	border-radius: 5px;
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
@@ -214,30 +219,23 @@ img.ionic-right {
 }
 
 .ionic-post {
-	clear: both;
-	overflow: hidden;
 	margin-bottom: 10px;
 	overflow: hidden;
 	clear: both;
-	border: 1px solid #CAD7E1;
-	border-radius: 5px;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	-khtml-border-radius: 5px;
-	height: 100%;
 	width: 100%;
-	background: url(../img/post_bg.png) no-repeat;
-}
-
-.ionic-post-nobg {
-	background: #fff;
 }
 
 .ionic-post-left {
-	border-right: 1px solid #CAD7E1;
+	border: 1px solid #ededed;
+	background: #fdfdfd;
 	float: left;
 	width: 140px;
-	padding: 15px;
+	padding: 7px;
+	margin-bottom: 10px;
+    -webkit-border-bottom-right-radius: 10px;
+    -moz-border-radius-bottomright: 10px;
+    border-bottom-right-radius: 10px;
+    box-shadow: 10px 10px 10px -13px #BBB;
 }
 
 .ionic-post-right {
@@ -245,12 +243,19 @@ img.ionic-right {
 }
 
 .ionic-post-info {
-	background: url(../img/admin/login_bg.gif) repeat-x;
-	padding-right: 10px;
+    background: #fcfff4;
+    background: -moz-linear-gradient(top,  #fcfff4 0%, #ededed 100%);
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fcfff4), color-stop(100%,#ededed));
+    background: -webkit-linear-gradient(top,  #fcfff4 0%,#ededed 100%);
+    background: -o-linear-gradient(top,  #fcfff4 0%,#ededed 100%);
+    background: -ms-linear-gradient(top,  #fcfff4 0%,#ededed 100%);
+    background: linear-gradient(to bottom,  #fcfff4 0%,#ededed 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcfff4', endColorstr='#ededed',GradientType=0 );
+    border-top: 1px solid #ededed;
+    border-right: 1px solid #ededed;
+    padding: 10px 15px;
 	overflow: hidden;
-	padding-left: 15px;
-	padding-top: 11px;
-	padding-bottom: 9px;
+	font-size: 0.9em;
 }
 
 .ionic-post-content {
@@ -276,30 +281,31 @@ img.ionic-right {
 	width: 100%;
 	margin-bottom: 10px;
 	clear: both;
-	border: 1px solid #CAD7E1;
+	border: 1px solid #EDEDED;
 	border-radius: 5px;
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	-khtml-border-radius: 5px;
-	border-spacing: 1px;
+	border-spacing: 0px;
+	box-shadow: 7px 7px 7px -11px #BBB;
 }
 
 .ionic-table th {
-	height: 21px;
-	background: #fff url(../img/admin/th_bg.gif) repeat-x;
-	border-bottom: 1px solid #92a5bc;
+	background: #fff;
+	border-bottom: 1px solid #cacaca;
 	font-weight: normal;
 	text-align: center;
+	padding: 5px 0px;
 }
 
 .ionic-table th:hover, .ionic-table th.active {
-	background: #fff url(../img/admin/th_bg2.gif) repeat-x;
-	border-bottom: 1px solid #5f6c7c;
+	border-bottom: 3px solid #cacaca;
+    padding: 5px 0px 3px 0px;
 }
 
 .ionic-table td {
 	padding: 5px;
-	background: #fafdff;
+	background: #fff;
 }
 
 .ionic-table td.centered {
@@ -307,7 +313,7 @@ img.ionic-right {
 }
 
 .ionic-table tr:nth-child(even) td {
-	background: #f0f4f9;
+	background: #fdfdfd;
 }
 
 .tab-view-top {
@@ -318,34 +324,20 @@ img.ionic-right {
 .tab-view-top li {
 	float: left;
 	margin-right: 15px;
-	-moz-border-radius-topleft: 5px;
-	-webkit-border-top-left-radius: 5px;
-	-khtml-border-top-left-radius: 5px;
-	border-top-left-radius: 5px;
-	-moz-border-radius-topright: 5px;
-	-webkit-border-top-right-radius: 5px;
-	-khtml-border-top-right-radius: 5px;
-	border-top-right-radius: 5px;
-	height: 24px;
 	background: #fff;
-	padding: 1px;
-	border: 1px solid #92a5bc;
-	border-bottom: none;
+	padding: 10px;
+	position: relative;
+	top: 1px;
 }
 
 .tab-view-top li a {
 	border: none;
-	height: 20px;
-	padding-top: 4px;
-	padding-left: 10px;
-	padding-right: 10px;
-	display: block;
 	cursor: pointer;
-	background: url(../img/admin/login_bg.gif);
 }
 
-.tab-view-top li.active a {
-	border: none;
+.tab-view-top li.active {
+	border: 1px solid #ebebeb;
+	border-bottom: 0px;
 	-moz-border-radius-topleft: 5px;
 	-webkit-border-top-left-radius: 5px;
 	-khtml-border-top-left-radius: 5px;
@@ -354,26 +346,11 @@ img.ionic-right {
 	-webkit-border-top-right-radius: 5px;
 	-khtml-border-top-right-radius: 5px;
 	border-top-right-radius: 5px;
-	background: #1b3559 url(../img/admin/table_bg.gif) repeat-x;
-	color: #fff;
-	height: 20px;
-	padding-top: 4px;
-	padding-left: 10px;
-	padding-right: 10px;
-	display: block;
 }
 
 .tab-view-content {
 	padding: 20px;
-	-moz-border-radius-bottomleft: 5px;
-	-webkit-border-bottom-left-radius: 5px;
-	-khtml-border-bottom-left-radius: 5px;
-	border-bottom-left-radius: 5px;
-	-moz-border-radius-bottomright: 5px;
-	-webkit-border-bottom-right-radius: 5px;
-	-khtml-border-bottom-right-radius: 5px;
-	border-bottom-right-radius: 5px;
-	border: 1px solid #92a5bc;
+	border: 1px solid #ebebeb;
 	overflow: hidden;
 	clear: both;
 }
@@ -434,6 +411,125 @@ img.ionic-right {
 	cursor: pointer;
 }
 
+.ionic-news-view {
+	padding: 8px;
+	margin-bottom: 10px;
+	overflow: hidden;
+	clear: both;
+	border: 1px solid #EDEDED;
+}
+
+.ionic-news-view-container {
+    overflow: hidden;
+    clear: both;
+}
+
+.ionic-news-small, .ionic-news-tiny {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 50%;
+    *width: 45%;
+    float: left;
+    clear: none;
+    height: 11em;
+}
+
+.ionic-news-tiny {
+    height: 8em;
+}
+
+.ionic-news-small2 {
+    border-left: none;
+}
+
+.ionic-news-left {
+    float: left;
+    width: 25%;
+    margin-right: 10px;
+}
+
+.ionic-news-tiny .ionic-news-left {
+    width: 18%;
+}
+
+.ionic-news-left img {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 100%;
+    *width: 95%;
+    height: auto;
+    display: block;
+    border: 1px solid #EDEDED;
+    padding: 2px;
+}
+
+.ionic-news-tiny img {
+    max-height: 6em;
+}
+
+.ionic-news-left span {
+    display: block;
+	background: #EBF1F5;
+	border: 1px solid #CAD7E1;
+	border-top: 0px;
+	padding: 10px;
+}
+
+.ionic-news-info {
+    font-size: 0.8em;
+    margin-bottom: 10px;
+}
+
+.ionic-news-date {
+    background: url(../img/admin/item/seasons.png) no-repeat 0% 0%;
+    padding: 0px 8px 3px 20px;
+}
+
+.ionic-news-comments {
+    background: url(../img/admin/item/comments.png) no-repeat 0% 0%;
+    padding: 0px 8px 3px 20px;
+}
+
+.ionic-news-author {
+    background: url(../img/admin/item/users.png) no-repeat 0% 0%;
+    padding: 0px 8px 3px 20px;
+}
+
+.ionic-news-source {
+    background: url(../img/admin/item/pages.png) no-repeat 0% 0%;
+    padding: 0px 8px 3px 20px;
+}
+
+.ionic-news-right p {
+    line-height: 130%;
+    margin: 0px 0px 11px 0px;
+    padding: 0px;
+}
+
+.ionic-news-foot {
+    margin-top: 5px;
+    overflow: hidden;
+    clear: both;
+}
+
+.ionic-news-foot .ionic-karma {
+    float: left;
+}
+
+.ionic-news-foot .ionic-tags {
+    float: right;
+    font-size: 0.8em;
+}
+
+.ionic-news-archive {
+	padding: 3px;
+	margin-bottom: 10px;
+	overflow: hidden;
+	border: 1px solid #ededed;
+}
+
 .ionic-news-panels {
 	margin: 10px auto;
 	clear: both;
@@ -442,21 +538,23 @@ img.ionic-right {
 
 .ionic-news-panel {
 	padding: 10px;
-	width: 40%;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 49%;
+    *width: 45%;
 	margin-right: 10px;
 	overflow: hidden;
 	float: left;
-	border: 1px solid #CAD7E1;
-	border-radius: 5px;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	-khtml-border-radius: 5px;
+	border: 1px solid #ededed;
 }
 
-.ionic-news-panel h3 {
+.ionic-news-panel h3, .ionic-news-archive h3 {
 	font-size: 1.1em;
 	font-weight: bold;
 	margin: 0px 0px 5px 5px;
+	padding: 0px 0px 5px 0px;
+	border-bottom: 1px solid #cacaca;
 }
 
 .ionic-news-panel-right {

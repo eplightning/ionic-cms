@@ -1,18 +1,24 @@
 <div class="ionic-box">
 	<h2>Newsy dla tagu: {{ tag.title }}</h2>
 </div>
-{% for month, posts in grouped_news %}
-<div class="ionic-box">
-	<h2>{{ month|date('month') }}</h2>
-	<ul class="ionic-list">
-	{% for n in posts %}
-	<li>
-		<a href="{{ make('news', n.slug, n.external_url) }}" style="font-size: 1.2em">{{ n.title }} ({{ n.comments_count }} komentarzy)</a>
-		<br />
-		<small>News został dodany {{ n.created_at|date }} przez <a href="{{ make('user', n.user_slug) }}">{{ n.display_name }}</a></small>
-	</li>
-	{% endfor %}
-	</ul>
+{% for n in news.results %}
+<div class="ionic-news-view">
+	<div class="ionic-news-left">
+		{% if n.small_image %}
+		<img src="public/upload/images/{{ n.small_image }}" title="{{ n.image_text }}" alt="{{ n.image_text }}" />
+		{% elseif n.big_image %}
+		<img src="public/upload/images/{{ n.big_image }}" title="{{ n.image_text }}" alt="{{ n.image_text }}" />
+		{% endif %}
+	</div>
+	<div class="ionic-news-right">
+		<h2><a href="{{ make('news', n.slug, n.external_url) }}">{{ n.title }}</a></h2>
+		<div class="ionic-news-info">
+			<span class="ionic-news-date">{{ n.created_at|date }}</span>
+			<span class="ionic-news-comments">{{ n.comments_count }} komentarzy</span>
+			<span class="ionic-news-author"><a href="users/profile/{{ n.user_slug }}">{{ n.display_name }}</a></span>
+		</div>
+		<p>{{ n.content_intro|limit(300) }}</p>
+	</div>
 </div>
 {% endfor %}
 {{ news.links() }}

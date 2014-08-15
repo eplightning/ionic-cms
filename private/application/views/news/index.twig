@@ -1,39 +1,42 @@
 {% for n in main_news %}
-<div class="ionic-box">
-	<h2><a href="{{ make('news', n.slug, n.external_url) }}">{{ n.title }}</a></h2>
-	<div style="font-size: 0.8em; margin-bottom: 10px">
-		<div class="ionic-left">
-			Napisane {{ n.created_at|date }} | {{ n.comments_count }} komentarzy
-		</div>
-	</div>
-	<div class="ionic-post-content">
+<div class="ionic-news-view">
+	<div class="ionic-news-left">
 		{% if n.big_image %}
-		<img src="public/upload/images/{{ n.big_image }}" style="margin-right: 10px; float: left" alt="" />
+		<img src="public/upload/images/{{ n.big_image }}" title="{{ n.image_text }}" alt="{{ n.image_text }}" />
 		{% elseif n.small_image %}
-		<img src="public/upload/images/{{ n.small_image }}" style="margin-right: 10px; float: left" alt="" />
+		<img src="public/upload/images/{{ n.small_image }}" title="{{ n.image_text }}" alt="{{ n.image_text }}" />
 		{% endif %}
-		{{ n.content_intro }}
+	</div>
+	<div class="ionic-news-right">
+		<h2><a href="{{ make('news', n.slug, n.external_url) }}">{{ n.title }}</a></h2>
+		<div class="ionic-news-info">
+			<span class="ionic-news-date">{{ n.created_at|date }}</span>
+			<span class="ionic-news-comments">{{ n.comments_count }} komentarzy</span>
+			<span class="ionic-news-author"><a href="users/profile/{{ n.user_slug }}">{{ n.display_name }}</a></span>
+		</div>
+		<p>{{ n.content_intro }}</p>
 	</div>
 </div>
 {% endfor %}
+<div class="ionic-news-view-container">
 {% for n in news %}
-<div class="ionic-box">
-	<h2><a href="{{ make('news', n.slug, n.external_url) }}">{{ n.title }}</a></h2>
-	<div style="font-size: 0.8em; margin-bottom: 10px">
-		<div class="ionic-left">
-			Napisane {{ n.created_at|date }} | {{ n.comments_count }} komentarzy
+	<div class="ionic-news-view ionic-news-small{{ cycle(['', ' ionic-news-small2'], loop.index0) }}">
+		<div class="ionic-news-left">
+			{% if n.small_image %}
+			<img src="public/upload/images/{{ n.small_image }}" title="{{ n.image_text }}" alt="{{ n.image_text }}" />
+			{% endif %}
+		</div>
+		<div class="ionic-news-right">
+			<h2><a href="{{ make('news', n.slug, n.external_url) }}">{{ n.title|limit(40) }}</a></h2>
+			<div class="ionic-news-info">
+				<span class="ionic-news-date">{{ n.created_at|date }}</span>
+				<span class="ionic-news-comments">{{ n.comments_count }} komentarzy</span>
+			</div>
+			<p>{{ n.content_intro|limit(200) }}</p>
 		</div>
 	</div>
-	<div class="ionic-post-content">
-		{% if n.big_image %}
-		<img src="public/upload/images/{{ n.big_image }}" style="margin-right: 10px; float: left" alt="" />
-		{% elseif n.small_image %}
-		<img src="public/upload/images/{{ n.small_image }}" style="margin-right: 10px; float: left" alt="" />
-		{% endif %}
-		{{ n.content_intro }}
-	</div>
-</div>
 {% endfor %}
+</div>
 <ul class="ionic-list">
 {% for n in archive %}
 <li>
@@ -42,4 +45,7 @@
 	<small>{{ n.created_at|date }}</small>
 </li>
 {% endfor %}
+<li>
+	<a href="news/archive">Przejdź do archiwum</a>
+</li>
 </ul>
