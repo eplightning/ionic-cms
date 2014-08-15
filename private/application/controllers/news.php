@@ -250,7 +250,7 @@ class News_Controller extends Base_Controller {
         $rss = '<?xml version="1.0" encoding="UTF-8"?>'."\n".'<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="'.Config::get('application.language', 'pl').'">'."\n";
 
         $rss .= "\t<title>".sprintf(Config::get('meta.title'), 'Atom')."</title>\n";
-        
+
         $rss .= "\t<id>".URL::base()."/</id>\n";
         $rss .= "\t<link href=\"".URL::to('news/atom')."\" rel=\"self\" />\n";
         $rss .= "\t<link href=\"".URL::base()."\" rel=\"alternate\" type=\"text/html\" />\n";
