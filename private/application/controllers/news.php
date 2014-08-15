@@ -241,6 +241,72 @@ class News_Controller extends Base_Controller {
     }
 
     /**
+     * Atom
+     *
+     * @return Response
+     */
+    public function action_atom()
+    {
+        $rss = '<?xml version="1.0" encoding="UTF-8"?>'."\n".'<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="'.Config::get('application.language', 'pl').'">'."\n";
+
+        $rss .= "\t<title>".sprintf(Config::get('meta.title'), 'Atom')."</title>\n";
+        
+        $rss .= "\t<id>".URL::base()."/</id>\n";
+        $rss .= "\t<link href=\"".URL::to('news/atom')."\" rel=\"self\" />\n";
+        $rss .= "\t<link href=\"".URL::base()."\" rel=\"alternate\" type=\"text/html\" />\n";
+        $rss .= "\t<link href=\"".URL::to('news/rss')."\" rel=\"alternate\" type=\"application/rss+xml\" />\n";
+
+        $rss .= "\t<generator version=\"1.3\">IonicCMS</generator>\n";
+        $rss .= "\t<subtitle>".Config::get('meta.description')."</subtitle>\n";
+
+        $updated = null;
+        $items = '';
+
+        foreach (DB::table('news')->order_by('news.created_at', 'desc')
+                ->where('news.is_published', '=', 1)
+                ->left_join('users', 'users.id', '=', 'news.user_id')
+                ->or_where('news.publish_at', '<=', date('Y-m-d H:i:s'))
+                ->where('news.publish_at', '<>', '0000-00-00 00:00:00')
+                ->take(10)->get(array('news.title', 'news.slug', 'news.external_url', 'news.created_at', 'news.content_intro', 'news.content', 'news.small_image', 'users.display_name', 'users.slug as user_slug')) as $n)
+        {
+            $date = date('c', strtotime($n->created_at));
+            $link = URL::to(ionic_make_link('news', $n->slug, $n->external_url));
+
+            if (!$updated)
+                $updated = $date;
+
+            $intro = trim(html_entity_decode($n->content_intro, ENT_COMPAT, 'UTF-8'));
+
+            if (empty($intro))
+            {
+                $intro = trim(html_entity_decode(Str::limit(strip_tags($n->content), 200), ENT_COMPAT, 'UTF-8'));
+            }
+            
+            if ($n->small_image)
+            {
+                $intro = '<img src="'.URL::base().'/public/upload/images/'.$n->small_image.'" width="200" height="150" alt="" /> '.$intro;
+            }
+
+            $items .= "\t<entry>\n";
+
+            $items .= "\t\t<title>".$n->title."</title>\n";
+            $items .= "\t\t<updated>".$date."</updated>\n";
+            $items .= "\t\t<link href=\"".$link."\" rel=\"alternate\" />\n";
+            $items .= "\t\t<id>".URL::to(ionic_make_link('news', $n->slug, $n->external_url))."</id>\n";
+            $items .= "\t\t<author>\n\t\t\t<name>".$n->display_name."</name>\n\t\t\t<uri>".URL::to(ionic_make_link('user', $n->user_slug))."</uri>\n\t\t</author>\n";
+            $items .= "\t\t<summary type=\"html\">".HTML::specialchars($intro)."</summary>\n";
+
+            $items .= "\t</entry>\n";
+        }
+
+        $rss .= "\t<updated>".$updated."</updated>\n".$items."</feed>";
+
+        return Response::make($rss, 200, array(
+            'Content-type' => 'application/atom+xml; charset=UTF-8'
+        ));
+    }
+
+    /**
      * RSS
      *
      * @return Response
@@ -252,21 +318,27 @@ class News_Controller extends Base_Controller {
         $rss .= "\t\t<atom:link href=\"".URL::to('news/rss')."\" rel=\"self\" type=\"application/rss+xml\" />\n";
 
         $rss .= "\t\t<link>".URL::to('news/rss')."</link>\n";
-        $rss .= "\t\t<title>".sprintf(\Config::get('meta.title'), 'RSS')."</title>\n";
+        $rss .= "\t\t<title>".sprintf(Config::get('meta.title'), 'RSS')."</title>\n";
         $rss .= "\t\t<generator>IonicCMS</generator>\n";
-        $rss .= "\t\t<description>".\Config::get('meta.description')."</description>\n";
+        $rss .= "\t\t<description>".Config::get('meta.description')."</description>\n";
+        $rss .= "\t\t<language>".Config::get('application.language', 'pl')."</language>\n";
 
         foreach (DB::table('news')->order_by('news.created_at', 'desc')
                 ->where('news.is_published', '=', 1)
                 ->or_where('news.publish_at', '<=', date('Y-m-d H:i:s'))
                 ->where('news.publish_at', '<>', '0000-00-00 00:00:00')
-                ->take(10)->get(array('news.title', 'news.slug', 'news.external_url', 'news.created_at', 'news.content_intro', 'news.content')) as $n)
+                ->take(10)->get(array('news.title', 'news.slug', 'news.external_url', 'news.created_at', 'news.content_intro', 'news.content', 'news.small_image')) as $n)
         {
-            $intro = trim(html_entity_decode($n->content_intro));
+            $intro = trim(html_entity_decode($n->content_intro, ENT_COMPAT, 'UTF-8'));
 
             if (empty($intro))
             {
-                $intro = trim(html_entity_decode(Str::limit(strip_tags($n->content), 200)));
+                $intro = trim(html_entity_decode(Str::limit(strip_tags($n->content), 200), ENT_COMPAT, 'UTF-8'));
+            }
+            
+            if ($n->small_image)
+            {
+                $intro = '<img src="'.URL::base().'/public/upload/images/'.$n->small_image.'" width="200" height="150" alt="" /> '.$intro;
             }
 
             $rss .= "\t\t<item>\n";
@@ -274,8 +346,8 @@ class News_Controller extends Base_Controller {
             $rss .= "\t\t\t<title>".$n->title."</title>\n";
             $rss .= "\t\t\t<pubDate>".date('D, d M Y H:i:s O', strtotime($n->created_at))."</pubDate>\n";
             $rss .= "\t\t\t<link>".URL::to(ionic_make_link('news', $n->slug, $n->external_url))."</link>\n";
-            $rss .= "\t\t\t<description>".HTML::specialchars($intro)."</description>\n";
             $rss .= "\t\t\t<guid>".URL::to(ionic_make_link('news', $n->slug, $n->external_url))."</guid>\n";
+            $rss .= "\t\t\t<description>".HTML::specialchars($intro)."</description>\n";
 
             $rss .= "\t\t</item>\n";
         }
@@ -283,8 +355,8 @@ class News_Controller extends Base_Controller {
         $rss .= "\t</channel>\n</rss>";
 
         return Response::make($rss, 200, array(
-                    'Content-type' => 'application/rss+xml; charset=UTF-8'
-                ));
+            'Content-type' => 'application/rss+xml; charset=UTF-8'
+        ));
     }
 
     /**
