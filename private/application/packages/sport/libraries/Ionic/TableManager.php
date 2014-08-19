@@ -337,6 +337,8 @@ class TableManager {
         if (!$table)
             return false;
 
+        $teams = array();
+
         foreach (DB::table('competition_teams')->where('season_id', '=', $table->season_id)->where('competition_id', '=', $table->competition_id)->get('team_id') as $t)
         {
             $teams[$t->team_id] = $t->team_id;
