@@ -344,8 +344,10 @@ class TableManager {
             $teams[$t->team_id] = $t->team_id;
         }
 
-        if (!empty($teams))
-            DB::table('table_positions')->where('table_id', '=', $table->id)->where_not_in('team_id', $teams)->delete();
+        if (empty($teams))
+            return false;
+
+        DB::table('table_positions')->where('table_id', '=', $table->id)->where_not_in('team_id', $teams)->delete();
 
         foreach (DB::table('table_positions')->where('table_id', '=', $table->id)->where_in('team_id', $teams)->get('team_id') as $t)
         {
