@@ -47,7 +47,6 @@ class Admin_Warnings_Controller extends Admin_Controller {
                     {
                         $this->notice('Nie możesz dodać ostrzeżenia root adminowi!');
                         return Redirect::to('admin/warnings/add')->with_input('only', array('user', 'reason'));
-                        ;
                     }
                 }
 

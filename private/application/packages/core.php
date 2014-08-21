@@ -122,10 +122,28 @@ class Core_Package extends \Ionic\Package {
         {
             $api->add_config(2, 'E-mail kontaktowy', 'Na ten adres e-mail będą wysyłane wiadomości napisane przez formularz kontaktowy.', 'Ogólne', 'example@gmail.com', 'text', '', 'string', 'contact_email');
             $api->add_config(12, 'Dynamiczne akcje w panelu', 'Wyłącz, aby przywrócić okienko potwierdzenia operacji z poprzednich wersji.', 'Panel administracyjny', '1', 'yesno', '', 'bool', 'admin_prefer_ajax');
-            
+
+            $api->add_admin_menu('Kalendarz', 'Treść', 'calendar', 'admin_calendar', 27);
+
+            $api->add_role('admin_calendar', 'Typer', 'Może zarządzać kalendarzem');
+            $api->add_role('admin_calendar_add', 'Typer', 'Może dodawać do kalendarza');
+            $api->add_role('admin_calendar_edit', 'Typer', 'Może edytować kalendarz');
+            $api->add_role('admin_calendar_delete', 'Typer', 'Może usuwać z kalendarza');
+
             $api->execute_queries(array(
                  "ALTER TABLE ".DB::prefix()."news
                   ADD INDEX created_at (created_at)",
+
+                  "CREATE TABLE IF NOT EXISTS `".DB::prefix()."calendar` (
+                   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+                   `title` varchar(127) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+                   `date_start` date NOT NULL DEFAULT '0000-00-00',
+                   `date_end` date NOT NULL DEFAULT '0000-00-00',
+                   `handler` varchar(127) NOT NULL DEFAULT 'event',
+                   `type` varchar(127) NOT NULL DEFAULT '',
+                   `options` mediumtext NOT NULL,
+                   PRIMARY KEY (`id`)
+                   ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;",
             ), true);
 
             $version = '1.3';

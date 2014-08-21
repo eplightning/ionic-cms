@@ -56,7 +56,8 @@ INSERT INTO `{dbp}admin_menu` (`id`, `title`, `category`, `sorting`, `module`, `
 (44, 'Piłkarz miesiąca', 'Rozgrywki', 44, 'monthpicks', 'admin_monthpicks'),
 (45, 'Piłkarz meczu', 'Rozgrywki', 45, 'matchpicks', 'admin_matchpicks'),
 (46, 'Relacje live', 'Rozgrywki', 46, 'relations', 'admin_relations'),
-(47, 'Moduły systemu', 'System', 10, 'packages', 'admin_root');
+(47, 'Moduły systemu', 'System', 10, 'packages', 'admin_root'),
+(48, 'Kalendarz', 'Treść', 27, 'calendar', 'admin_calendar');
 
 CREATE TABLE IF NOT EXISTS `{dbp}admin_notes` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -108,6 +109,17 @@ CREATE TABLE IF NOT EXISTS `{dbp}blogs` (
   UNIQUE KEY `slug` (`slug`),
   KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+
+CREATE TABLE IF NOT EXISTS `{dbp}calendar` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(127) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  `date_start` date NOT NULL DEFAULT '0000-00-00',
+  `date_end` date NOT NULL DEFAULT '0000-00-00',
+  `handler` varchar(127) NOT NULL DEFAULT 'event',
+  `type` varchar(127) NOT NULL DEFAULT '',
+  `options` mediumtext NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `{dbp}comments` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -988,7 +1000,11 @@ INSERT INTO `{dbp}roles` (`id`, `name`, `section`, `title`) VALUES
 (161, 'mod_warnings', 'Moderacja', 'Może dodawać/usuwać ostrzeżenia'),
 (162, 'mod_shoutbox', 'Moderacja', 'Może moderować shoutbox'),
 (163, 'mod_blogs', 'Moderacja', 'Może moderować blogi'),
-(164, 'admin_xss', 'Administracja', 'Może używać potencjalnie niebezpiecznego kodu w newsach i podstronach?');
+(164, 'admin_xss', 'Administracja', 'Może używać potencjalnie niebezpiecznego kodu w newsach i podstronach'),
+(165, 'admin_calendar', 'Typer', 'Może zarządzać kalendarzem'),
+(166, 'admin_calendar_add', 'Typer', 'Może dodawać do kalendarza'),
+(167, 'admin_calendar_edit', 'Typer', 'Może edytować kalendarz'),
+(168, 'admin_calendar_delete', 'Typer', 'Może usuwać z kalendarza');
 
 CREATE TABLE IF NOT EXISTS `{dbp}seasons` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,

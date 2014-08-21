@@ -214,6 +214,10 @@ class Sport_Package extends \Ionic\Package {
             return $links;
         });
 
+        \Event::listen('ionic.calendar_handler', function() {
+            return array('sport' => new \Ionic\Calendar\Sport);
+        });
+
         $root = path('app').'packages'.DS.'sport'.DS;
 
         // Class mappings
@@ -222,6 +226,7 @@ class Sport_Package extends \Ionic\Package {
             'Model\\Monthpick' => $root.'models'.DS.'monthpick.php',
             'Ionic\\BetHandler' => $root.'libraries'.DS.'Ionic'.DS.'BetHandler.php',
             'Ionic\\TableManager' => $root.'libraries'.DS.'Ionic'.DS.'TableManager.php',
+            'Ionic\\Calendar\\Sport' => $root.'libraries'.DS.'Ionic'.DS.'Calendar'.DS.'Sport.php',
             'Ionic\\Widget\\Birthdays' => $root.'libraries'.DS.'Ionic'.DS.'Widget'.DS.'Birthdays.php',
             'Ionic\\Widget\\Injuries' => $root.'libraries'.DS.'Ionic'.DS.'Widget'.DS.'Injuries.php',
             'Ionic\\Widget\\Match' => $root.'libraries'.DS.'Ionic'.DS.'Widget'.DS.'Match.php',

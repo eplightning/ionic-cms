@@ -362,7 +362,7 @@ class Admin_Matches_Controller extends Admin_Controller {
 
     public function action_autocomplete($id)
     {
-        if (!Auth::can('admin_matches'))
+        if (!Auth::can('admin_access'))
             return Response::error(403);
 
         $grid = $this->make_grid();

@@ -1,0 +1,32 @@
+<h2>Wybór rodzaju źródła</h2>
+<div class="section">
+	<div class="theader">
+		<div class="theader2">Wybór</div>
+	</div>
+	<div class="section-content">
+		<select id="calendar-src">
+		{% for k, v in sources %}
+			<option value="{{ k }}">{{ v }}</option>
+		{% endfor %}
+		</select>
+	</div>
+</div>
+<div class="toolbar ui-widget-header ui-corner-all">
+	<input type="submit" name="submit" style="width: auto" value="Zapisz" id="calendar-redirect" />
+</div>
+<script type="text/javascript">
+$(document).ready(function() {
+	$('#calendar-redirect').button().click(function(event) {
+		event.preventDefault();
+
+		window.location.href = IONIC_BASE_URL+'/admin/calendar/add_source/'+$('#calendar-src').val();
+	});
+});
+</script>
+<noscript>
+<ul>
+{% for k, v in sources %}
+	<li><a href="admin/calendar/add_source/{{ k }}">{{ v }}</a></li>
+{% endfor %}
+</ul>
+</noscript>

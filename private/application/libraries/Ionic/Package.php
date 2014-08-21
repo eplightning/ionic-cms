@@ -19,6 +19,7 @@ namespace Ionic;
  * array       ionic.karma_valid(string type)
  * array       ionic.notification_add(string type, User user, array parameters)
  * array       ionic.pagemap_links(string format)
+ * Ionic\Cal.. ionic.calendar_handler(void)
  *
  * @package Ionic
  * @author  Wrexdot <wrexdot@gmail.com>
@@ -66,7 +67,7 @@ abstract class Package {
      */
     public function change_state($state, \Ionic\Package\API $api)
     {
-        
+
     }
 
     /**

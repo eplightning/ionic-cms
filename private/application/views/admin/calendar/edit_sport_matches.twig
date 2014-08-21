@@ -1,0 +1,95 @@
+<h2>Edycja źródła wydarzeń</h2>
+<form action="{{ action_uri }}" method="post">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Dane podstawowe</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="title">Tytuł<br /><small>Tytuł wydarzenia</small></label>
+				<div class="right">
+				{% if errors.has('title') %}
+					<div class="error">{{ errors.first('title') }}</div>
+				{% endif %}
+				<input type="text" id="title" name="title" value="{% if old_data.title != '' %}{{ old_data.title|e }}{% else %}{{ object.title }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="date_start">Data od<br /><small>Od którego dnia mają się zaczynać wydarzenia</small></label>
+				<div class="right">
+				{% if errors.has('date_start') %}
+					<div class="error">{{ errors.first('date_start') }}</div>
+				{% endif %}
+				<input class="datepicker" type="text" id="date_start" name="date_start" value="{% if old_data.date_start != '' %}{{ old_data.date_start|e }}{% else %}{{ object.date_start }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="date_end">Data do<br /><small>Do kiedy mają być pobierane wydarzenia</small></label>
+				<div class="right">
+				{% if errors.has('date_end') %}
+					<div class="error">{{ errors.first('date_end') }}</div>
+				{% endif %}
+				<input class="datepicker" type="text" id="date_end" name="date_end" value="{% if old_data.date_end != '' %}{{ old_data.date_end|e }}{% else %}{{ object.date_end }}{% endif %}" />
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Klub/rozgrywki/sezon</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="team">Klub<br /><small>(Opcjonalne) Prowadź nazwę klubu ,którego spotkania mają być pobrane</small></label>
+				<div class="right">
+				{% if errors.has('team') %}
+					<div class="error">{{ errors.first('team') }}</div>
+				{% endif %}
+				<input type="text" id="team" name="team" value="{% if old_data.team != '' %}{{ old_data.team|e }}{% else %}{{ options.team }}{% endif %}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="competition_id">Rozgrywki<br /><small>Rozgrywki (opcjonalne)</small></label>
+				<div class="right">
+				{% if errors.has('competition_id') %}
+					<div class="error">{{ errors.first('competition_id') }}</div>
+				{% endif %}
+				<select id="competition_id" name="competition_id">
+					<option value="">---</option>
+				{% for k, v in related_competition_id %}
+					<option value="{{ k }}"{% if (old_data.competition_id == k) or (options.competition == k and old_data.competition_id == '') %} selected="selected"{% endif %}>{{ v|e }}</option>
+				{% endfor %}
+				</select>
+				</div>
+			</div>
+			<div class="elem">
+				<label for="season_id">Sezon<br /><small>Sezon (opcjonalne)</small></label>
+				<div class="right">
+				{% if errors.has('season_id') %}
+					<div class="error">{{ errors.first('season_id') }}</div>
+				{% endif %}
+				<select id="season_id" name="season_id">
+					<option value="">---</option>
+				{% for k, v in related_season_id %}
+					<option value="{{ k }}"{% if (old_data.season_id == k) or (options.season == k and old_data.season_id == '') %} selected="selected"{% endif %}>{{ v|e }}</option>
+				{% endfor %}
+				</select>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	$('input[type="submit"]').button();
+	$('#team').autocomplete({
+		minLength: 2,
+		source: IONIC_BASE_URL+'admin/matches/autocomplete/team'
+	});
+	$('.datepicker').datepicker({dateFormat: 'yy-mm-dd' });
+});
+</script>

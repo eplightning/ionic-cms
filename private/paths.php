@@ -18,19 +18,19 @@ chdir(__DIR__);
 // --------------------------------------------------------------
 if ( ! defined('DS'))
 {
-	define('DS', DIRECTORY_SEPARATOR);
+    define('DS', DIRECTORY_SEPARATOR);
 }
 
 // --------------------------------------------------------------
 // Define the path to the base directory.
 // --------------------------------------------------------------
 $GLOBALS['laravel_paths'] = array(
-	'base' => __DIR__.DS,
-	'app' => __DIR__.DS.'application'.DS,
-	'sys' => __DIR__.DS.'laravel'.DS,
-	'bundle' => __DIR__.DS.'bundles'.DS,
-	'storage' => __DIR__.DS.'storage'.DS,
-	'public' => realpath('./../public').DS
+    'base' => __DIR__.DS,
+    'app' => __DIR__.DS.'application'.DS,
+    'sys' => __DIR__.DS.'laravel'.DS,
+    'bundle' => __DIR__.DS.'bundles'.DS,
+    'storage' => __DIR__.DS.'storage'.DS,
+    'public' => realpath('./../public').DS
 );
 
 /**
@@ -45,7 +45,7 @@ $GLOBALS['laravel_paths'] = array(
  */
 function path($path)
 {
-	return $GLOBALS['laravel_paths'][$path];
+    return $GLOBALS['laravel_paths'][$path];
 }
 
 /**
@@ -57,5 +57,5 @@ function path($path)
  */
 function set_path($path, $value)
 {
-	$GLOBALS['laravel_paths'][$path] = $value;
+    $GLOBALS['laravel_paths'][$path] = $value;
 }

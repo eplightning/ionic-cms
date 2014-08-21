@@ -1,0 +1,34 @@
+<div class="ionic-calendar-container">
+	<ul class="ionic-calendar ionic-calendar-tiny">
+		{% if padding_start > 0 %}
+		{% for i in 0..(padding_start - 1) %}
+		<li class="ionic-calendar-day"><div class="ionic-calendar-inner ionic-calendar-day-padding"></div></li>
+		{% endfor %}
+		{% endif %}
+		{% for i in 1..number_of_days %}
+		<li class="ionic-calendar-day">
+			<span class="ionic-calendar-day-num{% if i == day %} ionic-calendar-day-today{% endif %}">{{ i }}</span>
+			{% set events_count = events[i]|length %}
+			{% if events_count == 0 %}
+			<div class="ionic-calendar-inner">
+			</div>
+			{% elseif events_count == 1 %}
+			<div class="ionic-calendar-inner"{% if events[i][0].image %} style="background-image: url({{ events[i][0].image }})"{% endif %}>
+				<a href="{{ events[i][0].url }}">{{ events[i][0].title }}</a>
+				{#<br />
+				<span class="ionic-calendar-details">{{ events[i][0].details }}</span>#}
+			</div>
+			{% else %}
+			<div class="ionic-calendar-inner">
+			    <a href="calendar/day/{{ year }}-{{ month }}-{{ i }}">{{ events_count }} wydarzenia</a>
+			</div>
+			{% endif %}
+		</li>
+		{% endfor %}
+		{% if padding_end > 0 %}
+		{% for i in 0..(padding_end - 1) %}
+		<li class="ionic-calendar-day"><div class="ionic-calendar-inner ionic-calendar-day-padding"></div></li>
+		{% endfor %}
+		{% endif %}
+	</ul>
+</div>

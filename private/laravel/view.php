@@ -173,10 +173,6 @@ class View implements ArrayAccess {
 		{
 			return $path;
 		}
-		elseif (file_exists($path = $directory.$view.BLADE_EXT))
-		{
-			return $path;
-		}
 	}
 
 	/**

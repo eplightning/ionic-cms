@@ -24,7 +24,6 @@ class Notifications {
             {
                 if ($parameters['setting_email'] and \Config::get('advanced.notifications_email', true))
                 {
-
                     ionic_mail(4, $parameters['email'], array(
                         ':name'    => $parameters['display_name'],
                         ':sender'  => $current_user->display_name,

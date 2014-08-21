@@ -145,7 +145,6 @@ return array(
         'Authenticator' => 'Laravel\\Auth\\Drivers\\Driver',
         'Asset'         => 'Ionic\\Asset',
         'Autoloader'    => 'Laravel\\Autoloader',
-        'Blade'         => 'Laravel\\Blade',
         'Bundle'        => 'Laravel\\Bundle',
         'Cache'         => 'Laravel\\Cache',
         'Config'        => 'Laravel\\Config',

@@ -661,6 +661,116 @@ img.ionic-right {
 	font-weight: bold;
 }
 
+.ionic-calendar-container {
+	overflow: hidden;
+	clear: both;
+	width: 100%;
+}
+
+.ionic-calendar-captions, .ionic-calendar {
+	overflow: hidden;
+	clear: both;
+	list-style: none;
+	margin: 0px;
+	padding: 0px;
+	width: 100%;
+}
+
+.ionic-calendar-captions li {
+	float: left;
+	width: 14.285%;
+	padding: 0px;
+	margin: 0px;
+	overflow: hidden;
+}
+
+.ionic-calendar-captions li span {
+	display: block;
+	text-align: center;
+	border: 1px solid #EDEDED;
+	border-left: 0px;
+	padding: 8px 0px;
+}
+
+.ionic-calendar-captions li:first-child span {
+	border-left: 1px solid #EDEDED;
+}
+
+.ionic-calendar-day {
+	float: left;
+	width: 14.285%;
+	padding: 0px;
+	margin: 0px;
+	height: 130px;
+	overflow: hidden;
+	position: relative;
+	background: #FFF;
+}
+
+.ionic-calendar-day .ionic-calendar-day-padding {
+	background: #F9F9F9 !important;
+}
+
+.ionic-calendar-day-num {
+	display: inline-block;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	background: #EDEDED;
+	padding: 2px 5px 2px 5px;
+	font-size: 0.9em;
+	-webkit-border-bottom-right-radius: 6px;
+	-moz-border-radius-bottomright: 6px;
+	border-bottom-right-radius: 6px;
+}
+
+.ionic-calendar-day-today {
+	font-weight: bold;
+}
+
+.ionic-calendar-inner {
+	border: 1px solid #EDEDED;
+	border-left: 0px;
+	border-top: 0px;
+	padding: 1.5em 5px 5px 5px;
+	overflow: hidden;
+	height: 100%;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+	box-sizing: border-box;
+	background-repeat: no-repeat;
+	background-position: 130% 120%;
+}
+
+.ionic-calendar-day:nth-child(even) .ionic-calendar-inner {
+	background-color: #FDFDFD;
+}
+
+.ionic-calendar-day:nth-child(7n + 1) .ionic-calendar-inner, .ionic-calendar-day:first-child .ionic-calendar-inner {
+	border-left: 1px solid #EDEDED;
+}
+
+.ionic-calendar-inner a {
+	cursor: pointer;
+}
+
+.ionic-calendar-details {
+	font-size: 0.8em;
+}
+
+.ionic-calendar-tiny {
+    border-top: 1px solid #EDEDED;
+}
+
+.ionic-calendar-tiny .ionic-calendar-inner {
+    background-position: 140% 240%;
+}
+
+.ionic-calendar-tiny .ionic-calendar-day {
+    height: 80px;
+}
+
 .bbcode .markItUpButton1 a {
 	background-image:url(../img/set/bold.png);
 }

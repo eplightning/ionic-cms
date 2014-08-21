@@ -1,0 +1,14 @@
+<div class="ionic-news-view">
+	<div class="ionic-news-left">
+		{% if options.image %}
+		<img src="public/upload/calendar/{{ options.image }}" alt="" />
+		{% endif %}
+	</div>
+	<div class="ionic-news-right">
+		<h2><a>{{ event.title }}</a></h2>
+		<div class="ionic-news-info">
+			<span class="ionic-news-date">{{ event.date_start|date('short') }}</span>
+		</div>
+		{{ options.content }}
+	</div>
+</div>

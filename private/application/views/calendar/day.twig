@@ -1,0 +1,10 @@
+<div class="ionic-box">
+	<h2>Wydarzenia w dniu {{ date }}</h2>
+	<ul class="ionic-list">
+		{% for event in events %}
+		<li>
+			<a href="{{ event.url }}">{{ event.title }}</a>
+		</li>
+		{% endfor %}
+	</ul>
+</div>

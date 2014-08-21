@@ -183,7 +183,8 @@ class Widget {
                 'poll'      => 'Sonda',
                 'rotation'  => 'Rotacja',
                 'shoutbox'  => 'Shoutbox',
-                'users'     => 'Użytkownicy'
+                'users'     => 'Użytkownicy',
+                'calendar'  => 'Kalendarz'
             );
 
             foreach (\Event::fire('ionic.widget_name') as $r)

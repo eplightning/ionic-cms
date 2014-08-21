@@ -13,7 +13,7 @@ class Thumbnail_Controller extends Controller {
      * @var array
      */
     protected $allowed_types = array(
-        'files', 'photos'
+        'calendar', 'files', 'photos'
     );
 
     /**

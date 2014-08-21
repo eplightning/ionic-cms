@@ -1,0 +1,65 @@
+<h2>Dodawanie wydarzenia</h2>
+<form action="admin/calendar/add" method="post" enctype="multipart/form-data">
+	<div class="section">
+		<div class="theader">
+			<div class="theader2">Dane</div>
+		</div>
+		<div class="section-content">
+			<div class="elem">
+				<label for="title">Tytuł<br /><small>Tytuł wydarzenia</small></label>
+				<div class="right">
+				{% if errors.has('title') %}
+					<div class="error">{{ errors.first('title') }}</div>
+				{% endif %}
+				<input type="text" id="title" name="title" value="{{ old_data.title|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="date_start">Data<br /><small>Data wydarzenia</small></label>
+				<div class="right">
+				{% if errors.has('date_start') %}
+					<div class="error">{{ errors.first('date_start') }}</div>
+				{% endif %}
+				<input class="datepicker" type="text" id="date_start" name="date_start" value="{{ old_data.date_start|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="url">Zewnętrzny link<br /><small>Jeśli ustawione nie będzie możliwości podglądu treści wydarzenia (opcjonalne)</small></label>
+				<div class="right">
+				{% if errors.has('url') %}
+					<div class="error">{{ errors.first('url') }}</div>
+				{% endif %}
+				<input type="text" id="url" name="url" value="{{ old_data.url|e }}" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="image">Obrazek<br /><small>Obrazek do tego wydarzenia (opcjonalne)</small></label>
+				<div class="right">
+				{% if errors.has('image') %}
+					<div class="error">{{ errors.first('image') }}</div>
+				{% endif %}
+				<input type="file" id="image" name="image" />
+				</div>
+			</div>
+			<div class="elem">
+				<label for="event_content">Treść<br /><small>Treść wydarzenia (opcjonalne)</small></label>
+				<div class="right">
+				{% if errors.has('event_content') %}
+					<div class="error">{{ errors.first('event_content') }}</div>
+				{% endif %}
+				{{ editor('event_content', old_data.event_content|e ) }}
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="toolbar ui-widget-header ui-corner-all">
+		{{ form_token() }}
+		<input type="submit" name="submit" style="width: auto" value="Zapisz" />
+	</div>
+</form>
+<script type="text/javascript">
+$(function(){
+	$('input[type="submit"]').button();
+	$('.datepicker').datepicker({dateFormat: 'yy-mm-dd' });
+});
+</script>

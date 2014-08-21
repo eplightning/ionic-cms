@@ -123,7 +123,7 @@ class Admin_Players_Controller extends Admin_Controller {
 
     public function action_autocomplete($id)
     {
-        if (!Auth::can('admin_players'))
+        if (!Auth::can('admin_access'))
             return Response::error(403);
 
         $grid = $this->make_grid();

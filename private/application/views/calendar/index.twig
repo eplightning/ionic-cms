@@ -1,0 +1,91 @@
+<div class="ionic-box">
+	<h2>Kalendarz</h2>
+	<div class="ionic-calendar-container">
+		<ul class="ionic-calendar-captions">
+			<li><span>poniedziałek</span></li>
+			<li><span>wtorek</span></li>
+			<li><span>środa</span></li>
+			<li><span>czwartek</span></li>
+			<li><span>piątek</span></li>
+			<li><span>sobota</span></li>
+			<li><span>niedziela</span></li>
+		</ul>
+		<ul class="ionic-calendar">
+			{% if padding_start > 0 %}
+			{% for i in 0..(padding_start - 1) %}
+			<li class="ionic-calendar-day"><div class="ionic-calendar-inner ionic-calendar-day-padding"></div></li>
+			{% endfor %}
+			{% endif %}
+			{% for i in 1..number_of_days %}
+			<li class="ionic-calendar-day">
+				<span class="ionic-calendar-day-num{% if i == day %} ionic-calendar-day-today{% endif %}">{{ i }}</span>
+				{% set events_count = events[i]|length %}
+				{% if events_count == 0 %}
+				<div class="ionic-calendar-inner">
+				</div>
+				{% elseif events_count == 1 %}
+				<div class="ionic-calendar-inner"{% if events[i][0].image %} style="background-image: url({{ events[i][0].image }})"{% endif %}>
+					<a href="{{ events[i][0].url }}">{{ events[i][0].title }}</a>
+					<br />
+					<span class="ionic-calendar-details">{{ events[i][0].details }}</span>
+				</div>
+				{% else %}
+				<div class="ionic-calendar-inner">
+				    <a href="calendar/day/{{ year }}-{{ month }}-{{ i }}">{{ events_count }} wydarzenia</a>
+				</div>
+				{% endif %}
+			</li>
+			{% endfor %}
+			{% if padding_end > 0 %}
+			{% for i in 0..(padding_end - 1) %}
+			<li class="ionic-calendar-day"><div class="ionic-calendar-inner ionic-calendar-day-padding"></div></li>
+			{% endfor %}
+			{% endif %}
+		</ul>
+	</div>
+</div>
+<div class="ionic-form">
+	<form action="calendar" method="post" id="form-calendar">
+		<div class="ionic-form-legend">Miesiąc i rok</div>
+		<div class="ionic-form-elem">
+			<label for="cal-month">Miesiąc:</label>
+			<select name="month" id="cal-month">
+				<option value="jan"{% if month == '01' %} selected="selected"{% endif %}>styczeń</option>
+				<option value="feb"{% if month == '02' %} selected="selected"{% endif %}>luty</option>
+				<option value="mar"{% if month == '03' %} selected="selected"{% endif %}>marzec</option>
+				<option value="apr"{% if month == '04' %} selected="selected"{% endif %}>kwiecień</option>
+				<option value="may"{% if month == '05' %} selected="selected"{% endif %}>maj</option>
+				<option value="jun"{% if month == '06' %} selected="selected"{% endif %}>czerwiec</option>
+				<option value="jul"{% if month == '07' %} selected="selected"{% endif %}>lipiec</option>
+				<option value="aug"{% if month == '08' %} selected="selected"{% endif %}>sierpień</option>
+				<option value="sep"{% if month == '09' %} selected="selected"{% endif %}>wrzesień</option>
+				<option value="oct"{% if month == '10' %} selected="selected"{% endif %}>październik</option>
+				<option value="nov"{% if month == '11' %} selected="selected"{% endif %}>listopad</option>
+				<option value="dec"{% if month == '12' %} selected="selected"{% endif %}>grudzień</option>
+			</select>
+		</div>
+		<div class="ionic-form-elem">
+			<label for="cal-year">Rok:</label>
+			<input type="text" maxlength="4" name="year" id="cal-year" value="{{ year }}" />
+		</div>
+		<div class="ionic-form-elem">
+			<input type="submit" name="submit" class="submit" value="Wyświetl" />
+		</div>
+	</form>
+</div>
+<script type="text/javascript">
+$(document).ready(function() {
+	$('#form-calendar').submit(function(event) {
+		event.preventDefault();
+
+		var year = parseInt($('#cal-year').val());
+
+		if (year < 1900 || year > 2100)
+		{
+			return;
+		}
+
+		window.location.href = IONIC_BASE_URL+'calendar/index/'+$('#cal-month').val()+'/'+year;
+	});
+});
+</script>

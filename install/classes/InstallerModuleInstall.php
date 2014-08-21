@@ -306,6 +306,8 @@ class InstallerModuleInstall extends InstallerModule {
             'private/storage/min',
             'private/storage/twig',
             'public/upload/avatars',
+            'public/upload/calendar',
+            'public/upload/calendar/thumbnail',
             'public/upload/files',
             'public/upload/files/thumbnail',
             'public/upload/images',

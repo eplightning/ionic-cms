@@ -2,7 +2,6 @@
 class Auth extends \Ionic\Auth { }
 class Asset extends \Ionic\Asset { }
 class Autoloader extends Laravel\Autoloader { }
-class Blade extends Laravel\Blade { }
 class Bundle extends Laravel\Bundle { }
 class Cache extends Laravel\Cache { }
 class Config extends Laravel\Config { }
@@ -32,7 +31,6 @@ class Response extends Laravel\Response { }
 class Route extends Laravel\Routing\Route { }
 class Router extends Laravel\Routing\Router { }
 class Schema extends Laravel\Database\Schema { }
-class Section extends Laravel\Section { }
 class Session extends Laravel\Session { }
 class Str extends Laravel\Str { }
 class Task extends Laravel\CLI\Tasks\Task { }
