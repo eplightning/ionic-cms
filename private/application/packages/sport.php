@@ -132,11 +132,9 @@ class Sport_Package extends \Ionic\Package {
 
         // Current season
         IoC::singleton('current_season', function() {
-            if (\Cache::has('current-season'))
-            {
-                return \Cache::get('current-season');
-            }
-            else
+            $season = \Cache::get('current-season');
+
+            if (!$season)
             {
                 $season = \DB::table('seasons')->where('is_active', '=', 1)->first('*');
 
@@ -152,9 +150,9 @@ class Sport_Package extends \Ionic\Package {
                 }
 
                 \Cache::put('current-season', $season);
-
-                return $season;
             }
+
+            return $season;
         });
 
         // Pagemap

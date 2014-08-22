@@ -76,15 +76,13 @@ class Admin_Controller extends Controller {
         $response->content->with('scripts', Asset::scripts());
 
         // Menu
-        if (!Cache::has('admin-menu'))
+        $menu = Cache::get('admin-menu');
+
+        if ($menu === null)
         {
             $menu = Model\AdminMenu::retrieve();
 
             Cache::put('admin-menu', $menu);
-        }
-        else
-        {
-            $menu = Cache::get('admin-menu');
         }
 
         // Determine active admin module and remove unaccessible ones

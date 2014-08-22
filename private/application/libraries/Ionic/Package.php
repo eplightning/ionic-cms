@@ -1,6 +1,10 @@
 <?php
 namespace Ionic;
 
+use Cache;
+use DB;
+use Str;
+
 /**
  * Ionic package
  *
@@ -122,20 +126,18 @@ abstract class Package {
      */
     public static function load()
     {
-        if (\Cache::has('packages'))
-        {
-            $packages = \Cache::get('packages');
-        }
-        else
+        $packages = Cache::get('packages');
+
+        if (empty($packages))
         {
             $packages = array();
 
-            foreach (\DB::table('packages')->where('is_disabled', '=', 0)->where('id', '<>', 'core')->get('id') as $pkg)
+            foreach (DB::table('packages')->where('is_disabled', '=', 0)->where('id', '<>', 'core')->get('id') as $pkg)
             {
                 $packages[] = $pkg->id;
             }
 
-            \Cache::put('packages', $packages);
+            Cache::put('packages', $packages);
         }
 
         foreach ($packages as $pkg)
@@ -145,15 +147,10 @@ abstract class Package {
 
             require_once path('app').'packages/'.$pkg.'.php';
 
-            $pkg_class = '\\'.\Str::classify($pkg).'_Package';
-
-            if (!class_exists($pkg_class))
-                continue;
+            $pkg_class = '\\'.Str::classify($pkg).'_Package';
 
             self::$packages[$pkg] = new $pkg_class;
-
-            if (self::$packages[$pkg] instanceof Package)
-                self::$packages[$pkg]->init_package();
+            self::$packages[$pkg]->init_package();
         }
     }
 

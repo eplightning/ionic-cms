@@ -787,9 +787,11 @@ IoC::singleton('online', function() {
 });
 
 // We need config before we do any package initialization
-if (Cache::has('db-config'))
+$config = Cache::get('db-config');
+
+if ($config)
 {
-    Config::set_from_array(Cache::get('db-config'));
+    Config::set_from_array($config);
 }
 else
 {
@@ -798,9 +800,9 @@ else
     Config::set_from_array($config);
 
     Cache::put('db-config', $config);
-
-    unset($config);
 }
+
+unset($config);
 
 // Update timezone
 date_default_timezone_set(Config::get('application.timezone'));

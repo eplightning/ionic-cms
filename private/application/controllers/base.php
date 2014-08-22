@@ -67,11 +67,9 @@ abstract class Base_Controller extends Controller {
         $response->content->with('scripts', Asset::scripts());
 
         // Menu
-        if (Cache::has('menu'))
-        {
-            $menu = Cache::get('menu');
-        }
-        else
+        $menu = Cache::get('menu');
+
+        if ($menu === null)
         {
             $menu = Ionic\Tree::build_tree('menu', 0, Config::get('limits.menu', 1));
 

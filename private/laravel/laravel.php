@@ -1,4 +1,6 @@
-<?php namespace Laravel;
+<?php
+namespace Laravel;
+
 use Closure;
 
 /*
@@ -45,7 +47,7 @@ class IoC {
      */
     public static function register($name, $resolver = null, $singleton = false)
     {
-        if (is_null($resolver)) $resolver = $name;
+        if ($resolver === null) $resolver = $name;
 
         static::$registry[$name] = compact('resolver', 'singleton');
     }
@@ -461,7 +463,7 @@ class Config {
     {
         if (isset(static::$items[$name])) return static::$items[$name];
 
-        if (file_exists(path('app').'config'.DS.$name.'.php'))
+        if (is_file(path('app').'config'.DS.$name.'.php'))
         {
             static::$items[$name] = require path('app').'config'.DS.$name.'.php';
         }
@@ -480,16 +482,9 @@ class Config {
 
     public static function get($item, $default = null)
     {
-        if (strpos($item, '.') !== FALSE)
-        {
-            $item = explode('.', $item, 2);
-        }
-        else
-        {
-            $item = array($item, null);
-        }
+        $item = explode('.', $item, 2);
 
-        if (!$item[1])
+        if (empty($item[1]))
         {
             if (isset(static::$database[$item[0]]))
             {
@@ -499,12 +494,11 @@ class Config {
             return static::file($item[0]);
         }
 
-        if (isset(static::$database[$item[0]][$item[1]])) return static::$database[$item[0]][$item[1]];
+        if (isset(static::$database[$item[0]][$item[1]]))
+            return static::$database[$item[0]][$item[1]];
 
         if (!isset(static::$items[$item[0]]))
-        {
             static::file($item[0]);
-        }
 
         return isset(static::$items[$item[0]][$item[1]]) ? static::$items[$item[0]][$item[1]] : value($default);
     }
@@ -771,9 +765,10 @@ class Autoloader {
 spl_autoload_register(array('Laravel\\Autoloader', 'load'));
 
 Autoloader::namespaces(array(
-    'Laravel' => path('sys'),
-    'Symfony\Component\Console' => path('sys').'vendor/Symfony/Component/Console',
-    'Symfony\Component\HttpFoundation' => path('sys').'vendor/Symfony/Component/HttpFoundation'));
+    'Laravel'                          => path('sys'),
+    'Symfony\Component\Console'        => path('sys').'vendor/Symfony/Component/Console',
+    'Symfony\Component\HttpFoundation' => path('sys').'vendor/Symfony/Component/HttpFoundation'
+));
 
 if (defined('HACK_BROKENFCGI'))
 {
