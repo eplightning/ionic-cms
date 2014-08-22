@@ -41,12 +41,13 @@ class Match_Controller extends Base_Controller {
         $this->view = View::make('match.report', array(
                     'match'       => $match,
                     'report_data' => empty($match->report_data) ? array() : unserialize($match->report_data)
-                ));
+        ));
 
         if ($match->report_slug)
         {
             $news = DB::table('news')->left_join('users', 'users.id', '=', 'news.user_id')
-                            ->where('news.slug', '=', $match->report_slug)->first(array('news.*', 'users.display_name', 'users.slug as user_slug'));
+                                    ->where('news.slug', '=', $match->report_slug)
+                                    ->first(array('news.*', 'users.display_name', 'users.slug as user_slug'));
 
             if ($news)
             {
@@ -54,9 +55,57 @@ class Match_Controller extends Base_Controller {
                 {
                     DB::table('news')->where('id', '=', $news->id)->update(array('views' => $news->views + 1));
                 }
-                
-                $this->view->with('news', $news);
-                $this->view->with('comments', $this->page->make_comments($news->id, 'news'));
+
+                // Tags
+                $tags = array();
+
+                foreach (DB::table('news_tags')->join('tags', 'tags.id', '=', 'news_tags.tag_id')->where('news_id', '=', $news->id)
+                        ->get(array('tags.title', 'tags.id', 'tags.slug')) as $t)
+                {
+                    $tags[$t->id] = $t;
+                }
+
+                // Similar news
+                if (empty($tags))
+                {
+                    $similar = DB::table('news')->where('is_published', '=', 1)
+                            ->where('id', '<>', $news->id)
+                            ->order_by('id', 'desc')
+                            ->take(3)
+                            ->get(array('title', 'slug', 'created_at', 'comments_count', 'external_url'));
+                }
+                else
+                {
+                    $similar = DB::table('news_tags')->distinct()
+                            ->where('is_published', '=', 1)
+                            ->where('id', '<>', $news->id)
+                            ->order_by('id', 'desc')
+                            ->take(3)
+                            ->where_in('tag_id', array_keys($tags))
+                            ->join('news', 'news_id', '=', 'id')
+                            ->get(array('title', 'slug', 'created_at', 'comments_count', 'external_url'));
+                }
+
+                // Open graph
+                if (Config::get('advanced.og_bigimage', false) and $news->big_image)
+                {
+                    $this->page->set_property('og:image', URL::base().'/public/upload/images/'.$news->big_image);
+                }
+                elseif ($news->small_image)
+                {
+                    $this->page->set_property('og:image', URL::base().'/public/upload/images/'.$news->small_image);
+                }
+
+                $this->page->set_property('og:type', 'article');
+                $this->page->set_property('og:description', str_replace('"', '&quot;', strip_tags(html_entity_decode($news->content_intro, ENT_NOQUOTES))));
+
+                $this->view->with(array(
+                    'news'      => $news,
+                    'tags'      => $tags,
+                    'similar'   => $similar,
+                    'can_karma' => Model\Karma::can_karma($news->id, 'news'),
+                    'comments'  => $this->page->make_comments($news->id, 'news')
+                ));
             }
             else
             {

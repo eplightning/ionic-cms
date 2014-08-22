@@ -55,23 +55,66 @@
 	{% endif %}
 </div>
 {% if news %}
-<div class="ionic-box">
-	<div style="font-size: 0.8em">
-		<div class="ionic-left">
-			Napisane {{ news.created_at|date }} przez <a href="{{ make('user', news.user_slug) }}">{{ news.display_name }}</a>
+<div class="ionic-news-view">
+	<div class="ionic-news-left">
+		{% if news.big_image %}
+		<img src="public/upload/images/{{ news.big_image }}" title="{{ news.image_text }}" alt="{{ news.image_text }}" />
+		{% elseif news.small_image %}
+		<img src="public/upload/images/{{ news.small_image }}" title="{{ news.image_text }}" alt="{{ news.image_text }}" />
+		{% endif %}
+	</div>
+	<div class="ionic-news-right">
+		<h2><a href="{{ make('news', news.slug, news.external_url) }}">{{ news.title }}</a></h2>
+		<div class="ionic-news-info">
+			<span class="ionic-news-date">{{ news.created_at|date }}</span>
+			<span class="ionic-news-comments">{{ news.comments_count }} komentarzy</span>
+			<span class="ionic-news-author"><a href="users/profile/{{ news.user_slug }}">{{ news.display_name }}</a></span>
+			<span class="ionic-news-source">źródło: {{ news.source ? news.source : 'brak' }}</span>
 		</div>
-		<div class="ionic-right">
-			<a href="news/format/{{ news.id }}/printable">Wersja do druku</a> / <a href="news/format/{{ news.id }}/pdf">Wersja PDF</a>
+		{{ news.content }}
+		<div class="ionic-news-foot">
+			<div class="ionic-karma">
+				Karma: {% if news.karma >= 0 %}<span id="karma-indicator" style="color: green">+{{ news.karma }}</span>{% else %}<span id="karma-indicator" style="color: red">{{ news.karma }}</span>{% endif %}
+				{% if can_karma %}<span id="karma-options">( <a id="karma-add">[+]</a> / <a id="karma-minus">[-]</a> )</span>{% endif %}
+			</div>
+			<div class="ionic-tags">
+				Tagi:
+				{% for tag in tags %}{% if loop.index0 != 0 %}, {% endif %}
+				<a href="news/tag/{{ tag.slug }}">{{ tag.title }}</a>
+				{% endfor %}
+			</div>
 		</div>
 	</div>
-	<div class="ionic-post-content">
-		{% if news.big_image %}
-		<img src="public/upload/images/{{ news.big_image }}" style="margin-right: 10px; float: left" alt="" />
-		{% elseif news.small_image %}
-		<img src="public/upload/images/{{ news.small_image }}" style="margin-right: 10px; float: left" alt="" />
-		{% endif %}
-		{{ news.content }}
+</div>
+<div class="ionic-news-panels">
+	<div class="ionic-news-panel">
+		<h3>Podobne newsy</h3>
+		<ul class="ionic-list">
+		{% for n in similar %}
+		<li>
+		<a href="{{ make('news', n.slug, n.external_url) }}">{{ n.title }} ({{ n.comments_count }})</a>
+		<br />
+		<small>{{ n.created_at|date }}</small>
+		</li>
+		{% endfor %}
+		</ul>
+	</div>
+	<div class="ionic-news-panel ionic-news-panel-right">
+		<h3>Inne wersje</h3>
+		<ul class="ionic-list">
+			<li>
+				<a href="news/format/{{ news.id }}/printable">Wersja do druku</a>
+			</li>
+			<li>
+				<a href="news/format/{{ news.id }}/pdf">Wersja PDF</a>
+			</li>
+		</ul>
 	</div>
 </div>
 {{ comments }}
+<script type="text/javascript">
+$(function() {
+	IonicPage.initKarma({{ news.id }}, 'news');
+});
+</script>
 {% endif %}
