@@ -27,10 +27,11 @@ class Installer {
     /**
      * Add user
      *
-     * @param  string  $login
-     * @param  string  $password
-     * @param  string  $email
-     * @param  boolean $admin [optional]
+     * @param   string      $login
+     * @param   string      $password
+     * @param   string      $email
+     * @param   boolean     $admin
+     * @throws  Exception
      */
     public function addUser($login, $password, $email, $admin = true)
     {
@@ -166,31 +167,35 @@ class Installer {
         $success = true;
 
         // New list
-        $new = array(
-        );
+        $new = array();
 
         // Iterate
         foreach ($list as $f)
         {
-            if (!is_writable(IONIC_PATH.$f))
+            $writeable = is_writable(IONIC_PATH.$f);
+
+            if (!$writeable)
                 $success = false;
 
             $new[] = array(
                 'file'      => $f,
-                'writeable' => is_writable(IONIC_PATH.$f));
+                'writeable' => $writeable
+            );
         }
 
         // Return
         return array(
             'success' => $success,
-            'files'   => $new);
+            'files'   => $new
+        );
     }
 
     /**
      * Execute MySQL scheme
      *
-     * @param object $file
-     * @return
+     * @param   string      $file
+     * @param   string      $prefix
+     * @throws  Exception
      */
     public function executeScheme($file, $prefix = 'ionic_')
     {
@@ -220,7 +225,7 @@ class Installer {
         for ($i = 0; $i <= $count; $i++)
         {
             // Prefix
-            if ($file[$i] == '{' and $file[$i + 1] == 'd' and $file[$i + 2] == 'b' and $file[$i + 3] == 'p' and $file[$i + 4] == '}')
+            if (substr($file, $i, 5) == '{dbp}')
             {
                 // Add prefix
                 $query .= $prefix;
@@ -233,7 +238,7 @@ class Installer {
             }
 
             // String
-            if ($file[$i] == '"' OR $file[$i] == "'")
+            if ($file[$i] == '"' or $file[$i] == "'")
             {
                 if (!$inString)
                 {
@@ -274,13 +279,13 @@ class Installer {
     public function handleInstallation(InstallerModule $mod)
     {
         // Blocked?
-        if (file_exists(IONIC_PATH.'public/upload/install.lock'))
+        if (is_file(IONIC_PATH.'public/upload/install.lock'))
         {
             echo $this->parseView('layout', array(
                 'content'     => $this->parseView('blocked'),
-                'steps'       => array(
-                    1 => 'Informacja'),
-                'currentStep' => 1));
+                'steps'       => array(1 => 'Informacja'),
+                'currentStep' => 1
+            ));
 
             return;
         }
@@ -321,7 +326,8 @@ class Installer {
         $content = $this->parseView('layout', array(
             'content'     => $this->view,
             'steps'       => $mod->getStepList(),
-            'currentStep' => $_SESSION['step']));
+            'currentStep' => $_SESSION['step']
+        ));
 
         // Next step?
         if ($this->next_step)
@@ -348,10 +354,11 @@ class Installer {
     }
 
     /**
-     * Modify WxSport config
+     * Modify Ionic config
      *
-     * @param string $file
-     * @param array  $values
+     * @param   string      $file
+     * @param   array       $values
+     * @throws  Exception
      */
     public function modifyConfig($file, array $values)
     {
@@ -362,7 +369,7 @@ class Installer {
         }
 
         // Save
-        file_put_contents(IONIC_PATH.'private/application/config/'.$file.'.php', '<?php'."\n\n".'return '.var_export($values, true).';');
+        file_put_contents(IONIC_PATH.'private/application/config/'.$file.'.php', "<?php\n\nreturn ".var_export($values, true).';');
     }
 
     /**
@@ -387,9 +394,10 @@ class Installer {
     /**
      * Parse view
      *
-     * @param  string $name
-     * @param  array  $params [optional]
-     * @return string
+     * @param   string      $viewName
+     * @param   array       $params
+     * @throws  Exception
+     * @return  string
      */
     public function parseView($viewName, array $params = array())
     {

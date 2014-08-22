@@ -46,8 +46,7 @@ class InstallerModuleInstall extends InstallerModule {
         }
 
         // View
-        $this->installer->parseView('admin', array(
-            'message' => $message));
+        $this->installer->parseView('admin', array('message' => $message));
     }
 
     /**
@@ -297,8 +296,7 @@ class InstallerModuleInstall extends InstallerModule {
         }
 
         // CHMOD check
-        $chmod = $this->installer->checkWrite(array
-            (
+        $chmod = $this->installer->checkWrite(array(
             'private/application/config/database.php',
             'private/storage/cache',
             'private/storage/files',
@@ -318,7 +316,7 @@ class InstallerModuleInstall extends InstallerModule {
             'public/upload/teams',
             'public/upload/teams/thumbnail',
             'public/upload'
-                ));
+        ));
 
         // Success?
         if (!$chmod['success'] and substr(PHP_OS, 0, 3) != 'WIN')
@@ -337,7 +335,8 @@ class InstallerModuleInstall extends InstallerModule {
         $this->installer->parseView('check', array(
             'success' => $success,
             'server'  => $server,
-            'files'   => $chmod['files']));
+            'files'   => $chmod['files']
+        ));
     }
 
 }
