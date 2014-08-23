@@ -253,7 +253,8 @@ INSERT INTO `{dbp}config` (`id`, `category_id`, `name`, `description`, `section`
 (80, 12, 'Czas ważności miniaturek', 'Czas ważności miniaturek prezentowany w nagłówku HTTP Expires (nie wpływa na działanie generatora) w sekundach.', 'Optymalizacje', '86400', 'text', 'numeric', 'int', 'thumbnail_expires'),
 (81, 12, 'Polityka cookie', 'Czy generować komunikat o polityce cookie?', 'Optymalizacje', '1', 'yesno', '', 'bool', 'cookie_policy'),
 (82, 2, 'E-mail kontaktowy', 'Na ten adres e-mail będą wysyłane wiadomości napisane przez formularz kontaktowy.', 'Ogólne', 'example@gmail.com', 'text', '', 'string', 'contact_email'),
-(83, 12, 'Dynamiczne akcje w panelu', 'Wyłącz, aby przywrócić okienko potwierdzenia operacji z poprzednich wersji.', 'Panel administracyjny', '1', 'yesno', '', 'bool', 'admin_prefer_ajax');
+(83, 12, 'Dynamiczne akcje w panelu', 'Wyłącz, aby przywrócić okienko potwierdzenia operacji z poprzednich wersji.', 'Panel administracyjny', '1', 'yesno', '', 'bool', 'admin_prefer_ajax'),
+(84, 10, 'Layout dla newsa', 'Podaj layout używany do wyświetlania widoku newsa', 'Newsy', 'layouts.index', 'text', '', 'string', 'news_show_layout');
 
 CREATE TABLE IF NOT EXISTS `{dbp}config_categories` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -584,8 +585,8 @@ CREATE TABLE IF NOT EXISTS `{dbp}packages` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO `{dbp}packages` (`id`, `version`, `is_disabled`) VALUES
-('core', '1.2', 0),
-('sport', '1.2', 0);
+('core', '1.3', 0),
+('sport', '1.3', 0);
 
 CREATE TABLE IF NOT EXISTS `{dbp}pages` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -1014,7 +1015,7 @@ CREATE TABLE IF NOT EXISTS `{dbp}seasons` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=2 ;
 
 INSERT INTO `{dbp}seasons` (`id`, `year`, `is_active`) VALUES
-(1, 2012, 1);
+(1, 2014, 1);
 
 CREATE TABLE IF NOT EXISTS `{dbp}sessions` (
   `id` varchar(40) COLLATE utf8_unicode_ci NOT NULL,

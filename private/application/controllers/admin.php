@@ -70,6 +70,10 @@ class Admin_Controller extends Controller {
                 $response->content->with('admin_skin', 'admin.css');
             }
         }
+        else
+        {
+            $response->content->with('admin_skin', 'admin.css');
+        }
 
         // JS and CSS
         $response->content->with('styles', Asset::styles());

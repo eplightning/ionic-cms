@@ -281,7 +281,7 @@ class News_Controller extends Base_Controller {
             {
                 $intro = trim(html_entity_decode(Str::limit(strip_tags($n->content), 200), ENT_COMPAT, 'UTF-8'));
             }
-            
+
             if ($n->small_image)
             {
                 $intro = '<img src="'.URL::base().'/public/upload/images/'.$n->small_image.'" width="200" height="150" alt="" /> '.$intro;
@@ -335,7 +335,7 @@ class News_Controller extends Base_Controller {
             {
                 $intro = trim(html_entity_decode(Str::limit(strip_tags($n->content), 200), ENT_COMPAT, 'UTF-8'));
             }
-            
+
             if ($n->small_image)
             {
                 $intro = '<img src="'.URL::base().'/public/upload/images/'.$n->small_image.'" width="200" height="150" alt="" /> '.$intro;
@@ -444,16 +444,18 @@ class News_Controller extends Base_Controller {
         $this->online($news->title, 'news/show/'.$news->slug);
         $this->page->set_title($news->title);
         $this->page->breadcrumb_append($news->title, 'news/show/'.$news->slug);
-        $this->layout = View::make('layouts.index');
+
+        if (($lay = Config::get('homepage.news_show_layout', 'layouts.index')) != 'layouts.main')
+            $this->layout = View::make($lay);
 
         // View
         $this->view = View::make('news.show', array(
-                    'news'      => $news,
-                    'tags'      => $tags,
-                    'similar'   => $similar,
-                    'can_karma' => Model\Karma::can_karma($news->id, 'news'),
-                    'comments'  => $this->page->make_comments($news->id, 'news')
-                ));
+            'news'      => $news,
+            'tags'      => $tags,
+            'similar'   => $similar,
+            'can_karma' => Model\Karma::can_karma($news->id, 'news'),
+            'comments'  => $this->page->make_comments($news->id, 'news')
+        ));
     }
 
     /**

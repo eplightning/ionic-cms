@@ -327,7 +327,7 @@ img.ionic-right {
 	background: #fff;
 	padding: 10px;
 	position: relative;
-	top: 1px;
+	top: 0px;
 }
 
 .tab-view-top li a {
@@ -346,6 +346,7 @@ img.ionic-right {
 	-webkit-border-top-right-radius: 5px;
 	-khtml-border-top-right-radius: 5px;
 	border-top-right-radius: 5px;
+	top: 1px;
 }
 
 .tab-view-content {

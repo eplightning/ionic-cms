@@ -82,6 +82,8 @@ class Admin_Calendar_Controller extends Admin_Controller {
 
                 $obj_id = DB::table('calendar')->insert_get_id($prepared_data);
 
+                Cache::forget('calendar');
+
                 $this->notice('Wydarzenie dodane pomyślnie');
                 $this->log(sprintf('Dodał wydarzenie: %s', $prepared_data['title']));
                 return Redirect::to('admin/calendar/index');
@@ -165,6 +167,8 @@ class Admin_Calendar_Controller extends Admin_Controller {
                 'options'    => is_array($retval['options']) ? serialize($retval['options']) : $retval['options']
             ));
 
+            Cache::forget('calendar');
+
             $this->notice('Źródło wydarzeń dodane pomyślnie');
             $this->log(sprintf('Dodał źródło wydarzeń: %s', $retval['title']));
 
@@ -236,6 +240,8 @@ class Admin_Calendar_Controller extends Admin_Controller {
 
         DB::table('calendar')->where('id', '=', $id->id)->delete();
 
+        Cache::forget('calendar');
+
         if (!Request::ajax())
         {
             $this->notice('Wydarzenie / źródło usunięte pomyślnie');
@@ -299,6 +305,8 @@ class Admin_Calendar_Controller extends Admin_Controller {
                     'type'       => isset($retval['type']) ? $retval['type'] : $id->type,
                     'options'    => is_array($retval['options']) ? serialize($retval['options']) : $retval['options']
                 ));
+
+                Cache::forget('calendar');
 
                 $this->notice('Źródło zaaktualizowane pomyślnie');
                 $this->log(sprintf('Zmieniono źródło wydarzeń: %s', $retval['title']));
@@ -380,6 +388,8 @@ class Admin_Calendar_Controller extends Admin_Controller {
                 $prepared_data['options'] = serialize($options);
 
                 \DB::table('calendar')->where('id', '=', $id->id)->update($prepared_data);
+
+                Cache::forget('calendar');
 
                 $this->notice('Wydarzenie zaaktualizowane pomyślnie');
                 $this->log(sprintf('Zmieniono wydarzenie: %s', $prepared_data['title']));

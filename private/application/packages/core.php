@@ -122,6 +122,7 @@ class Core_Package extends \Ionic\Package {
         {
             $api->add_config(2, 'E-mail kontaktowy', 'Na ten adres e-mail będą wysyłane wiadomości napisane przez formularz kontaktowy.', 'Ogólne', 'example@gmail.com', 'text', '', 'string', 'contact_email');
             $api->add_config(12, 'Dynamiczne akcje w panelu', 'Wyłącz, aby przywrócić okienko potwierdzenia operacji z poprzednich wersji.', 'Panel administracyjny', '1', 'yesno', '', 'bool', 'admin_prefer_ajax');
+            $api->add_config(10, 'Layout dla newsa', 'Podaj layout używany do wyświetlania widoku newsa', 'Newsy', 'layouts.index', 'text', '', 'string', 'news_show_layout');
 
             $api->add_admin_menu('Kalendarz', 'Treść', 'calendar', 'admin_calendar', 27);
 
