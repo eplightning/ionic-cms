@@ -73,8 +73,9 @@ class Injuries extends Widget {
                     ->join('teams', 'teams.id', '=', 'players.team_id')
                     ->order_by('player_injuries.recovery_date', 'asc')
                     ->where(function($q) {
-                        $q->where('player_injuries.recovery_date', '>=', date('Y-m-d H:i:s'));
-                        $q->or_where('player_injuries.recovery_date', '=', '0000-00-00 00:00:00');
+                        $q->where('player_injuries.recovery_date', '>=', date('Y-m-d'));
+                        $q->or_where('player_injuries.recovery_date', '=', '0000-00-00');
+                        $q->or_where('player_injuries.recovery_date', '=', date('Y-m-').'00');
                     });
 
             if ($options['distinct'])
@@ -86,7 +87,7 @@ class Injuries extends Widget {
                 'player_injuries.id', 'player_injuries.injury', 'player_injuries.recovery_date',
                 'players.name', 'players.image', 'players.slug', 'players.number',
                 'teams.name as team_name', 'teams.image as team_image', 'teams.is_distinct as team_is_distinct', 'teams.slug as team_slug'
-                    ));
+            ));
 
             $injuries = (string) View::make($options['template'], array('injuries' => $injuries));
 
