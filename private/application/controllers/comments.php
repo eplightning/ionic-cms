@@ -22,7 +22,7 @@ class Comments_Controller extends Base_Controller {
         {
             return Response::error(403);
         }
-        
+
         if (Auth::is_guest() and !Config::get('guests.comments', false))
         {
             return Response::error(403);
@@ -229,7 +229,7 @@ class Comments_Controller extends Base_Controller {
             return Response::json(array('status' => true));
 
         Model\Comment::delete($id);
-        
+
         if (!$id->user_id or empty($id->display_name))
         {
             Model\Log::add('Usunięto komentarz gościa '.$id->guest_name, $this->user->id);
@@ -486,11 +486,13 @@ class Comments_Controller extends Base_Controller {
             }
         }
 
-        $view = View::make('comments.list');
-
-        $view->with('comments', $comments)
-                ->with('used_karma', $used_karma)
-                ->with('moderation', $moderation);
+        $view = View::make('comments.list', array(
+            'content_id'    => $content_id,
+            'content_type'  => $content_type,
+            'comments'      => $comments,
+            'used_karma'    => $used_karma,
+            'moderation'    => $moderation
+        ));
 
         return Response::json(array('status' => true, 'count' => $count, 'per_page' => $per_page, 'comments' => $view->render(), 'last_comment' => $last_id));
     }

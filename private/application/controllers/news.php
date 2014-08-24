@@ -135,10 +135,8 @@ class News_Controller extends Base_Controller {
         $this->layout = View::make('layouts.index');
 
         // Cache
-        if (Cache::has('news-index'))
+        if (($news = Cache::get('news-index')))
         {
-            $news = Cache::get('news-index');
-
             $this->main_news = $news['main'];
 
             $this->view = View::make('news.index', array(
