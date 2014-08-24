@@ -19,12 +19,13 @@ class TwigExtension extends \Twig_Extension_Core {
         return array_merge(parent::getFilters(), array(
             'date'           => new \Twig_Filter_Function('ionic_date'),
             'relativedate'   => new \Twig_Filter_Function('ionic_date_rel'),
+            'specialdate'    => new \Twig_Filter_Function('ionic_date_special'),
             'url'            => new \Twig_Filter_Function('url'),
             'nl2br_noescape' => new \Twig_Filter_Function('nl2br'),
             'limit'          => new \Twig_Filter_Function('Str::limit'),
             'md5'            => new \Twig_Filter_Function('md5'),
             'addslashes'     => new \Twig_Filter_Function('addslashes')
-                ));
+        ));
     }
 
     /**

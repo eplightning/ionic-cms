@@ -9,7 +9,7 @@
 			<span>{{ player.injury }}</span>
 		</div>
 		<div class="player-info">
-			<span>{{ (player.recovery_date == '0000-00-00' ? 'Nieznana' : player.recovery_date|date('short')) }}</span>
+			<span>{{ player.recovery_date|specialdate }}</span>
 		</div>
 	</li>
 	{% endfor %}

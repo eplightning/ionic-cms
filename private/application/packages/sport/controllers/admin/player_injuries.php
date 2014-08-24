@@ -239,9 +239,7 @@ class Admin_Player_injuries_Controller extends Admin_Controller {
         $grid->add_column('name', 'Zawodnik', 'name', 'players.name', 'players.name');
         $grid->add_column('injury', 'Kontuzja', 'injury', 'player_injuries.injury', 'player_injuries.injury');
         $grid->add_column('recovery_date', 'Data wyg.', function($obj) {
-            if ($obj->recovery_date == '0000-00-00')
-                return 'Nieznana';
-            return ionic_date($obj->recovery_date, 'short');
+            return ionic_date_special($obj->recovery_date);
         }, 'player_injuries.recovery_date', 'player_injuries.recovery_date');
 
         if (Auth::can('admin_player_injuries_add'))

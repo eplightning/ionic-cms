@@ -24,7 +24,7 @@
 				</div>
 			</div>
 			<div class="elem">
-				<label for="recovery_date">Data wygaśnięcia<br /><small>Data powrotu zawodnika do zdrowia. Zostaw puste jeśli nieznana</small></label>
+				<label for="recovery_date">Data wygaśnięcia<br /><small>Jeśli dzień nieznany podaj datę ręcznie w formacie: RRRR-MM-00. Zostaw puste jeśli nieznana</small></label>
 				<div class="right">
 				{% if errors.has('recovery_date') %}
 					<div class="error">{{ errors.first('recovery_date') }}</div>

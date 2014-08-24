@@ -389,6 +389,8 @@ class Conversations_Controller extends Base_Controller {
             'last_post_user' => $this->user->display_name,
         ));
 
+        $mail_data = DB::table('emails')->where('id', '=', 4)->first(array('subject', 'message'));
+
         foreach (DB::table('conversation_users')->where('conversation_users.conversation_id', '=', $conv->id)
                 ->where('conversation_users.user_id', '<>', $this->user->id)
                 ->where('conversation_users.notifications', '=', 1)
@@ -402,7 +404,8 @@ class Conversations_Controller extends Base_Controller {
                 'display_name'  => $u->display_name,
                 'user_id'       => $u->id,
                 'id'            => $conv->id,
-                'title'         => $conv->title
+                'title'         => $conv->title,
+                'mail_data'     => $mail_data
             ));
         }
 
@@ -418,7 +421,8 @@ class Conversations_Controller extends Base_Controller {
                     'display_name'  => $u->display_name,
                     'user_id'       => $u->id,
                     'id'            => $conv->id,
-                    'title'         => $conv->title
+                    'title'         => $conv->title,
+                    'mail_data'     => $mail_data
                 ));
             }
         }

@@ -53,15 +53,15 @@ function ionic_mail($id, $to, array $replacement = array())
     // Retrieve email data
     if (is_int($id))
     {
-        $data = DB::table('emails')->where('id', '=', $id)->first(array(
-            'subject',
-            'message'));
+        $data = DB::table('emails')->where('id', '=', $id)->first(array('subject', 'message'));
+    }
+    elseif (is_string($id))
+    {
+        $data = DB::table('emails')->where('title', '=', $id)->first(array('subject', 'message'));
     }
     else
     {
-        $data = DB::table('emails')->where('title', '=', $id)->first(array(
-            'subject',
-            'message'));
+        $data = $id;
     }
 
     if (!$data)
@@ -410,11 +410,6 @@ function ionic_date($time = null, $format = 'standard', $relative = false)
     }
     elseif (is_string($time) and !ctype_digit($time))
     {
-        if (strlen($time) == 10 and substr($time, 8, 2) == '00')
-        {
-            return date('Y.m', strtotime($time) + 86400);
-        }
-
         $time = new DateTime($time);
     }
     else
@@ -578,6 +573,34 @@ function ionic_date($time = null, $format = 'standard', $relative = false)
 function ionic_date_rel($time = null)
 {
     return ionic_date($time, 'standard', true);
+}
+
+/**
+ * Format special date string, allowed formats:
+ *
+ * Y-m-d        : Standard date
+ * Y-m-00       : Standard date without day
+ * Y-00-00      : Standard date without day and month
+ * 0000-00-00   : Unknown
+ *
+ * @param   string  $time
+ * @return  string
+ */
+function ionic_date_special($time = null)
+{
+    if (!is_string($time))
+        return ionic_date();
+
+    if (strlen($time) != 10 or $time == '0000-00-00')
+        return 'Nieznana';
+
+    if (substr($time, 5, 2) == '00'))
+        return date('Y', strtotime($time) + 86400);
+
+    if (substr($time, 8) == '00')
+        return date('Y.m', strtotime($time) + 86400);
+
+    return ionic_date($time);
 }
 
 /**

@@ -11,7 +11,7 @@
 				<span>Opis: {{ player.injury }}</span>
 			</div>
 			<div class="player-info">
-				<span>Data wyzdrowienia: {{ (player.recovery_date == '0000-00-00' ? 'Nieznana' : player.recovery_date|date('short')) }}</span>
+				<span>Data wyzdrowienia: {{ player.recovery_date|specialdate }}</span>
 			</div>
 		</li>
 		{% endfor %}
