@@ -5,6 +5,7 @@ use \View;
 use \Ionic\Widget;
 use \DB;
 use \Input;
+use Cache;
 
 class Loginbox extends Widget {
 

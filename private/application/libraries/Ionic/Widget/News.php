@@ -5,6 +5,7 @@ use \View;
 use \Ionic\Widget;
 use \DB;
 use \Input;
+use Cache;
 
 class News extends Widget {
 
@@ -104,9 +105,9 @@ class News extends Widget {
             return;
         }
 
-        if (\Cache::has($news))
+        if (($news = Cache::get($news)) !== null)
         {
-            return \Cache::get($news);
+            return $news;
         }
         else
         {
@@ -142,7 +143,7 @@ class News extends Widget {
                         ));
             }
 
-            $news = (string) View::make($options['template'], array('news' => $news));
+            $news = View::make($options['template'], array('news' => $news))->render();
 
             \Cache::put('news-'.$options['limit'].'-'.$options['sort_item'].'-'.$options['sort_order'].'-'.(int) $options['tag'], $news);
 

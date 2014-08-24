@@ -5,6 +5,7 @@ use \View;
 use \Ionic\Widget;
 use \DB;
 use \Input;
+use Cache;
 
 class Pagestats extends Widget {
 
@@ -56,11 +57,7 @@ class Pagestats extends Widget {
     {
         $options = array_merge(array('date'     => date('Y-m-d'), 'template' => 'widgets.pagestats'), $this->options);
 
-        if (\Cache::has('page-stats'))
-        {
-            $pagestats = \Cache::get('page-stats');
-        }
-        else
+        if (!($pagestats = Cache::get('page-stats')))
         {
             $pagestats = array(
                 'news'      => DB::table('news')->where('is_published', '=', 1)->or_where('publish_at', '<=', date('Y-m-d H:i:s'))->count(),
@@ -77,7 +74,7 @@ class Pagestats extends Widget {
                     'pagestats' => $pagestats,
                     'online'    => \IoC::resolve('online'),
                     'exists'    => $date->diff(new \DateTime('now'))
-                ));
+                ))->render();
     }
 
 }

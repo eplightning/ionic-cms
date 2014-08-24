@@ -79,9 +79,9 @@ class Comments extends Widget {
             return;
         }
 
-        if (Cache::has($comments))
+        if (($comments = Cache::get($comments)) !== null)
         {
-            return Cache::get($comments);
+            return $comments;
         }
         else
         {
@@ -95,7 +95,7 @@ class Comments extends Widget {
                     ));
 
 
-            $comments = (string) View::make($options['template'], array('comments' => $comments));
+            $comments = View::make($options['template'], array('comments' => $comments))->render();
 
             Cache::put('comments-'.$options['limit'].'-'.$options['sort_item'].'-'.$options['sort_order'], $comments);
 

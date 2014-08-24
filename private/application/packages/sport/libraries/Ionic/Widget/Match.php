@@ -5,6 +5,7 @@ use \View;
 use \Ionic\Widget;
 use \DB;
 use \Input;
+use Cache;
 
 class Match extends Widget {
 
@@ -93,11 +94,7 @@ class Match extends Widget {
 
         $match = 'match-'.$options['type'].'-'.$options['competition'].'-'.(int) $options['distinct'];
 
-        if (\Cache::has($match))
-        {
-            return \Cache::get($match);
-        }
-        else
+        if (($match = Cache::get($match)) === null)
         {
             $match = DB::table('matches')->join('fixtures', 'fixtures.id', '=', 'matches.fixture_id')
                     ->join('competitions', 'competitions.id', '=', 'fixtures.competition_id')
@@ -185,13 +182,12 @@ class Match extends Widget {
                 }
             }
 
-            $match = (string) View::make($options['template'], array(
-                        'match' => $match));
+            $match = View::make($options['template'], array('match' => $match))->render();
 
             \Cache::put('match-'.$options['type'].'-'.$options['competition'].'-'.(int) $options['distinct'], $match);
-
-            return $match;
         }
+
+        return $match;
     }
 
 }

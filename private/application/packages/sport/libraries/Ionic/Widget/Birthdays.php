@@ -70,11 +70,7 @@ class Birthdays extends Widget {
             return;
         }
 
-        if (Cache::has($birthdays))
-        {
-            return Cache::get($birthdays);
-        }
-        else
+        if (($birthdays = Cache::get($birthdays)) === null)
         {
             $birthdays = DB::query("SELECT     players.*, teams.name AS team_name, teams.slug AS team_slug, teams.image AS team_image,
 			                                   players.date + INTERVAL(YEAR(CURRENT_TIMESTAMP) - YEAR(players.date)) + 0 YEAR AS currbirthday,
@@ -89,13 +85,12 @@ class Birthdays extends Widget {
                                     END
 			                        LIMIT      ".(int) $options['limit']);
 
-            $birthdays = (string) View::make($options['template'], array(
-                        'birthdays' => $birthdays));
+            $birthdays = View::make($options['template'], array('birthdays' => $birthdays))->render();
 
             Cache::put('birthdays-'.$options['limit'].'-'.(int) $options['distinct'], $birthdays);
-
-            return $birthdays;
         }
+
+        return $birthdays;
     }
 
 }

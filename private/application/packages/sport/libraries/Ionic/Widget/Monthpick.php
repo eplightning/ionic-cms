@@ -6,6 +6,7 @@ use \Ionic\Widget;
 use \DB;
 use \Input;
 use \stdClass;
+use Cache;
 
 class Monthpick extends Widget {
 
@@ -76,11 +77,7 @@ class Monthpick extends Widget {
     {
         $options = array_merge(array('template' => 'widgets.monthpick', 'competition' => 0), $this->options);
 
-        if (\Cache::has('monthpick'))
-        {
-            $monthpick = \Cache::get('monthpick');
-        }
-        else
+        if (!($monthpick = Cache::get('monthpick')))
         {
             $monthpick = array('player' => null, 'active' => new \Model\Monthpick,
                 'player_votes' => 0, 'player_percent' => 0, 'player_stats' => null);
@@ -129,7 +126,7 @@ class Monthpick extends Widget {
             \Cache::put('monthpick', $monthpick);
         }
 
-        return View::make($options['template'], array('monthpick' => $monthpick));
+        return View::make($options['template'], array('monthpick' => $monthpick))->render();
     }
 
 }

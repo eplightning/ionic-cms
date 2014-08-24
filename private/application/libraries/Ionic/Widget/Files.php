@@ -5,6 +5,7 @@ use \View;
 use \Ionic\Widget;
 use \DB;
 use \Input;
+use Cache;
 
 class Files extends Widget {
 
@@ -54,9 +55,9 @@ class Files extends Widget {
 
         $files = 'files-'.$options['limit'];
 
-        if (\Cache::has($files))
+        if (($files = Cache::get($files)) !== null)
         {
-            return \Cache::get($files);
+            return $files;
         }
         else
         {
@@ -68,9 +69,9 @@ class Files extends Widget {
                 'file_categories.slug as category_slug', 'files.description'
                     ));
 
-            $files = (string) View::make($options['template'], array('files' => $files));
+            $files = View::make($options['template'], array('files' => $files))->render();
 
-            \Cache::put('files-'.$options['limit'], $files);
+            Cache::put('files-'.$options['limit'], $files);
 
             return $files;
         }

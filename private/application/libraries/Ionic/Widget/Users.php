@@ -5,6 +5,7 @@ use \View;
 use \Ionic\Widget;
 use \DB;
 use \Input;
+use Cache;
 
 class Users extends Widget {
 
@@ -86,11 +87,7 @@ class Users extends Widget {
             return;
         }
 
-        if (\Cache::has($users))
-        {
-            $users = \Cache::get($users);
-        }
-        else
+        if (($users = Cache::get($users)) === null)
         {
             $users = DB::table('users')->join('profiles', 'profiles.user_id', '=', 'users.id')
                     ->order_by('profiles.'.$options['sort_item'], $options['sort_order'])->take($options['limit'])
@@ -99,7 +96,7 @@ class Users extends Widget {
                 'profiles.bet_points', 'profiles.points', 'profiles.comments_count', 'profiles.news_count', 'profiles.avatar', 'profiles.real_name', 'profiles.created_at'
                     ));
 
-            $users = (string) View::make($options['template'], array('users' => $users));
+            $users = View::make($options['template'], array('users' => $users))->render();
 
             \Cache::put('users-'.$options['limit'].'-'.$options['sort_item'].'-'.$options['sort_order'], $users);
         }

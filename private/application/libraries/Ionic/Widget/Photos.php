@@ -5,6 +5,7 @@ use \View;
 use \Ionic\Widget;
 use \DB;
 use \Input;
+use Cache;
 
 class Photos extends Widget {
 
@@ -66,11 +67,7 @@ class Photos extends Widget {
 
         $photos = 'photos-'.$options['limit'].'-'.$options['type'];
 
-        if (\Cache::has($photos))
-        {
-            $photos = \Cache::get($photos);
-        }
-        else
+        if (($photos = Cache::get($photos)) === null)
         {
             if ($options['type'] == 'photos')
             {
@@ -125,8 +122,7 @@ class Photos extends Widget {
                 }
             }
 
-            $photos = (string) View::make($options['template'], array(
-                        'photos' => $photos));
+            $photos = View::make($options['template'], array('photos' => $photos))->render();
 
             \Cache::put('photos-'.$options['limit'].'-'.$options['type'], $photos);
         }

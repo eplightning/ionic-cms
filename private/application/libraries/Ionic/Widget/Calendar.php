@@ -56,9 +56,9 @@ class Calendar extends Widget {
     {
         $options = array_merge(array('template' => 'widgets.calendar', 'width' => 64, 'height' => 64), $this->options);
 
-        if (Cache::has('calendar'))
+        if (($calendar = Cache::get('calendar')) !== null)
         {
-            return Cache::get('calendar');
+            return $calendar;
         }
         else
         {
@@ -67,7 +67,7 @@ class Calendar extends Widget {
 
             $calendar_data = \Model\Calendar::month_view((int) $month, (int) $year, $options['width'], $options['height']);
 
-            $calendar = (string) View::make($options['template'], array(
+            $calendar = View::make($options['template'], array(
                 'number_of_days' => $calendar_data['number_of_days'],
                 'padding_start' => $calendar_data['padding_start'],
                 'padding_end' => $calendar_data['padding_end'],
@@ -75,7 +75,7 @@ class Calendar extends Widget {
                 'day' => (int) date('j'),
                 'month' => $month,
                 'year' => $year
-            ));
+            ))->render();
 
             Cache::put('calendar', $calendar);
 

@@ -5,6 +5,7 @@ use \View;
 use \Ionic\Widget;
 use \DB;
 use \Input;
+use Cache;
 
 class Videos extends Widget {
 
@@ -56,11 +57,7 @@ class Videos extends Widget {
 
         $videos = 'videos-'.$options['limit'];
 
-        if (\Cache::has($videos))
-        {
-            $videos = \Cache::get($videos);
-        }
-        else
+        if (($videos = Cache::get($videos)) === null)
         {
             $videos = DB::table('videos')->join('video_categories', 'video_categories.id', '=', 'videos.category_id')
                     ->take($options['limit'])
@@ -70,7 +67,7 @@ class Videos extends Widget {
                 'video_categories.slug as category_slug', 'videos.description'
                     ));
 
-            $videos = (string) View::make($options['template'], array('videos' => $videos));
+            $videos = View::make($options['template'], array('videos' => $videos))->render();
 
             \Cache::put('videos-'.$options['limit'], $videos);
         }

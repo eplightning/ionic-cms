@@ -5,6 +5,7 @@ use \View;
 use \Ionic\Widget;
 use \DB;
 use \Input;
+use Cache;
 
 class Injuries extends Widget {
 
@@ -62,11 +63,7 @@ class Injuries extends Widget {
             return;
         }
 
-        if (\Cache::has($injuries))
-        {
-            return \Cache::get($injuries);
-        }
-        else
+        if (($injuries = Cache::get($injuries)) === null)
         {
             $injuries = DB::table('player_injuries')->take($options['limit'])
                     ->join('players', 'players.id', '=', 'player_injuries.player_id')
@@ -89,12 +86,12 @@ class Injuries extends Widget {
                 'teams.name as team_name', 'teams.image as team_image', 'teams.is_distinct as team_is_distinct', 'teams.slug as team_slug'
             ));
 
-            $injuries = (string) View::make($options['template'], array('injuries' => $injuries));
+            $injuries = View::make($options['template'], array('injuries' => $injuries))->render();
 
             \Cache::put('injuries-'.$options['limit'].'-'.(int) $options['distinct'], $injuries);
-
-            return $injuries;
         }
+
+        return $injuries;
     }
 
 }

@@ -75,12 +75,12 @@ class Buttons extends Widget {
     {
         $options = array_merge(array('template' => 'widgets.buttons', 'buttons'  => array(), 'id'       => 'buttons'), $this->options);
 
-        if (Cache::has('buttons-'.$options['id']))
+        if (($buttons = Cache::get('buttons-'.$options['id'])) !== null)
         {
-            return Cache::get('buttons-'.$options['id']);
+            return $buttons;
         }
 
-        $buttons = (string) View::make($options['template'], array('buttons' => $options['buttons']));
+        $buttons = View::make($options['template'], array('buttons' => $options['buttons']))->render();
 
         Cache::put('buttons-'.$options['id'], $buttons);
 

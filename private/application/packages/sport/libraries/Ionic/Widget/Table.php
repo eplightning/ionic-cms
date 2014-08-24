@@ -5,6 +5,7 @@ use \View;
 use \Ionic\Widget;
 use \DB;
 use \Input;
+use Cache;
 
 class Table extends Widget {
 
@@ -98,16 +99,11 @@ class Table extends Widget {
 
         $table = 'table-'.$options['table'].'-'.(int) $options['force_distinct'].'-'.$options['sort_order'].'-'.$options['limit'];
 
-        if (\Cache::has($table))
-        {
-            $table = \Cache::get($table);
-        }
-        else
+        if (($table = Cache::get($table)) === null)
         {
             $table = \Ionic\TableManager::get($options['table'], 'table_positions.position', $options['sort_order'], $options['limit'], $options['force_distinct']);
 
-            $table = (string) View::make($options['template'], array(
-                        'table' => $table));
+            $table = View::make($options['template'], array('table' => $table))->render();
 
             \Cache::put('table-'.$options['table'].'-'.(int) $options['force_distinct'].'-'.$options['sort_order'].'-'.$options['limit'], $table);
         }

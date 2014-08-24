@@ -5,6 +5,7 @@ use \View;
 use \Ionic\Widget;
 use \DB;
 use \Input;
+use Cache;
 
 class Matchpick extends Widget {
 
@@ -51,11 +52,7 @@ class Matchpick extends Widget {
     {
         $options = array_merge(array('template' => 'widgets.matchpick'), $this->options);
 
-        if (\Cache::has('matchpick'))
-        {
-            $matchpick = \Cache::get('matchpick');
-        }
-        else
+        if (!($matchpick = Cache::get('matchpick')))
         {
             $matchpick = array('player'        => null, 'active'        => new \Model\Matchpick, 'player_rating' => 0);
 
@@ -78,7 +75,7 @@ class Matchpick extends Widget {
             \Cache::put('matchpick', $matchpick);
         }
 
-        return View::make($options['template'], array('matchpick' => $matchpick));
+        return View::make($options['template'], array('matchpick' => $matchpick))->render();
     }
 
 }

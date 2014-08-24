@@ -6,6 +6,7 @@ use \Ionic\Widget;
 use \DB;
 use \Input;
 use \IoC;
+use Cache;
 
 /**
  * Widget - Poll
@@ -58,18 +59,14 @@ class Poll extends Widget {
     {
         $options = array_merge(array('template' => 'widgets.poll'), $this->options);
 
-        if (\Cache::has('poll'))
-        {
-            $poll = \Cache::get('poll');
-        }
-        else
+        if (!($poll = Cache::get('poll')))
         {
             $poll = new \Model\Poll;
 
             \Cache::put('poll', $poll);
         }
 
-        return View::make($options['template'], array('poll' => $poll));
+        return View::make($options['template'], array('poll' => $poll))->render();
     }
 
 }

@@ -6,6 +6,7 @@ use \Ionic\Widget;
 use \DB;
 use \Input;
 use \Auth;
+use Cache;
 
 class Rotation extends Widget {
 

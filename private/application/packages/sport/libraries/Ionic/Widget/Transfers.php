@@ -5,6 +5,7 @@ use \View;
 use \Ionic\Widget;
 use \DB;
 use \Input;
+use Cache;
 
 class Transfers extends Widget {
 
@@ -71,11 +72,7 @@ class Transfers extends Widget {
             return;
         }
 
-        if (\Cache::has($transfers))
-        {
-            $transfers = \Cache::get($transfers);
-        }
-        else
+        if (($transfers = Cache::get($transfers)) === null)
         {
             $transfers = DB::table('player_transfers')->take($options['limit'])
                     ->join('players', 'players.id', '=', 'player_transfers.player_id')
@@ -109,7 +106,7 @@ class Transfers extends Widget {
                 'to.name as to_name', 'to.image as to_image', 'to.is_distinct as to_is_distinct', 'to.slug as to_slug'
                     ));
 
-            $transfers = (string) View::make($options['template'], array('transfers' => $transfers));
+            $transfers = View::make($options['template'], array('transfers' => $transfers))->render();
 
             \Cache::put('transfers-'.$options['limit'].'-'.$options['type'].'-'.(int) $options['distinct'], $transfers);
         }

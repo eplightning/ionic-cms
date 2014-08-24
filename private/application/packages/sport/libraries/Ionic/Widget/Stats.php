@@ -6,6 +6,7 @@ use \Ionic\Widget;
 use \DB;
 use \Input;
 use \IoC;
+use Cache;
 
 class Stats extends Widget {
 
@@ -122,11 +123,7 @@ class Stats extends Widget {
 
         $stats = 'stats-'.$options['sort'].'-'.$options['limit'].'-'.$options['competition'].'-'.$options['season'];
 
-        if (\Cache::has($stats))
-        {
-            $stats = \Cache::get($stats);
-        }
-        else
+        if (($stats = Cache::get($stats)) === null)
         {
             $stats = DB::table('player_stats')->where('competition_id', '=', $options['competition'])
                     ->where('season_id', '=', $options['season'])
@@ -136,7 +133,7 @@ class Stats extends Widget {
                     ->order_by('player_stats.'.$options['sort'], 'desc')
                     ->get(array('player_stats.*', 'players.name', 'players.number', 'players.slug', 'teams.name as team_name', 'teams.is_distinct', 'teams.slug as team_slug', 'teams.image as team_image'));
 
-            $stats = (string) View::make($options['template'], array('stats' => $stats));
+            $stats = View::make($options['template'], array('stats' => $stats))->render();
 
             \Cache::put('stats-'.$options['sort'].'-'.$options['limit'].'-'.$options['competition'].'-'.$options['season'], $stats);
         }

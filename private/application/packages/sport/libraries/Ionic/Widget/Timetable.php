@@ -6,6 +6,7 @@ use \Ionic\Widget;
 use \DB;
 use \Input;
 use \IoC;
+use Cache;
 
 class Timetable extends Widget {
 
@@ -147,11 +148,7 @@ class Timetable extends Widget {
 
         $timetable = 'timetable-'.$options['type'].$options['type2'].'-'.(int) $options['distinct'].'-'.$options['limit'].'-'.$options['competition'].'-'.$options['season'];
 
-        if (\Cache::has($timetable))
-        {
-            $timetable = \Cache::get($timetable);
-        }
-        else
+        if (($timetable = Cache::get($timetable)) === null)
         {
             if ($options['type2'] == 's')
             {
@@ -282,8 +279,7 @@ class Timetable extends Widget {
                 'away.image as away_image'
                     ));
 
-            $timetable = (string) View::make($options['template'], array(
-                        'timetable' => $timetable));
+            $timetable = View::make($options['template'], array('timetable' => $timetable))->render();
 
             \Cache::put('timetable-'.$options['type'].$options['type2'].'-'.(int) $options['distinct'].'-'.$options['limit'].'-'.$options['competition'].'-'.$options['season'], $timetable);
         }

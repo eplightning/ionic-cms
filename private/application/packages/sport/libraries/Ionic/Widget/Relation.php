@@ -5,6 +5,7 @@ use \View;
 use \Ionic\Widget;
 use \DB;
 use \Input;
+use Cache;
 
 class Relation extends Widget {
 
@@ -51,11 +52,7 @@ class Relation extends Widget {
     {
         $options = array_merge(array('template' => 'widgets.relation'), $this->options);
 
-        if (\Cache::has('last-relation'))
-        {
-            $relation = \Cache::get('last-relation');
-        }
-        else
+        if (($relation = Cache::get('last-relation')) === null)
         {
             $relation = DB::table('relations')->join('matches', 'matches.id', '=', 'relations.match_id')
                     ->join('fixtures', 'fixtures.id', '=', 'matches.fixture_id')
@@ -76,7 +73,7 @@ class Relation extends Widget {
             if (!$relation)
                 $relation = false;
 
-            $relation = (string) View::make($options['template'], array('relation' => $relation));
+            $relation = View::make($options['template'], array('relation' => $relation))->render();
 
             \Cache::put('last-relation', $relation);
         }

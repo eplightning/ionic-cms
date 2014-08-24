@@ -5,6 +5,7 @@ use \View;
 use \Ionic\Widget;
 use \DB;
 use \Input;
+use Cache;
 
 class Shoutbox extends Widget {
 
@@ -61,7 +62,7 @@ class Shoutbox extends Widget {
                     )),
                     'can_add'      => ((\Auth::is_logged() and !\Auth::banned()) or (\Auth::is_guest() and \Config::get('guests.shoutbox', false))),
                     'auto_refresh' => $options['auto_refresh']
-                ));
+                ))->render();
     }
 
 }
