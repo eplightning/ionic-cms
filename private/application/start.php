@@ -594,11 +594,52 @@ function ionic_date_special($time = null)
     if (strlen($time) != 10 or $time == '0000-00-00')
         return 'Nieznana';
 
-    if (substr($time, 5, 2) == '00'))
+    if (substr($time, 5, 2) == '00')
         return date('Y', strtotime($time) + 86400);
 
     if (substr($time, 8) == '00')
-        return date('Y.m', strtotime($time) + 86400);
+    {
+        $time = strtotime($time) + 86400;
+
+        switch ((int) date('n', $time))
+        {
+            case 1:
+                return 'styczeń '.date('Y', $time);
+
+            case 2:
+                return 'luty '.date('Y', $time);
+
+            case 3:
+                return 'marzec '.date('Y', $time);
+
+            case 4:
+                return 'kwiecień '.date('Y', $time);
+
+            case 5:
+                return 'maj '.date('Y', $time);
+
+            case 6:
+                return 'czerwiec '.date('Y', $time);
+
+            case 7:
+                return 'lipiec '.date('Y', $time);
+
+            case 8:
+                return 'sierpień '.date('Y', $time);
+
+            case 9:
+                return 'wrzesień '.date('Y', $time);
+
+            case 10:
+                return 'październik '.date('Y', $time);
+
+            case 11:
+                return 'listopad '.date('Y', $time);
+
+            default:
+                return 'grudzień '.date('Y', $time);
+        }
+    }
 
     return ionic_date($time);
 }
