@@ -77,7 +77,7 @@ class View implements ArrayAccess {
             }
             else
             {
-                $this->data['errors'] = new Laravel\Messages;
+                $this->data['errors'] = new Messages;
             }
         }
     }
