@@ -151,3 +151,52 @@ IonicCMS 1.2.1:
     - Kosmetyczne poprawki w domyślnym ionic.css
     - Dodana możliwość aktualizacji głównego modułu systemu
     - Zintegrowane wyświetlanie komunikatu o korzystaniu z cookie (do wyłączenia w konfiguracji)
+
+IonicCMS 1.3:
+    - Aktualizacje komponentów zew.: htmLawed, MobileDetect, Twig, SwiftMailer, jQuery
+    - Dodano zaawansowany kalendarz:
+        - Obsługa ręcznie tworzonych wydarzeń (możliwość uploadu obrazka, podania treści lub przekierowania)
+        - Obsługa automatycznynie tworzonych wydarzeń
+        - Obecnie jest jedynie możliwość pobierania meczów z terminarza dla określonego przedziału czasowego, drużyny i opcjonalnie rozgrywek/sezonu. Wydarzenia są tworzone na bieżąco dynamicznie.
+        - Podstrona wyświetlająca kalendarz oraz widżet ,który można umieścić w każdym miejscu na stronie
+    - Optymalizacje:
+        - Klasa od tworzenia widoków stała się nie zależna od oryginalnej klasy i dostała drobne optymalizacje
+        - Optymalizacje w obsłudze cache
+        - Index bazy danych na datę w newsach
+    - Raport pomeczowy ma teraz wszystkie dostępne zmienne co news (teraz można po prostu skopiować views/news/show.twig do views/match/report.twig jeśli nie zależy nam na wyświetlaniu wyników i innych)
+    - Opcja konfiguracyjna pozwalająca zmienić layout używany przez pojedyńczy news
+    - Błędy w szablonach widżetów nie powinny teraz wywoływać fatal errora PHP
+    - Dodano zmienne content_type i content_id przy odświeżaniu komentarzy
+    - Obsługa niepełnych dat (głównie używane przez kontuzje)
+    - Wyrzucone niepotrzebne pliki w katalogu laravel
+    - Uspranienia nagłówków:
+        - Poprawione kodowanie dla wersji PHP starszych niż 5.4
+        - Mały obrazek
+        - Dodany tag language
+        - Wsparcie dla formatu Atom (news/atom), RSS 2.0 nadal dostępny pod news/rss
+    - Prosty formularz kontaktowy (page/contact)
+    - Nieco ulepszony domyślny wygląd strony
+    - Shoutbox jest teraz automatycznie odświeżany tylko gdy strona jest widoczna dla użytkownika
+    - Sensowniejsze logi przy usuwaniu komentarzy z poziomu strony
+    - Poprawione wyświetlanie kontuzji w widżecie i na podstronie
+    - Nowa mapa strony
+        - Rozszerzalna przez moduły (teraz są na niej linki do tabel, terminarzy itd.)
+        - Wsparcie formatu Sitemap (page/map/sitemap.xml)
+    - Panel admina:
+        - Usprawnienia w zarządzaniu obrazkami
+            - Lazy-loading: Obrazki są wczytywane dopiero gdy pojawią się na ekranie (eliminuje lag)
+            - Automatyczne dopasowanie odstępów między obrazkami (kosmetyczna poprawka)
+        - Zaokrąglone procenty w podglądzie sondy
+        - Sensowniejsze logi przy usuwaniu komentarzy z poziomu panelu
+        - Tytuł bloga teraz linkuje do posta
+        - Znacząco usprawniony Ionic\Grid
+            - Optymalizacje i porządek w kodzie
+            - Automatyczna aktualizacja ilości elementów i stronnicowania
+            - System porad
+            - Zintegrowany system podglądu
+            - Usuwanie/publikacja elementów jest teraz dynamiczna (potwierdzenie przez okienko przeglądarki zamiast odświeżania strony)
+            - Filtrowanie jest również dynamiczne bez odświeżania strony
+            - W przypadku problemów z dwoma powyższymi zmianami jest możliwość przywrócenia poprzedniego zachowania w konfiguracji
+        - Kluby są teraz przypisane do pary rozgrywki/sezon zamiast samych rozgrywek
+        - Drugi skin panelu administracyjnego (przełączanie w górnym prawym rogu)
+        - Poprawione przeładowywanie tabeli w przypadku ,gdy nie ma żadnych klubów
