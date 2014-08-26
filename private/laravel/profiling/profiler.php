@@ -1,6 +1,6 @@
 <?php namespace Laravel\Profiling;
 
-use Laravel\View;
+use View;
 use Laravel\File;
 use Laravel\Event;
 use Laravel\Config;
@@ -32,7 +32,7 @@ class Profiler {
 			static::$data['memory'] = get_file_size(memory_get_usage(true));
 			static::$data['memory_peak'] = get_file_size(memory_get_peak_usage(true));
 			static::$data['time'] = (microtime(true) - LARAVEL_START);
-			return render('path: '.__DIR__.'/template'.EXT, static::$data);
+			return render('profiler', static::$data);
 		}
 	}
 

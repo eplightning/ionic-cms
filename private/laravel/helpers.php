@@ -523,7 +523,7 @@ function view($view, $data = array())
 {
 	if (is_null($view)) return '';
 
-	return Laravel\View::make($view, $data);
+	return View::make($view, $data);
 }
 
 /**
@@ -537,7 +537,7 @@ function render($view, $data = array())
 {
 	if (is_null($view)) return '';
 
-	return Laravel\View::make($view, $data)->render();
+	return View::make($view, $data)->render();
 }
 
 /**
@@ -551,7 +551,7 @@ function render($view, $data = array())
  */
 function render_each($partial, array $data, $iterator, $empty = 'raw|')
 {
-	return Laravel\View::render_each($partial, $data, $iterator, $empty);
+	return '';
 }
 
 /**
@@ -584,7 +584,7 @@ function get_cli_option($option, $default = null)
 
 	return value($default);
 }
-	
+
 /**
  * Calculate the human-readable file size (with proper units).
  *

@@ -15,6 +15,7 @@ class Admin_Templates_Controller extends Admin_Controller {
             'layouts' => 'Layout',
             'news' => 'Newsy',
             'blog' => 'Blog',
+            'calendar' => 'Kalendarz',
             'comments' => 'Komentarze',
             'conversations' => 'Prywatne dyskusje',
             'files' => 'Pliki',

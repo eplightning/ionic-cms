@@ -2,13 +2,13 @@
 
 use Laravel\IoC;
 use Laravel\Str;
-use Laravel\View;
 use Laravel\Event;
 use Laravel\Bundle;
 use Laravel\Request;
 use Laravel\Redirect;
 use Laravel\Response;
 use FilesystemIterator as fIterator;
+use View;
 
 abstract class Controller {
 
@@ -386,12 +386,7 @@ abstract class Controller {
 	 */
 	public function layout()
 	{
-		if (starts_with($this->layout, 'name: '))
-		{
-			return \View::of(substr($this->layout, 6));
-		}
-
-		return \View::make($this->layout);
+		return View::make($this->layout);
 	}
 
 	/**
