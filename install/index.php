@@ -4,7 +4,7 @@
  *
  * @package    ionic
  * @subpackage install
- * @copyright  2009-2013 (c) Wrex
+ * @copyright  2009-2014 (c) Wrex
  */
 session_start();
 

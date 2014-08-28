@@ -30,7 +30,9 @@ class Admin_Controller extends Controller {
     public $view = null;
 
     /**
-     * Logout
+     * Logout from admin panel
+     *
+     * @return Response
      */
     public function action_logout()
     {
@@ -48,36 +50,12 @@ class Admin_Controller extends Controller {
      */
     public function after($response)
     {
-        // Nothing to do here gentlemen
+        // If no layout or view is specified the response is already ready
         if (!$this->layout or !$this->view)
-        {
             return;
-        }
 
-        // Breadcrumbs
-        $this->page->breadcrumb_prepend('Panel administracyjny', 'admin/dashboard/index');
-        $this->page->breadcrumb_prepend('Strona główna', 'index');
-
-        // Select skin
-        if (Cookie::has('ionic-admin-skin'))
-        {
-            if (Cookie::get('ionic-admin-skin') == 'admin_flat.css')
-            {
-                $response->content->with('admin_skin', 'admin_flat.css');
-            }
-            else
-            {
-                $response->content->with('admin_skin', 'admin.css');
-            }
-        }
-        else
-        {
-            $response->content->with('admin_skin', 'admin.css');
-        }
-
-        // JS and CSS
-        $response->content->with('styles', Asset::styles());
-        $response->content->with('scripts', Asset::scripts());
+        // Style to use
+        $admin_skin = (Cookie::get('ionic-admin-skin') == 'admin_flat.css') ? 'admin_flat.css' : 'admin.css';
 
         // Menu
         $menu = Cache::get('admin-menu');
@@ -92,9 +70,10 @@ class Admin_Controller extends Controller {
         // Determine active admin module and remove unaccessible ones
         $active_index = null;
         $active_module = null;
-
+        $perform_role_check = !Auth::can('admin_root');
         $url = explode('/', URI::current(), 3);
-        if (!isset($url[1]))
+
+        if (empty($url[1]))
             $url[1] = 'dashboard';
 
         foreach ($menu as $k => $v)
@@ -102,10 +81,8 @@ class Admin_Controller extends Controller {
             foreach ($v as $k2 => $v2)
             {
                 // Permission check
-                if ($v2['role'] and !Auth::can($v2['role']))
-                {
+                if ($perform_role_check and ($v2['role'] and !Auth::can($v2['role'], true)))
                     unset($menu[$k][$k2]);
-                }
 
                 // Are we here?
                 if (!$active_module and $url[1] == $v2['module'])
@@ -116,16 +93,25 @@ class Admin_Controller extends Controller {
             }
         }
 
-        // Add menu stuff to layout
-        $response->content->with('active_module', $active_module);
-        $response->content->with('active_index', $active_index);
-        $response->content->with('menu', $menu);
+        // Basic breadcrumb setup
+        $this->page->breadcrumb_prepend('Panel administracyjny', 'admin/dashboard/index');
+        $this->page->breadcrumb_prepend('Strona główna', 'index');
 
-        // Notice
-        $response->content->with('notice', Session::get('notice', ''));
-
-        // Content
-        $response->content->with('content', $this->view instanceof View ? $this->view->render() : (string) $this->view);
+        // Pass variables
+        $response->content->with(array(
+            // CSS, JS
+            'styles'        => Asset::styles(),
+            'scripts'       => Asset::scripts(),
+            'admin_skin'    => $admin_skin,
+            // Menu
+            'active_module' => $active_module,
+            'active_index'  => $active_index,
+            'menu'          => $menu,
+            // Notice
+            'notice'        => Session::get('notice', ''),
+            // Actual content
+            'content'       => $this->view instanceof View ? $this->view->render() : (string) $this->view
+        ));
     }
 
     /**
@@ -135,13 +121,16 @@ class Admin_Controller extends Controller {
      */
     public function before()
     {
+        // User
+        $this->user = Auth::get_user();
+
         // Page container setup
         $this->page = IoC::resolve('page');
-        Config::set('meta.title', '%s - Panel administracyjny');
         View::share('page', $this->page);
-        View::share('current_user', Auth::get_user());
+        View::share('current_user', $this->user);
 
-        // Default title
+        // Set page title
+        Config::set('meta.title', '%s - Panel administracyjny');
         $this->page->set_title('Panel administracyjny', true);
 
         // CSRF token
@@ -155,9 +144,6 @@ class Admin_Controller extends Controller {
 
         // Styles
         Asset::add('jquery-ui', 'public/css/flick/jquery-ui.custom.css');
-
-        // User
-        $this->user = Auth::get_user();
     }
 
     /**
@@ -167,14 +153,17 @@ class Admin_Controller extends Controller {
      */
     protected function confirm()
     {
-        // If form was submitted
-        if (Input::has('yes') and !Request::forged())
+        // Confirmation received
+        if (!Request::forged())
         {
-            return 1;
-        }
-        elseif (Input::has('no') and !Request::forged())
-        {
-            return 2;
+            if (Input::has('yes'))
+            {
+                return 1;
+            }
+            elseif (Input::has('no'))
+            {
+                return 2;
+            }
         }
 
         // Or not
@@ -191,11 +180,8 @@ class Admin_Controller extends Controller {
      */
     public function execute($method, $parameters = array())
     {
+        // Registered filters
         $filters = $this->filters('before', $method);
-
-        // Again, as was the case with route closures, if the controller "before"
-        // filters return a response, it will be considered the response to the
-        // request and the controller method will not be used.
         $response = Filter::run($filters, array(), true);
 
         // Session
@@ -208,6 +194,7 @@ class Admin_Controller extends Controller {
         // Force login form?
         if (Auth::is_guest() and is_null($response))
         {
+            // Try to preserve POST data if form was submitted after session expiration
             if (Input::except(array('alusername', 'alpassword', Session::csrf_token, 'alsubmit')))
             {
                 Input::flash('except', array('alusername', 'alpassword', Session::csrf_token, 'alsubmit'));
@@ -220,16 +207,14 @@ class Admin_Controller extends Controller {
             if (Input::has('alusername') and Input::has('alpassword') and Request::method() == 'POST')
             {
                 if (Request::forged())
-                {
-                    return Response::error('500');
-                }
+                    return Response::error(500);
 
                 $status = Auth::login_admin(Input::get('alusername'), Input::get('alpassword'));
 
                 switch ($status)
                 {
                     case Auth::LOGIN_SUCCESS:
-                        if (URI::current() == 'admin')
+                        if (URI::current() == 'admin' or URI::current() == 'admin/index')
                         {
                             return Redirect::to('admin/dashboard/index');
                         }
@@ -240,28 +225,35 @@ class Admin_Controller extends Controller {
                         break;
 
                     case Auth::LOGIN_BRUTEFORCE:
-                        $response = View::make('admin.login', array('message' => 'Liczba nieudanych prób logowania przekroczyła limit. Musisz odczekać 15 minut.', 'url'     => URI::current()));
+                        $response = View::make('admin.login', array(
+                            'message' => 'Liczba nieudanych prób logowania przekroczyła limit. Musisz odczekać 15 minut.',
+                            'url'     => URI::current()
+                        ));
                         break;
 
                     case Auth::LOGIN_NOT_ADMIN:
-                        $response = View::make('admin.login', array('message' => 'To konto nie posiada wystarczających uprawnień do zarządzania stroną.', 'url'     => URI::current()));
+                        $response = View::make('admin.login', array(
+                            'message' => 'To konto nie posiada wystarczających uprawnień do zarządzania stroną.',
+                            'url'     => URI::current()
+                        ));
                         break;
 
                     default:
-                        $response = View::make('admin.login', array('message' => 'Nieprawidłowa nazwa użytkownika lub hasło.', 'url'     => URI::current()));
+                        $response = View::make('admin.login', array(
+                            'message' => 'Nieprawidłowa nazwa użytkownika lub hasło.',
+                            'url'     => URI::current()
+                        ));
                 }
             }
             else
             {
-                $response = View::make('admin.login', array('message' => '', 'url'     => URI::current()));
+                $response = View::make('admin.login', array('message' => '', 'url' => URI::current()));
             }
         }
         elseif (is_null($response))
         {
             if (URI::current() == 'admin' or URI::current() == 'admin/index')
-            {
                 return Redirect::to('admin/dashboard/index');
-            }
 
             $this->before();
 
@@ -270,9 +262,6 @@ class Admin_Controller extends Controller {
 
         $response = Response::prepare($response);
 
-        // The "after" function on the controller is simply a convenient hook
-        // so the developer can work on the response before it's returned to
-        // the browser. This is useful for templating, etc.
         $this->after($response);
 
         Filter::run($this->filters('after', $method), array($response));
