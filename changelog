@@ -167,6 +167,7 @@ IonicCMS 1.3:
     - Opcja konfiguracyjna pozwalająca zmienić layout używany przez pojedyńczy news
     - Błędy w szablonach widżetów nie powinny teraz wywoływać fatal errora PHP
     - Dodano zmienne content_type i content_id przy odświeżaniu komentarzy
+    - Dodana obsługa wyświetlania przypisanych tagów na stronie głównej
     - Obsługa niepełnych dat (głównie używane przez kontuzje)
     - Wyrzucone niepotrzebne pliki w katalogu laravel
     - Uspranienia nagłówków:
