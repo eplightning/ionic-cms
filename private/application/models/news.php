@@ -108,7 +108,7 @@ class NewsTagAccess implements ArrayAccess {
      */
     public function offsetExists($offset)
     {
-        return $this->results !== null and isset($this->results[(int) $offset]);
+        return $this->offsetGet($offset) !== null;
     }
 
     /**
