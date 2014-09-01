@@ -11,16 +11,18 @@ class News_Controller extends Base_Controller {
 
     /**
      * News archive
+     *
+     * @return Response
      */
     public function action_archive()
     {
         $news = DB::table('news')->left_join('users', 'users.id', '=', 'news.user_id')
-                ->order_by('news.created_at', 'desc')
-                ->where('news.is_published', '=', 1)
-                ->or_where('news.publish_at', '<=', date('Y-m-d H:i:s'))
-                ->where('news.publish_at', '<>', '0000-00-00 00:00:00')
-                ->paginate(20, array('news.id', 'news.created_at', 'news.title', 'news.comments_count', 'news.slug', 'news.external_url',
-            'news.big_image', 'news.small_image', 'users.display_name', 'users.slug as user_slug'));
+                                 ->order_by('news.created_at', 'desc')
+                                 ->where('news.is_published', '=', 1)
+                                 ->or_where('news.publish_at', '<=', date('Y-m-d H:i:s'))
+                                 ->where('news.publish_at', '<>', '0000-00-00 00:00:00')
+                                 ->paginate(20, array('news.id', 'news.created_at', 'news.title', 'news.comments_count', 'news.slug', 'news.external_url',
+                                                      'news.big_image', 'news.small_image', 'users.display_name', 'users.slug as user_slug'));
 
         $grouped_news = array();
 
@@ -40,7 +42,68 @@ class News_Controller extends Base_Controller {
         $this->online('Archiwum newsów', 'news/archive');
         $this->page->breadcrumb_append('Archiwum newsów', 'news/archive');
 
-        $this->view = View::make('news.archive', array('grouped_news' => $grouped_news, 'news'         => $news));
+        $this->view = View::make('news.archive', array('grouped_news' => $grouped_news, 'news' => $news));
+    }
+
+    /**
+     * Atom
+     *
+     * @return Response
+     */
+    public function action_atom()
+    {
+        $rss = '<?xml version="1.0" encoding="UTF-8"?>'."\n".'<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="'.Config::get('application.language', 'pl').'">'."\n";
+
+        $rss .= "\t<title>".sprintf(Config::get('meta.title'), 'Atom')."</title>\n";
+
+        $rss .= "\t<id>".URL::base()."/</id>\n";
+        $rss .= "\t<link href=\"".URL::to('news/atom')."\" rel=\"self\" />\n";
+        $rss .= "\t<link href=\"".URL::base()."\" rel=\"alternate\" type=\"text/html\" />\n";
+        $rss .= "\t<link href=\"".URL::to('news/rss')."\" rel=\"alternate\" type=\"application/rss+xml\" />\n";
+
+        $rss .= "\t<generator version=\"1.3\">IonicCMS</generator>\n";
+        $rss .= "\t<subtitle>".Config::get('meta.description')."</subtitle>\n";
+
+        $updated = null;
+        $items = '';
+
+        foreach (Model\News::get(10) as $n)
+        {
+            $date = date('c', strtotime($n->created_at));
+            $link = URL::to(ionic_make_link('news', $n->slug, $n->external_url));
+
+            if (!$updated)
+                $updated = $date;
+
+            $intro = trim(html_entity_decode($n->content_intro, ENT_COMPAT, 'UTF-8'));
+
+            if (empty($intro))
+            {
+                $intro = trim(html_entity_decode(Str::limit(strip_tags($n->content), 200), ENT_COMPAT, 'UTF-8'));
+            }
+
+            if ($n->small_image)
+            {
+                $intro = '<img src="'.URL::base().'/public/upload/images/'.$n->small_image.'" width="200" height="150" alt="" /> '.$intro;
+            }
+
+            $items .= "\t<entry>\n";
+
+            $items .= "\t\t<title>".$n->title."</title>\n";
+            $items .= "\t\t<updated>".$date."</updated>\n";
+            $items .= "\t\t<link href=\"".$link."\" rel=\"alternate\" />\n";
+            $items .= "\t\t<id>".URL::to(ionic_make_link('news', $n->slug, $n->external_url))."</id>\n";
+            $items .= "\t\t<author>\n\t\t\t<name>".$n->display_name."</name>\n\t\t\t<uri>".URL::to(ionic_make_link('user', $n->user_slug))."</uri>\n\t\t</author>\n";
+            $items .= "\t\t<summary type=\"html\">".HTML::specialchars($intro)."</summary>\n";
+
+            $items .= "\t</entry>\n";
+        }
+
+        $rss .= "\t<updated>".$updated."</updated>\n".$items."</feed>";
+
+        return Response::make($rss, 200, array(
+            'Content-type' => 'application/atom+xml; charset=UTF-8'
+        ));
     }
 
     /**
@@ -117,11 +180,11 @@ class News_Controller extends Base_Controller {
             $pdf->write(1, "\n\nAutor: ".($news->display_name), '', 0, 'R');
 
             return Response::make($pdf->output('news.pdf', 'S'), 200, array(
-                        'Content-Type'        => 'application/pdf',
-                        'Content-Disposition' => 'inline; filename="news.pdf"',
-                        'Cache-Control'       => 'private, max-age=0, must-revalidate',
-                        'Pragma'              => 'public'
-                    ));
+                'Content-Type'        => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="news.pdf"',
+                'Cache-Control'       => 'private, max-age=0, must-revalidate',
+                'Pragma'              => 'public'
+            ));
         }
     }
 
@@ -130,6 +193,9 @@ class News_Controller extends Base_Controller {
      */
     public function action_index()
     {
+        // Preload news model
+        Autoloader::load('Model\News');
+
         // Setup page display
         $this->online('Strona główna', 'news/index');
         $this->layout = View::make('layouts.index');
@@ -140,167 +206,64 @@ class News_Controller extends Base_Controller {
             $this->main_news = $news['main'];
 
             $this->view = View::make('news.index', array(
-                        'main_news' => $news['main'],
-                        'news'      => $news['news'],
-                        'archive'   => $news['archive']
-                    ));
+                'main_news' => $news['main'],
+                'news'      => $news['news'],
+                'archive'   => $news['archive'],
+                'tags'      => $news['tags']
+            ));
 
             return;
         }
 
+        // Tags
+        $tags = new Model\NewsTagAccess;
+
+        // Retrieve news with "main_news" tag
         $exclude = array();
+
+        if (Config::get('limits.main_news', 0))
+        {
+            $this->main_news = Model\News::get_with_tag(1, Config::get('limits.main_news', 0));
+
+            // Make sure they won't get duplicated
+            foreach ($this->main_news as $n)
+            {
+                $exclude[] = $n->id;
+                $tags->news_ids[] = $n->id;
+            }
+        }
+
+        // Retrieve standard news
         $news = array();
         $archive = array();
         $news_limit = (int) Config::get('limits.news', 5);
         $headlines_limit = (int) Config::get('limits.headlines', 5);
         $i = 0;
 
-        // Retrieve news with "main_news" tag
-        if (Config::get('limits.main_news', 0))
+        foreach (Model\News::get($news_limit + $headlines_limit, $exclude) as $n)
         {
-            $this->main_news = DB::table('news_tags')
-                    ->left_join('news', 'news.id', '=', 'news_tags.news_id')
-                    ->left_join('users', 'users.id', '=', 'news.user_id')
-                    ->order_by('news.created_at', 'desc')
-                    ->take(Config::get('limits.main_news', 0))
-                    ->where(function($q) {
-                                $q->where('news.is_published', '=', 1);
-                                $q->or_where('news.publish_at', '<=', date('Y-m-d H:i:s'));
-                                $q->where('news.publish_at', '<>', '0000-00-00 00:00:00');
-                            })
-                    ->where('news_tags.tag_id', '=', 1)
-                    ->get(array('news.*',
-                'users.display_name', 'users.slug as user_slug'));
-
-            // Make sure they won't get duplicated
-            foreach ($this->main_news as $n)
+            if ($i < $news_limit)
             {
-                $exclude[] = $n->id;
+                $news[] = $n;
             }
+            else
+            {
+                $archive[] = $n;
+            }
+
+            $tags->news_ids[] = $n->id;
+
+            $i++;
         }
 
-        // Retrieve standard news
-        if (empty($exclude))
-        {
-            foreach (DB::table('news')->left_join('users', 'users.id', '=', 'news.user_id')
-                    ->order_by('news.created_at', 'desc')
-                    ->take(($news_limit + $headlines_limit))
-                    ->where('news.is_published', '=', 1)
-                    ->or_where('news.publish_at', '<=', date('Y-m-d H:i:s'))
-                    ->where('news.publish_at', '<>', '0000-00-00 00:00:00')
-                    ->get(array('news.*', 'users.display_name', 'users.slug as user_slug')) as $n)
-            {
-                if ($i < $news_limit)
-                {
-                    $news[] = $n;
-                }
-                else
-                {
-                    $archive[] = $n;
-                }
-
-                $i++;
-            }
-        }
-        else
-        {
-            foreach (DB::table('news')->left_join('users', 'users.id', '=', 'news.user_id')
-                    ->order_by('news.created_at', 'desc')
-                    ->take(($news_limit + $headlines_limit))
-                    ->where_not_in('news.id', $exclude)
-                    ->where(function($q) {
-                                $q->where('news.is_published', '=', 1);
-                                $q->or_where('news.publish_at', '<=', date('Y-m-d H:i:s'));
-                                $q->where('news.publish_at', '<>', '0000-00-00 00:00:00');
-                            })
-                    ->get(array('news.*', 'users.display_name', 'users.slug as user_slug')) as $n)
-            {
-                if ($i < $news_limit)
-                {
-                    $news[] = $n;
-                }
-                else
-                {
-                    $archive[] = $n;
-                }
-
-                $i++;
-            }
-        }
-
-        Cache::put('news-index', array('main' => $this->main_news, 'news' => $news, 'archive' => $archive), 6);
+        Cache::put('news-index', array('main' => $this->main_news, 'news' => $news, 'archive' => $archive, 'tags' => $tags), 6);
 
         // View
         $this->view = View::make('news.index', array(
-                    'main_news' => $this->main_news,
-                    'news'      => $news,
-                    'archive'   => $archive
-                ));
-    }
-
-    /**
-     * Atom
-     *
-     * @return Response
-     */
-    public function action_atom()
-    {
-        $rss = '<?xml version="1.0" encoding="UTF-8"?>'."\n".'<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="'.Config::get('application.language', 'pl').'">'."\n";
-
-        $rss .= "\t<title>".sprintf(Config::get('meta.title'), 'Atom')."</title>\n";
-
-        $rss .= "\t<id>".URL::base()."/</id>\n";
-        $rss .= "\t<link href=\"".URL::to('news/atom')."\" rel=\"self\" />\n";
-        $rss .= "\t<link href=\"".URL::base()."\" rel=\"alternate\" type=\"text/html\" />\n";
-        $rss .= "\t<link href=\"".URL::to('news/rss')."\" rel=\"alternate\" type=\"application/rss+xml\" />\n";
-
-        $rss .= "\t<generator version=\"1.3\">IonicCMS</generator>\n";
-        $rss .= "\t<subtitle>".Config::get('meta.description')."</subtitle>\n";
-
-        $updated = null;
-        $items = '';
-
-        foreach (DB::table('news')->order_by('news.created_at', 'desc')
-                ->where('news.is_published', '=', 1)
-                ->left_join('users', 'users.id', '=', 'news.user_id')
-                ->or_where('news.publish_at', '<=', date('Y-m-d H:i:s'))
-                ->where('news.publish_at', '<>', '0000-00-00 00:00:00')
-                ->take(10)->get(array('news.title', 'news.slug', 'news.external_url', 'news.created_at', 'news.content_intro', 'news.content', 'news.small_image', 'users.display_name', 'users.slug as user_slug')) as $n)
-        {
-            $date = date('c', strtotime($n->created_at));
-            $link = URL::to(ionic_make_link('news', $n->slug, $n->external_url));
-
-            if (!$updated)
-                $updated = $date;
-
-            $intro = trim(html_entity_decode($n->content_intro, ENT_COMPAT, 'UTF-8'));
-
-            if (empty($intro))
-            {
-                $intro = trim(html_entity_decode(Str::limit(strip_tags($n->content), 200), ENT_COMPAT, 'UTF-8'));
-            }
-
-            if ($n->small_image)
-            {
-                $intro = '<img src="'.URL::base().'/public/upload/images/'.$n->small_image.'" width="200" height="150" alt="" /> '.$intro;
-            }
-
-            $items .= "\t<entry>\n";
-
-            $items .= "\t\t<title>".$n->title."</title>\n";
-            $items .= "\t\t<updated>".$date."</updated>\n";
-            $items .= "\t\t<link href=\"".$link."\" rel=\"alternate\" />\n";
-            $items .= "\t\t<id>".URL::to(ionic_make_link('news', $n->slug, $n->external_url))."</id>\n";
-            $items .= "\t\t<author>\n\t\t\t<name>".$n->display_name."</name>\n\t\t\t<uri>".URL::to(ionic_make_link('user', $n->user_slug))."</uri>\n\t\t</author>\n";
-            $items .= "\t\t<summary type=\"html\">".HTML::specialchars($intro)."</summary>\n";
-
-            $items .= "\t</entry>\n";
-        }
-
-        $rss .= "\t<updated>".$updated."</updated>\n".$items."</feed>";
-
-        return Response::make($rss, 200, array(
-            'Content-type' => 'application/atom+xml; charset=UTF-8'
+            'main_news' => $this->main_news,
+            'news'      => $news,
+            'archive'   => $archive,
+            'tags'      => $tags
         ));
     }
 
@@ -321,11 +284,7 @@ class News_Controller extends Base_Controller {
         $rss .= "\t\t<description>".Config::get('meta.description')."</description>\n";
         $rss .= "\t\t<language>".Config::get('application.language', 'pl')."</language>\n";
 
-        foreach (DB::table('news')->order_by('news.created_at', 'desc')
-                ->where('news.is_published', '=', 1)
-                ->or_where('news.publish_at', '<=', date('Y-m-d H:i:s'))
-                ->where('news.publish_at', '<>', '0000-00-00 00:00:00')
-                ->take(10)->get(array('news.title', 'news.slug', 'news.external_url', 'news.created_at', 'news.content_intro', 'news.content', 'news.small_image')) as $n)
+        foreach (Model\News::get(10) as $n)
         {
             $intro = trim(html_entity_decode($n->content_intro, ENT_COMPAT, 'UTF-8'));
 
@@ -398,8 +357,9 @@ class News_Controller extends Base_Controller {
         // Tags
         $tags = array();
 
-        foreach (DB::table('news_tags')->join('tags', 'tags.id', '=', 'news_tags.tag_id')->where('news_id', '=', $news->id)
-                ->get(array('tags.title', 'tags.id', 'tags.slug')) as $t)
+        foreach (DB::table('news_tags')->join('tags', 'tags.id', '=', 'news_tags.tag_id')
+                                       ->where('news_id', '=', $news->id)
+                                       ->get(array('tags.title', 'tags.id', 'tags.slug')) as $t)
         {
             $tags[$t->id] = $t;
         }
@@ -436,7 +396,7 @@ class News_Controller extends Base_Controller {
         }
 
         $this->page->set_property('og:type', 'article');
-        $this->page->set_property('og:description', str_replace('"', '&quot;', strip_tags(html_entity_decode($news->content_intro, ENT_NOQUOTES))));
+        $this->page->set_property('og:description', HTML::specialchars(strip_tags(html_entity_decode($news->content_intro, ENT_QUOTES, 'UTF-8'))));
 
         // Setup page display
         $this->online($news->title, 'news/show/'.$news->slug);
