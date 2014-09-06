@@ -381,6 +381,7 @@ class News_Controller extends Base_Controller {
                                              ->where_in('tag_id', array_keys($tags))
                                              ->order_by('news_id', 'desc')
                                              ->take(3)
+                                             ->group_by('news_id')
                                              ->get(array('title', 'slug', 'created_at', 'comments_count', 'external_url'));
         }
 
