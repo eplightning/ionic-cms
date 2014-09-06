@@ -98,47 +98,19 @@
 	{% endfor %}
 </table>
 {% endfor %}
-{#{% for root in boards %}
-<div class="ionic-forum-root">
-	<div class="caption">{{ root[0].title }}</div>
-	<div class="table-captions">
-		<div class="board-content">Forum</div>
-		<div class="stats">Tematów / postów</div>
-		<div class="last-thread">Ostatni temat</div>
-	</div>
-	<ul class="boards">
-		{% for board in root[1] %}
-		<li>
-			<div class="board-content">
-				{% if unread[board[0].id] %}
-					<img src="public/img/forum/board_unread.png" alt="Nieprzeczytane posty" />
-				{% else %}
-					<img src="public/img/forum/board.png" alt="Brak nowych postów" />
-				{% endif %}
-				<h3><a href="board/show/{{ board[0].slug }}">{{ board[0].title }}</a></h3>
-				<p>{{ board[0].description }}</p>
-				{% if board[1]|length > 0 %}
-				<ul class="sub-boards">
-				{% for sub in board[1] %}
-					<li><a href="board/show/{{ sub.slug }}">{{ sub.title }}</a></li>
-				{% endfor %}
-				</ul>
-				{% endif %}
-			</div>
-			<div class="stats">
-				{{ board[0].threads_count }} / {{ board[0].posts_count }}
-			</div>
-			<div class="last-thread">
-				{% if board[0].last_title %}
-				<a href="thread/show/{{ board[0].last_slug }}/last">{{ board[0].last_title }}</a><br />
-				{{ board[0].last_date|relativedate }} przez {% if board[0].display_name %}<a href="{{ make('user', board[0].user_slug) }}">{{ board[0].display_name }}</a>{% else %}Gość{% endif %}
-				{% else %}
-				Brak
-				{% endif %}
-			</div>
-		</li>
-		{% endfor %}
-	</ul>
+<div class="ionic-box" style="text-align: right">
+    <select id="forum-jumpbox">
+        <option value="forum" selected="selected">Strona główna</option>
+        {% for item in jumpbox %}
+        <option value="{{ item[0] }}">{{ item[1] }}</option>
+        {% endfor %}
+    </select>
 </div>
-{% endfor %}#}
+<script type="text/javascript">
+$(function(){
+    $('#forum-jumpbox').change(function() {
+        window.location.href = IONIC_BASE_URL+$(this).val();
+    });
+});
+</script>
 {% endif %}

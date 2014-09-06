@@ -41,9 +41,14 @@ class Board_Controller extends Base_Controller {
         foreach ($sub_boards as $root) {
             $id = (int) $root[0]->id;
 
-            if (!$skip_check and !$this->permissions->can($id, PermissionManager::PERM_VIEW)) {
-                unset($sub_boards[$root[0]->id]);
-                continue;
+            if (!$skip_check) {
+                if (!$this->permissions->can($id, PermissionManager::PERM_VIEW)) {
+                    unset($sub_boards[$root[0]->id]);
+                    continue;
+                } elseif (!$this->permissions->can($id, PermissionManager::PERM_READ)) {
+                    $sub_boards[$root[0]->id][0]->last_title = 'Ukryte';
+                    $sub_boards[$root[0]->id][0]->last_slug = '';
+                }
             }
 
             // No threads or last post older than expiration date = always read forum
