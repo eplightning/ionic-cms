@@ -24,12 +24,9 @@ class Board {
         $select = array();
         $prev_depth = 0;
 
-        foreach (DB::table('forum_boards')->order_by('left', 'asc')->get(array('id', 'title', 'slug', 'depth')) as $elem)
-        {
-            if ($prev_depth > $elem->depth)
-            {
-                for (; $prev_depth > $elem->depth; $prev_depth--)
-                {
+        foreach (DB::table('forum_boards')->order_by('left', 'asc')->get(array('id', 'title', 'slug', 'depth')) as $elem) {
+            if ($prev_depth > $elem->depth) {
+                for (; $prev_depth > $elem->depth; $prev_depth--) {
                     if (isset($path[$prev_depth]))
                         unset($path[$prev_depth]);
                 }
