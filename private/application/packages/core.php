@@ -135,8 +135,14 @@ class Core_Package extends \Ionic\Package {
                  "ALTER TABLE ".DB::prefix()."news
                   ADD INDEX created_at (created_at)",
 
+                 "ALTER TABLE ".DB::prefix()."news
+                  ADD INDEX is_published (is_published)",
+
                  "ALTER TABLE ".DB::prefix()."news_tags
                   ADD INDEX news_id (news_id)",
+
+                 "ALTER TABLE ".DB::prefix()."shoutbox
+                  ADD INDEX `type` (`type`)",
 
                  "CREATE TABLE IF NOT EXISTS `".DB::prefix()."calendar` (
                    `id` int(10) unsigned NOT NULL AUTO_INCREMENT,

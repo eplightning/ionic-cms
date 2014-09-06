@@ -546,6 +546,7 @@ CREATE TABLE IF NOT EXISTS `{dbp}news` (
   UNIQUE KEY `slug` (`slug`),
   KEY `user_id` (`user_id`),
   KEY `created_at` (`created_at`),
+  KEY `is_published` (`is_published`),
   FULLTEXT KEY `title` (`content`,`title`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
@@ -1038,7 +1039,8 @@ CREATE TABLE IF NOT EXISTS `{dbp}shoutbox` (
   `content` text COLLATE utf8_unicode_ci NOT NULL,
   `ip` varchar(45) COLLATE utf8_unicode_ci NOT NULL DEFAULT '0.0.0.0',
   PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`)
+  KEY `user_id` (`user_id`),
+  KEY `type` (`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `{dbp}submitted_content` (
