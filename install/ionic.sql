@@ -563,7 +563,8 @@ CREATE TABLE IF NOT EXISTS `{dbp}newsletter` (
 CREATE TABLE IF NOT EXISTS `{dbp}news_tags` (
   `tag_id` int(10) unsigned NOT NULL DEFAULT '0',
   `news_id` int(10) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`tag_id`,`news_id`)
+  PRIMARY KEY (`tag_id`,`news_id`),
+  KEY `news_id` (`news_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `{dbp}notifications` (

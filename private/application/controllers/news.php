@@ -368,21 +368,20 @@ class News_Controller extends Base_Controller {
         if (empty($tags))
         {
             $similar = DB::table('news')->where('is_published', '=', 1)
-                    ->where('id', '<>', $news->id)
-                    ->order_by('id', 'desc')
-                    ->take(3)
-                    ->get(array('title', 'slug', 'created_at', 'comments_count', 'external_url'));
+                                        ->where('id', '<>', $news->id)
+                                        ->order_by('id', 'desc')
+                                        ->take(3)
+                                        ->get(array('title', 'slug', 'created_at', 'comments_count', 'external_url'));
         }
         else
         {
-            $similar = DB::table('news_tags')->distinct()
-                    ->where('is_published', '=', 1)
-                    ->where('id', '<>', $news->id)
-                    ->order_by('id', 'desc')
-                    ->take(3)
-                    ->where_in('tag_id', array_keys($tags))
-                    ->join('news', 'news_id', '=', 'id')
-                    ->get(array('title', 'slug', 'created_at', 'comments_count', 'external_url'));
+            $similar = DB::table('news_tags')->join('news', 'news_id', '=', 'id')
+                                             ->where('is_published', '=', 1)
+                                             ->where('news_id', '<>', $news->id)
+                                             ->where_in('tag_id', array_keys($tags))
+                                             ->order_by('news_id', 'desc')
+                                             ->take(3)
+                                             ->get(array('title', 'slug', 'created_at', 'comments_count', 'external_url'));
         }
 
         // Open graph

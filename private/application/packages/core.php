@@ -135,7 +135,10 @@ class Core_Package extends \Ionic\Package {
                  "ALTER TABLE ".DB::prefix()."news
                   ADD INDEX created_at (created_at)",
 
-                  "CREATE TABLE IF NOT EXISTS `".DB::prefix()."calendar` (
+                 "ALTER TABLE ".DB::prefix()."news_tags
+                  ADD INDEX news_id (news_id)",
+
+                 "CREATE TABLE IF NOT EXISTS `".DB::prefix()."calendar` (
                    `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
                    `title` varchar(127) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
                    `date_start` date NOT NULL DEFAULT '0000-00-00',
@@ -144,7 +147,7 @@ class Core_Package extends \Ionic\Package {
                    `type` varchar(127) NOT NULL DEFAULT '',
                    `options` mediumtext NOT NULL,
                    PRIMARY KEY (`id`)
-                   ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;",
+                  ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1",
             ), true);
 
             $version = '1.3';
