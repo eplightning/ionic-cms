@@ -121,6 +121,7 @@ class Forum_Package extends Package {
         // Class mappings
         Autoloader::map(array(
             'Model\\Forum\\Board'             => $root.'models'.DS.'Board.php',
+            'Model\\Forum\\Post'              => $root.'models'.DS.'Post.php',
             'Model\\Forum\\Thread'            => $root.'models'.DS.'Thread.php',
             'Ionic\\Forum\\MarkerManager'     => $root.'libraries'.DS.'MarkerManager.php',
             'Ionic\\Forum\\PermissionManager' => $root.'libraries'.DS.'PermissionManager.php',
@@ -160,7 +161,8 @@ class Forum_Package extends Package {
               `last_user_id` int(10) unsigned NOT NULL DEFAULT '0',
               PRIMARY KEY (`id`),
               UNIQUE KEY `slug` (`slug`),
-              KEY `last_user_id` (`last_user_id`)
+              KEY `last_user_id` (`last_user_id`),
+              KEY `left` (`left`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1",
 
             // Threads

@@ -1,13 +1,17 @@
 <style type="text/css">
 .ionic-forum-caption {
-    font-size: 1.2em;
-    font-weight: bold;
-    margin-bottom: 5px;
+	font-size: 1.2em;
+	font-weight: bold;
+	margin-bottom: 5px;
 }
 
 .ionic-forum-table .board-content {
 	width: 60%;
 	text-align: left;
+}
+
+.ionic-forum-table th.board-content {
+	text-align: center;
 }
 
 .ionic-forum-table .stats {
@@ -52,11 +56,7 @@
 	</div>
 	{% endif %}
 </div>
-{% if boards|length < 0 %}
-<div class="ionic-box">
-	Brak działów do wyświetlenia
-</div>
-{% else %}
+{% if boards|length > 0 %}
 {% for root in boards %}
 <h2 class="ionic-forum-caption">{{ root[0].title }}</h2>
 <table class="ionic-table ionic-forum-table">
@@ -69,9 +69,9 @@
 	<tr>
 		<td class="board-content">
 			{% if unread[board[0].id] %}
-				<img src="public/img/forum/board_unread.png" alt="Nieprzeczytane posty" />
+				<img src="public/img/forum/board_unread.png" alt="Nieprzeczytane posty" title="Nieprzeczytane posty" />
 			{% else %}
-				<img src="public/img/forum/board.png" alt="Brak nowych postów" />
+				<img src="public/img/forum/board.png" alt="Brak nowych postów" title="Brak nowych postów" />
 			{% endif %}
 			<h3><a href="board/show/{{ board[0].slug }}">{{ board[0].title }}</a></h3>
 			<p>{{ board[0].description }}</p>
@@ -98,19 +98,23 @@
 	{% endfor %}
 </table>
 {% endfor %}
+{% else %}
+<div class="ionic-box">
+	Brak działów do wyświetlenia
+</div>
+{% endif %}
 <div class="ionic-box" style="text-align: right">
-    <select id="forum-jumpbox">
-        <option value="forum" selected="selected">Strona główna</option>
-        {% for item in jumpbox %}
-        <option value="{{ item[0] }}">{{ item[1] }}</option>
-        {% endfor %}
-    </select>
+	<select id="forum-jumpbox">
+		<option value="forum" selected="selected">Strona główna</option>
+		{% for item in jumpbox %}
+		<option value="{{ item[0] }}">{{ item[1] }}</option>
+		{% endfor %}
+	</select>
 </div>
 <script type="text/javascript">
 $(function(){
-    $('#forum-jumpbox').change(function() {
-        window.location.href = IONIC_BASE_URL+$(this).val();
-    });
+	$('#forum-jumpbox').change(function() {
+		window.location.href = IONIC_BASE_URL+$(this).val();
+	});
 });
 </script>
-{% endif %}

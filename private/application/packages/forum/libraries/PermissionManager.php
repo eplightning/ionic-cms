@@ -15,25 +15,30 @@ use DB;
 class PermissionManager implements ArrayAccess {
 
     // Basic permissions (12 bits) 5 free
-    const PERM_VIEW      = 0x1;
-    const PERM_READ      = 0x2;
-    const PERM_POST      = 0x4;
-    const PERM_NEW_TOPIC = 0x8;
-    const PERM_EDIT_POST = 0x10;
-    const PERM_DEL_POST  = 0x20;
-    const PERM_DEL_TOPIC = 0x40;
+    const PERM_VIEW       = 0x1;
+    const PERM_READ       = 0x2;
+    const PERM_POST       = 0x4;
+    const PERM_NEW_THREAD = 0x8;
+    const PERM_EDIT_POST  = 0x10;
+    const PERM_DEL_POST   = 0x20;
+    const PERM_DEL_THREAD = 0x40;
 
     // Moderation (12 bits) 4 free
-    const PERM_MOD           = 0x1000;
-    const PERM_MOD_VIEW_IP   = 0x2000;
-    const PERM_MOD_EDIT      = 0x4000;
-    const PERM_MOD_DEL_POST  = 0x8000;
-    const PERM_MOD_DEL_TOPIC = 0x10000;
-    const PERM_MOD_MOVE      = 0x20000;
-    const PERM_MOD_MERGE     = 0x40000;
-    const PERM_MOD_CLOSE     = 0x80000;
+    const PERM_MOD            = 0x1000;
+    const PERM_MOD_VIEW_IP    = 0x2000;
+    const PERM_MOD_EDIT       = 0x4000;
+    const PERM_MOD_DEL_POST   = 0x8000;
+    const PERM_MOD_DEL_THREAD = 0x10000;
+    const PERM_MOD_MOVE       = 0x20000;
+    const PERM_MOD_MERGE      = 0x40000;
+    const PERM_MOD_CLOSE      = 0x80000;
 
     // Free bits (8 bits) 0x1000000 to 0x80000000
+
+    /**
+     * @var bool
+     */
+    protected $is_root = false;
 
     /**
      * @var array
@@ -50,8 +55,10 @@ class PermissionManager implements ArrayAccess {
      *
      * @param   int $group_id
      */
-    public function __construct($group_id = 0)
+    public function __construct($group_id = 0, $is_root = false)
     {
+        $this->is_root = $is_root;
+
         $permission_data = Cache::get('forum-permissions');
 
         if ($permission_data === null) {
@@ -77,7 +84,7 @@ class PermissionManager implements ArrayAccess {
     public function can($board, $permission)
     {
         // All under assumption that provided board_id is valid and our cache is not broken
-        return $this->permissions[$board] & $permission;
+        return ($this->permissions[$board] & $permission) or $this->is_root;
     }
 
     /**
@@ -102,7 +109,7 @@ class PermissionManager implements ArrayAccess {
         if ($this->selected_board === null)
             return false;
 
-        return $this->permissions[$this->selected_board] & $offset;
+        return ($this->permissions[$this->selected_board] & $offset) or $this->is_root;
     }
 
     /**

@@ -34,11 +34,10 @@ class Forum_Controller extends Base_Controller {
         // Process boards
         $unread = array();
         $board_ids = array();
-        $skip_check = Auth::can('admin_root');
         $expiration = time() - Config::get('forum.marker_expire', 7) * 86400;
 
         foreach ($boards as $root) {
-            if (!$skip_check and !$this->permissions->can((int) $root[0]->id, PermissionManager::PERM_VIEW)) {
+            if (!$this->permissions->can((int) $root[0]->id, PermissionManager::PERM_VIEW)) {
                 unset($boards[$root[0]->id]);
                 continue;
             }
@@ -50,14 +49,12 @@ class Forum_Controller extends Base_Controller {
             foreach ($root[1] as $board) {
                 $id = (int) $board[0]->id;
 
-                if (!$skip_check) {
-                    if (!$this->permissions->can($id, PermissionManager::PERM_VIEW)) {
-                        unset($boards[$root[0]->id][1][$board[0]->id]);
-                        continue;
-                    } elseif (!$this->permissions->can($id, PermissionManager::PERM_READ)) {
-                        $boards[$root[0]->id][1][$board[0]->id][0]->last_title = 'Ukryte';
-                        $boards[$root[0]->id][1][$board[0]->id][0]->last_slug = '';
-                    }
+                if (!$this->permissions->can($id, PermissionManager::PERM_VIEW)) {
+                    unset($boards[$root[0]->id][1][$board[0]->id]);
+                    continue;
+                } elseif (!$this->permissions->can($id, PermissionManager::PERM_READ)) {
+                    $boards[$root[0]->id][1][$board[0]->id][0]->last_title = 'Ukryte';
+                    $boards[$root[0]->id][1][$board[0]->id][0]->last_slug = '';
                 }
 
                 // No threads or last post older than expiration date = always read forum
@@ -71,11 +68,9 @@ class Forum_Controller extends Base_Controller {
                 }
 
                 // Third level (only permission check)
-                if (!$skip_check) {
-                    foreach ($board[1] as $sub) {
-                        if (!$this->permissions->can((int) $sub->id, PermissionManager::PERM_VIEW)) {
-                            unset($boards[$root[0]->id][1][$board[0]->id][1][$sub->id]);
-                        }
+                foreach ($board[1] as $sub) {
+                    if (!$this->permissions->can((int) $sub->id, PermissionManager::PERM_VIEW)) {
+                        unset($boards[$root[0]->id][1][$board[0]->id][1][$sub->id]);
                     }
                 }
             }
@@ -109,7 +104,7 @@ class Forum_Controller extends Base_Controller {
         parent::before();
 
         $this->markers = new MarkerManager;
-        $this->permissions = new PermissionManager(Auth::is_guest() ? 0 : (int) $this->user->group_id);
+        $this->permissions = new PermissionManager(Auth::is_guest() ? 0 : (int) $this->user->group_id, Auth::can('admin_root'));
     }
 
     /**
@@ -127,11 +122,9 @@ class Forum_Controller extends Base_Controller {
             Cache::put('forum-jumpbox', $jumpbox);
         }
 
-        if (!Auth::can('admin_root')) {
-            foreach ($jumpbox as $id => $val) {
-                if (!$this->permissions->can($id, PermissionManager::PERM_VIEW)) {
-                    unset($jumpbox[$id]);
-                }
+        foreach ($jumpbox as $id => $val) {
+            if (!$this->permissions->can($id, PermissionManager::PERM_VIEW)) {
+                unset($jumpbox[$id]);
             }
         }
 

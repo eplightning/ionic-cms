@@ -31,7 +31,7 @@ class MarkerManager implements ArrayAccess {
      */
     public function __construct()
     {
-        $this->expiration = Config::get('forum.marker_expire', 7) * 86400;
+        $this->expiration = time() - Config::get('forum.marker_expire', 7) * 86400;
 
         if (rand(1, Config::get('forum.marker_gc', 10)) == 1)
             $this->garbage_collector();
@@ -40,7 +40,7 @@ class MarkerManager implements ArrayAccess {
         if (Auth::is_guest())
             return;
 
-        foreach (DB::table('forum_markers')->where('time', '>', time() - $this->expiration)
+        foreach (DB::table('forum_markers')->where('time', '>', $this->expiration)
                                            ->where('user_id', '=', Auth::get_user()->id)
                                            ->get(array('thread_id')) as $marker) {
             $this->markers[] = (int) $marker->thread_id;
@@ -62,7 +62,7 @@ class MarkerManager implements ArrayAccess {
      */
     protected function garbage_collector()
     {
-        DB::table('forum_markers')->where('time', '<=', time() - $this->expiration)->delete();
+        DB::table('forum_markers')->where('time', '<=', $this->expiration)->delete();
     }
 
     /**
@@ -80,7 +80,7 @@ class MarkerManager implements ArrayAccess {
             return;
 
         // Too old or marked
-        if ($age <= time() - $this->expiration or $this->marked($thread))
+        if ($age <= $this->expiration or $this->marked($thread))
             return;
 
         DB::table('forum_markers')->insert(array(

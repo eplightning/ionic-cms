@@ -25,11 +25,9 @@ class Board {
         $prev_depth = 0;
 
         foreach (DB::table('forum_boards')->order_by('left', 'asc')->get(array('id', 'title', 'slug', 'depth')) as $elem) {
-            if ($prev_depth > $elem->depth) {
-                for (; $prev_depth > $elem->depth; $prev_depth--) {
-                    if (isset($path[$prev_depth]))
-                        unset($path[$prev_depth]);
-                }
+            for (; $prev_depth > $elem->depth; $prev_depth--) {
+                if (isset($path[$prev_depth]))
+                    unset($path[$prev_depth]);
             }
 
             $path[$elem->depth] = $elem->title;
@@ -63,7 +61,6 @@ class Board {
             $query->where('forum_boards.left', '>', $left)
                   ->where('forum_boards.right', '<', $right);
         }
-
 
         $boards = array();
 
@@ -125,5 +122,34 @@ class Board {
         }
 
         return $boards;
+    }
+
+    /**
+     * Update board and its parents counters
+     *
+     * @param   int $left
+     * @param   int $right
+     * @param   int $posts_change
+     * @param   int $threads_change
+     */
+    public static function update_board_counters($left, $right, $posts_change = 0, $threads_change = 0)
+    {
+        $update = array();
+
+        if ($posts_change > 0) {
+            $update['posts_count'] = DB::raw('`posts_count` + '.$posts_change);
+        } elseif ($posts_change < 0) {
+            $update['posts_count'] = DB::raw('`posts_count` - '.abs($posts_change));
+        }
+
+        if ($threads_change > 0) {
+            $update['threads_count'] = DB::raw('`threads_count` + '.$threads_change);
+        } elseif ($threads_change < 0) {
+            $update['threads_count'] = DB::raw('`threads_count` - '.abs($threads_change));
+        }
+
+        if (!empty($update)) {
+            DB::table('forum_boards')->where('left', '<=', $left)->where('right', '>=', $right)->update($update);
+        }
     }
 }
