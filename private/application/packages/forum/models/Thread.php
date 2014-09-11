@@ -2,6 +2,7 @@
 namespace Model\Forum;
 
 use Auth;
+use Config;
 use DB;
 
 /**
@@ -37,6 +38,11 @@ class Thread {
      * @var bool
      */
     public $is_closed = false;
+
+    /**
+     * @var bool
+     */
+    public $is_sticky = false;
 
     /**
      * @var int
@@ -93,6 +99,7 @@ class Thread {
         $this->created_at = $thread->created_at;
         $this->id = (int) $thread->id;
         $this->is_closed = (bool) $thread->is_closed;
+        $this->is_sticky = (bool) $thread->is_sticky;
         $this->last_id = (int) $thread->last_id;
         $this->last_date = $thread->last_date;
         $this->last_user_id = (int) $thread->last_user_id;
@@ -107,15 +114,18 @@ class Thread {
      */
     public function create()
     {
-        if ($this->user_id === null) {
-            $this->user_id = Auth::is_guest() ? 0 : Auth::get_user()->id;
-        }
+        if ($this->user_id === null)
+            $this->user_id = Auth::is_guest() ? null : Auth::get_user()->id;
+
+        if (!$this->created_at)
+            $this->created_at = date('Y-m-d H:i:s');
 
         $thread_id = DB::table('forum_threads')->insert_get_id(array(
             'board_id'    => $this->board_id,
             'user_id'     => $this->user_id,
             'is_closed'   => (int) $this->is_closed,
-            'created_at'  => $this->created_at ? $this->created_at : date('Y-m-d H:i:s'),
+            'is_sticky'   => (int) $this->is_sticky,
+            'created_at'  => $this->created_at,
             'title'       => $this->title,
             'slug'        => ionic_tmp_slug('forum_threads'),
             'posts_count' => $this->posts_count
@@ -126,6 +136,35 @@ class Thread {
         DB::table('forum_threads')->where('id', '=', $thread_id)->update(array('slug' => $this->slug));
 
         $this->id = (int) $thread_id;
+    }
+
+    /**
+     * Get unread threads
+     *
+     * @param   array   $ignore_board_ids
+     * @param   int     $offset
+     * @param   int     $count
+     * @param   array   $marker_ids
+     * @return  array
+     */
+    public static function get_new_threads(array $ignore_board_ids = array(), array $marker_ids = array(), $offset = 0, $count = 20)
+    {
+        $query = DB::table('forum_threads')->take($count)
+                                           ->skip($offset)
+                                           ->left_join('users', 'users.id', '=', 'forum_threads.last_user_id')
+                                           ->left_join('users as '.DB::prefix().'author', 'author.id', '=', 'forum_threads.user_id')
+                                           ->order_by('forum_threads.last_date', 'desc')
+                                           ->where('forum_threads.last_date', '>', time() - Config::get('forum.marker_expire', 7) * 86400);
+
+        if (!empty($ignore_board_ids))
+            $query->where_not_in('forum_threads.board_id', $ignore_board_ids);
+
+        if (!empty($marker_ids))
+            $query->where_not_in('forum_threads.id', $marker_ids);
+
+        return $query->get(array('forum_threads.*',
+                                 'users.slug as last_user_slug', 'users.display_name as last_display_name',
+                                 'author.slug as user_slug', 'author.display_name as display_name'));
     }
 
     /**
@@ -144,6 +183,7 @@ class Thread {
                                            ->where('forum_threads.board_id', '=', $board_id)
                                            ->skip($offset)
                                            ->take($limit)
+                                           ->order_by('forum_threads.is_sticky', 'desc')
                                            ->order_by($order_by, $order_type);
 
         return $query->get(array('forum_threads.*',

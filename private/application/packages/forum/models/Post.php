@@ -3,6 +3,7 @@ namespace Model\Forum;
 
 use Auth;
 use DB;
+use Request;
 use URL;
 
 /**
@@ -38,6 +39,11 @@ class Post {
      * @var int
      */
     public $id = null;
+
+    /**
+     * @var string
+     */
+    public $ip = null;
 
     /**
      * @var bool
@@ -88,6 +94,7 @@ class Post {
             $this->content_raw = $post->content_raw;
             $this->created_at = $post->created_at;
             $this->id = (int) $post->id;
+            $this->ip = $post->ip;
             $this->is_op = (bool) $post->is_op;
             $this->is_reported = (bool) $post->is_reported;
             $this->thread_id = (int) $post->thread_id;
@@ -102,20 +109,26 @@ class Post {
      */
     public function create()
     {
-        if ($this->user_id === null) {
-            $this->user_id = Auth::is_guest() ? 0 : Auth::get_user()->id;
-        }
+        if ($this->user_id === null)
+            $this->user_id = Auth::is_guest() ? null : Auth::get_user()->id;
+
+        if (!$this->ip)
+            $this->ip = Request::ip();
+
+        if (!$this->created_at)
+            $this->created_at = date('Y-m-d H:i:s');
 
         $post_id = DB::table('forum_posts')->insert_get_id(array(
             'thread_id'   => $this->thread_id,
             'user_id'     => $this->user_id,
             'is_op'       => (int) $this->is_op,
             'is_reported' => (int) $this->is_reported,
-            'created_at'  => $this->created_at ? $this->created_at : date('Y-m-d H:i:s'),
+            'created_at'  => $this->created_at,
             'updated_at'  => $this->updated_at,
             'updated_by'  => $this->updated_by,
             'content'     => $this->content,
-            'content_raw' => $this->content_raw
+            'content_raw' => $this->content_raw,
+            'ip'          => $this->ip
         ));
 
         DB::table('forum_posts_index')->insert(array(
@@ -182,11 +195,37 @@ class Post {
             'updated_at'  => $this->updated_at,
             'updated_by'  => $this->updated_by,
             'content'     => $this->content,
-            'content_raw' => $this->content_raw
+            'content_raw' => $this->content_raw,
+            'ip'          => $this->ip
         ));
 
         DB::table('forum_posts_index')->where('post_id', '=', $this->id)->update(array(
             'content_plain' => $this->content_clean
         ));
+    }
+
+    /**
+     * Get posts
+     *
+     * @param   int     $thread_id
+     * @param   int     $offset
+     * @param   int     $limit
+     * @param   string  $order_by
+     * @param   string  $order_type
+     */
+    public static function get_posts($thread_id, $offset = 0, $limit = 20, $order_by = 'forum_posts.id', $order_type = 'asc')
+    {
+        $query = DB::table('forum_posts')->left_join('users', 'forum_posts.user_id', '=', 'users.id')
+                                         ->left_join('profiles', 'profiles.user_id', '=', 'users.id')
+                                         ->left_join('groups', 'users.group_id', '=', 'groups.id')
+                                         ->where('forum_posts.thread_id', '=', $thread_id)
+                                         ->skip($offset)
+                                         ->take($limit)
+                                         ->order_by($order_by, $order_type);
+
+        return $query->get(array('forum_posts.*',
+                                 'users.slug as slug', 'users.display_name as display_name', 'users.email',
+                                 'groups.name as group_name', 'groups.style as group_style',
+                                 'profiles.posts_count', 'profiles.threads_count', 'profiles.avatar'));
     }
 }

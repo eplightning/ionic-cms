@@ -1,59 +1,10 @@
-<style type="text/css">
-.ionic-forum-caption {
-	font-size: 1.2em;
-	font-weight: bold;
-	margin-bottom: 5px;
-}
-
-.ionic-forum-table .board-content {
-	width: 60%;
-	text-align: left;
-}
-
-.ionic-forum-table th.board-content {
-	text-align: center;
-}
-
-.ionic-forum-table .stats {
-	width: 18%;
-	text-align: center;
-}
-
-.ionic-forum-table .last-thread {
-	width: 22%;
-	text-align: left;
-}
-
-.ionic-forum-table td.board-content img {
-	float: left;
-	margin-right: 10px;
-	margin-bottom: 10px;
-	cursor: pointer;
-}
-
-.ionic-forum-table td.board-content h3 {
-	margin-bottom: 5px;
-	padding: 0px;
-}
-
-.ionic-forum-table td.board-content ul.sub-boards {
-	list-style: circle;
-	padding: 0px;
-	margin: 5px 0px 0px 0px;
-}
-
-.ionic-forum-table td.board-content ul.sub-boards li {
-	float: left;
-	margin-right: 8px;
-}
-</style>
 <div class="ionic-box">
 	<h2>{{ board.title }}</h2>
 	<div class="ionic-toolbar">
-		<a href="forum">Strona główna forum</a>
 		{% if can_new %}
 		<a href="board/new/{{ board.id }}">Utwórz nowy temat</a>
 		{% endif %}
+		<a href="forum">Strona główna forum</a>
 	</div>
 </div>
 {% if sub_boards|length > 0 %}
@@ -87,7 +38,7 @@
 		</td>
 		<td class="last-thread">
 			{% if b[0].last_title %}
-			<a href="thread/show/{{ b[0].last_slug }}/last">{{ b[0].last_title }}</a><br />
+			<a href="thread/show/{{ b[0].last_slug }}?page=last">{{ b[0].last_title }}</a><br />
 			{{ b[0].last_date|relativedate }} przez {% if b[0].display_name %}<a href="{{ make('user', b[0].user_slug) }}">{{ b[0].display_name }}</a>{% else %}Gość{% endif %}
 			{% else %}
 			Brak
@@ -108,12 +59,14 @@
 	{% for thread in threads %}
 	<tr>
 		<td class="board-content">
-			{% if thread.is_unread %}
-				<img src="public/img/forum/thread_unread.png" alt="Nieprzeczytane posty" />
+			{% if thread.is_closed %}
+				<img src="public/img/forum/thread_closed.png" alt="Zamknięty temat" title="Zamknięty temat" />
+			{% elseif thread.is_unread %}
+				<img src="public/img/forum/thread_unread.png" alt="Nieprzeczytane posty" title="Nieprzeczytane posty" />
 			{% else %}
-				<img src="public/img/forum/thread.png" alt="Brak nowych postów" />
+				<img src="public/img/forum/thread.png" alt="Brak nowych postów" title="Brak nowych postów" />
 			{% endif %}
-			<h3><a href="thread/show/{{ thread.slug }}">{{ thread.title }}</a></h3>
+			<h3>{% if thread.is_sticky %}Przyklejony: {% endif %}<a href="thread/show/{{ thread.slug }}">{{ thread.title }}</a></h3>
 			<p>przez {% if thread.display_name %}<a href="{{ make('user', thread.user_slug) }}">{{ thread.display_name }}</a>{% else %}Gość{% endif %}</p>
 		</td>
 		<td class="stats">
@@ -137,6 +90,12 @@
 {% endif %}
 {{ paginator.links() }}
 <div class="ionic-box" style="text-align: right">
+	<div class="ionic-toolbar">
+		{% if can_new %}
+		<a href="board/new/{{ board.id }}">Utwórz nowy temat</a>
+		{% endif %}
+		<a href="forum">Strona główna forum</a>
+	</div>
 	<select id="forum-jumpbox">
 		<option value="forum">Strona główna</option>
 		{% for id, item in jumpbox %}

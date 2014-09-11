@@ -1,0 +1,58 @@
+<div class="ionic-box">
+	<h2>Nieprzeczytane tematy</h2>
+	<div class="ionic-toolbar">
+		<a href="forum">Strona główna forum</a>
+	</div>
+</div>
+{% if threads|length > 0 %}
+<table class="ionic-table ionic-forum-table">
+	<tr>
+		<th class="board-content">Temat</th>
+		<th class="stats">Postów / Wyśw.</th>
+		<th class="last-thread">Ostatnia aktywność</th>
+	</tr>
+	{% for thread in threads %}
+	<tr>
+		<td class="board-content">
+			{% if thread.is_closed %}
+				<img src="public/img/forum/thread_closed.png" alt="Zamknięty temat" title="Zamknięty temat" />
+			{% else %}
+				<img src="public/img/forum/thread_unread.png" alt="Nieprzeczytane posty" title="Nieprzeczytane posty" />
+			{% endif %}
+			<h3>{% if thread.is_sticky %}Przyklejony: {% endif %}<a href="thread/show/{{ thread.slug }}">{{ thread.title }}</a></h3>
+			<p>przez {% if thread.display_name %}<a href="{{ make('user', thread.user_slug) }}">{{ thread.display_name }}</a>{% else %}Gość{% endif %}</p>
+		</td>
+		<td class="stats">
+			{{ thread.posts_count }} / {{ thread.views }}
+		</td>
+		<td class="last-thread">
+			{% if thread.last_id %}
+			{% if thread.last_display_name %}<a href="{{ make('user', thread.last_user_slug) }}">{{ thread.last_display_name }}</a>{% else %}Gość{% endif %}<br />
+			{{ thread.last_date|relativedate }}
+			{% else %}
+			Brak
+			{% endif %}
+		</td>
+	</tr>
+	{% endfor %}
+</table>
+{% else %}
+<div class="ionic-box">
+	Brak tematów posiadających nowe posty
+</div>
+{% endif %}
+<div class="ionic-box" style="text-align: right">
+	<select id="forum-jumpbox">
+		<option value="forum">Strona główna</option>
+		{% for id, item in jumpbox %}
+		<option value="{{ item[0] }}"{% if id == board.id %} selected="selected"{% endif %}>{{ item[1] }}</option>
+		{% endfor %}
+	</select>
+</div>
+<script type="text/javascript">
+$(function(){
+	$('#forum-jumpbox').change(function() {
+		window.location.href = IONIC_BASE_URL+$(this).val();
+	});
+});
+</script>

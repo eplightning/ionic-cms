@@ -23,17 +23,41 @@ class PermissionManager implements ArrayAccess {
     const PERM_DEL_POST   = 0x20;
     const PERM_DEL_THREAD = 0x40;
 
-    // Moderation (12 bits) 4 free
+    // Moderation (12 bits) 3 free
     const PERM_MOD            = 0x1000;
     const PERM_MOD_VIEW_IP    = 0x2000;
-    const PERM_MOD_EDIT       = 0x4000;
-    const PERM_MOD_DEL_POST   = 0x8000;
-    const PERM_MOD_DEL_THREAD = 0x10000;
-    const PERM_MOD_MOVE       = 0x20000;
-    const PERM_MOD_MERGE      = 0x40000;
-    const PERM_MOD_CLOSE      = 0x80000;
+    const PERM_MOD_CLOSE      = 0x4000;
+    const PERM_MOD_STICKY     = 0x8000;
+    const PERM_MOD_EDIT       = 0x10000;
+    const PERM_MOD_DEL_POST   = 0x20000;
+    const PERM_MOD_DEL_THREAD = 0x40000;
+    const PERM_MOD_MOVE       = 0x80000;
+    const PERM_MOD_MERGE      = 0x100000;
 
     // Free bits (8 bits) 0x1000000 to 0x80000000
+
+    /**
+     * @var array
+     */
+    public static $bits = array(
+        'view'       => 0x1,
+        'read'       => 0x2,
+        'post'       => 0x4,
+        'new_thread' => 0x8,
+        'edit_post'  => 0x10,
+        'del_post'   => 0x20,
+        'del_thread' => 0x40,
+
+        'mod'            => 0x1000,
+        'mod_view_ip'    => 0x2000,
+        'mod_close'      => 0x4000,
+        'mod_sticky'     => 0x8000,
+        'mod_edit'       => 0x10000,
+        'mod_del_post'   => 0x20000,
+        'mod_del_thread' => 0x40000,
+        'mod_move'       => 0x80000,
+        'mod_merge'      => 0x100000
+    );
 
     /**
      * @var bool
@@ -43,7 +67,7 @@ class PermissionManager implements ArrayAccess {
     /**
      * @var array
      */
-    protected $permissions = array();
+    public $permissions = array();
 
     /**
      * @var int
@@ -95,7 +119,7 @@ class PermissionManager implements ArrayAccess {
      */
     public function offsetExists($offset)
     {
-        return is_int($offset);
+        return isset(self::$bits[$offset]);
     }
 
     /**
@@ -109,7 +133,7 @@ class PermissionManager implements ArrayAccess {
         if ($this->selected_board === null)
             return false;
 
-        return ($this->permissions[$this->selected_board] & $offset) or $this->is_root;
+        return ($this->permissions[$this->selected_board] & self::$bits[$offset]) or $this->is_root;
     }
 
     /**

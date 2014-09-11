@@ -16,6 +16,9 @@ class Board_Controller extends Base_Controller {
      */
     public function action_new($board)
     {
+        if (Auth::banned() or !ctype_digit($board))
+            return Response::error(500);
+
         $board = DB::table('forum_boards')->where('id', '=', $board)->first('*');
 
         if (!$board or $board->depth == 0)
@@ -24,13 +27,30 @@ class Board_Controller extends Base_Controller {
         $board_id = (int) $board->id;
 
         if (!$this->permissions->can($board_id, PermissionManager::PERM_NEW_THREAD)) {
-            $this->notice('Nie posiadasz wystarczających uprawnień, aby utworzyć temat na tym forum.');
+            $this->notice('Nie posiadasz wystarczających uprawnień, aby utworzyć temat na tym forum');
             return Redirect::to('forum');
         }
 
+        if (Auth::is_guest())
+            require_once path('app').'vendor'.DS.'recaptchalib.php';
+
         if (!Request::forged() and Request::method() == 'POST') {
-            $raw_data = array('title' => '', 'post' => '', 'is_closed' => '');
-            $raw_data = array_merge($raw_data, Input::only(array('title', 'post', 'is_closed')));
+            if (Auth::is_guest()) {
+                if (!isset($_POST['recaptcha_challenge_field']))
+                    $_POST['recaptcha_challenge_field'] = '';
+                if (!isset($_POST['recaptcha_response_field']))
+                    $_POST['recaptcha_response_field'] = '';
+
+                $response = recaptcha_check_answer(Config::get('advanced.recaptcha_private', ''), Request::ip(), $_POST['recaptcha_challenge_field'], $_POST['recaptcha_response_field']);
+
+                if (!$response->is_valid) {
+                    $this->notice('Wprowadzony kod z obrazka jest nieprawidłowy');
+                    return Redirect::to('board/new/'.$board->id)->with_input('only', array('title', 'post', 'is_closed', 'is_sticky'));
+                }
+            }
+
+            $raw_data = array('title' => '', 'post' => '', 'is_closed' => '', 'is_sticky' => '');
+            $raw_data = array_merge($raw_data, Input::only(array('title', 'post', 'is_closed', 'is_sticky')));
 
             $rules = array(
                 'title'     => 'required|max:127',
@@ -40,7 +60,7 @@ class Board_Controller extends Base_Controller {
             $validator = Validator::make($raw_data, $rules);
 
             if ($validator->fails()) {
-                return Redirect::to('board/new/'.$board->id)->with_input('only', array('title', 'post', 'is_closed'));
+                return Redirect::to('board/new/'.$board->id)->with_input('only', array('title', 'post', 'is_closed', 'is_sticky'));
             }
 
             DB::connection()->pdo->beginTransaction();
@@ -61,6 +81,12 @@ class Board_Controller extends Base_Controller {
                     $thread->is_closed = Input::get('is_closed', '0') == '1';
                 } else {
                     $thread->is_closed = false;
+                }
+
+                if ($this->permissions->can($board_id, PermissionManager::PERM_MOD_STICKY)) {
+                    $thread->is_sticky = Input::get('is_sticky', '0') == '1';
+                } else {
+                    $thread->is_sticky = false;
                 }
 
                 $thread->create();
@@ -85,7 +111,7 @@ class Board_Controller extends Base_Controller {
                 DB::connection()->pdo->rollBack();
 
                 $this->notice('Nieznany błąd');
-                return Redirect::to('board/new/'.$board->id)->with_input('only', array('title', 'post', 'is_closed'));
+                return Redirect::to('board/new/'.$board->id)->with_input('only', array('title', 'post', 'is_closed', 'is_sticky'));
             }
 
             DB::connection()->pdo->commit();
@@ -95,7 +121,7 @@ class Board_Controller extends Base_Controller {
         }
 
         // Old data
-        $old_data = array('title' => '', 'post' => '', 'is_closed' => '');
+        $old_data = array('title' => '', 'post' => '', 'is_closed' => '', 'is_sticky' => '');
         $old_data = array_merge($old_data, Input::old());
 
         // Setup page display
@@ -109,9 +135,11 @@ class Board_Controller extends Base_Controller {
         Asset::add('markitup', 'public/js/skins/simple/style.css');
 
         $this->view = View::make('forum.new_thread', array(
-            'board'     => $board,
-            'can_close' => $this->permissions->can($board_id, PermissionManager::PERM_MOD_CLOSE),
-            'old'       => $old_data
+            'board'      => $board,
+            'can_close'  => $this->permissions->can($board_id, PermissionManager::PERM_MOD_CLOSE),
+            'can_sticky' => $this->permissions->can($board_id, PermissionManager::PERM_MOD_STICKY),
+            'old'        => $old_data,
+            'recaptcha'  => Auth::is_guest() ? recaptcha_get_html(Config::get('advanced.recaptcha_public', '')) : ''
         ));
     }
 
@@ -131,7 +159,7 @@ class Board_Controller extends Base_Controller {
 
         // Read permission
         if (!$this->permissions->can($board_id, PermissionManager::PERM_READ)) {
-            $this->notice('Nie posiadasz wystarczających uprawnień, aby przeglądać zawartość tego forum.');
+            $this->notice('Nie posiadasz wystarczających uprawnień, aby przeglądać zawartość tego forum');
             return Redirect::to('forum');
         }
 
@@ -205,7 +233,7 @@ class Board_Controller extends Base_Controller {
             'jumpbox'    => $this->get_jumpbox(),
             'paginator'  => $paginator,
             'threads'    => $threads,
-            'can_new'    => $this->permissions->can($board_id, PermissionManager::PERM_NEW_THREAD)
+            'can_new'    => $this->permissions->can($board_id, PermissionManager::PERM_NEW_THREAD) and !Auth::banned()
         ));
     }
 

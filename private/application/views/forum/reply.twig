@@ -1,27 +1,14 @@
 <div class="ionic-box">
-	<h2>Tworzenie nowego tematu</h2>
-	<form action="board/new/{{ board.id }}" method="post">
+	<h2>Odpowiadanie na temat</h2>
+	<form action="{{ action }}" method="post">
 	<div class="ionic-form">
-		<div class="ionic-form-legend">Szczegóły tematu</div>
+		<div class="ionic-form-legend">Szczegóły postu</div>
 		<div class="ionic-form-elem">
-			<label for="title">Tytuł:</label>
-			<input type="text" name="title" id="title" maxlength="127" value="{{ old.title|e }}" />
+			<label>Temat:</label> {{ thread.title }}
 		</div>
 		<div class="ionic-form-elem">
 			<textarea id="bbcode" name="post" style="width: 100%">{{ old.post|e }}</textarea>
 		</div>
-		{% if can_close %}
-		<div class="ionic-form-elem">
-			<label for="is_closed">Zamknij temat:</label>
-			<input type="checkbox" name="is_closed" id="is_closed" class="checkbox" value="1"{% if old.is_closed %} checked="checked"{% endif %} />
-		</div>
-		{% endif %}
-		{% if can_sticky %}
-		<div class="ionic-form-elem">
-			<label for="is_sticky">Przyklej temat:</label>
-			<input type="checkbox" name="is_sticky" id="is_sticky" class="checkbox" value="1"{% if old.is_sticky %} checked="checked"{% endif %} />
-		</div>
-		{% endif %}
 		{% if not current_user %}
 		<div class="ionic-form-elem">
 			{{ recaptcha }}

@@ -1,6 +1,7 @@
 <?php
 namespace Model\Forum;
 
+use Config;
 use DB;
 
 /**

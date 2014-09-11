@@ -818,7 +818,7 @@ else return $bbcode->rule_html;
 function DoQuote($bbcode, $action, $name, $default, $params, $content) {
 if ($action == BBCODE_CHECK) return true;
 if (isset($params['name'])) {
-$title = htmlspecialchars(trim($params['name'])) . " wrote";
+$title = htmlspecialchars(trim($params['name'])) . " napisał";
 if (isset($params['date']))
 $title .= " on " . htmlspecialchars(trim($params['date']));
 $title .= ":";
@@ -829,8 +829,8 @@ $title = "<a href=\"" . htmlspecialchars($params['url']) . "\">" . $title . "</a
 }
 }
 else if (!is_string($default))
-$title = "Quote:";
-else $title = htmlspecialchars(trim($default)) . " wrote:";
+$title = "Cytat:";
+else $title = htmlspecialchars(trim($default)) . " napisał:";
 return "\n<div class=\"bbcode_quote\">\n<div class=\"bbcode_quote_head\">"
 . $title . "</div>\n<div class=\"bbcode_quote_body\">"
 . $content . "</div>\n</div>\n";
@@ -2047,4 +2047,3 @@ $result = trim($result);
 return $result;
 }
 }
-

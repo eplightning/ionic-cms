@@ -153,6 +153,6 @@ class MarkerManager implements ArrayAccess {
      */
     public function unmark($thread)
     {
-        DB::delete('forum_markers')->where('thread_id', '=', $thread)->delete();
+        DB::table('forum_markers')->where('thread_id', '=', $thread)->delete();
     }
 }

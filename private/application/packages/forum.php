@@ -174,6 +174,7 @@ class Forum_Package extends Package {
               `slug` varchar(127) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
               `created_at` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
               `is_closed` tinyint(3) NOT NULL DEFAULT '0',
+              `is_sticky` tinyint(3) NOT NULL DEFAULT '0',
               `posts_count` int(10) unsigned NOT NULL DEFAULT '0',
               `views` int(10) unsigned NOT NULL DEFAULT '0',
               `last_id` int(10) unsigned NOT NULL DEFAULT '0',
@@ -185,6 +186,7 @@ class Forum_Package extends Package {
               KEY `user_id` (`user_id`),
               KEY `last_date` (`last_date`),
               KEY `last_user_id` (`last_user_id`),
+              KEY `is_sticky` (`is_sticky`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1",
             "ALTER TABLE `".$prefix."forum_threads`
              ADD FOREIGN KEY (`board_id`) REFERENCES `".$prefix."forum_boards`(`id`) ON DELETE CASCADE ON UPDATE CASCADE",
@@ -203,6 +205,7 @@ class Forum_Package extends Package {
               `created_at` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
               `updated_at` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
               `updated_by` varchar(20) NOT NULL DEFAULT '',
+              `ip` varchar(45) COLLATE utf8_unicode_ci NOT NULL DEFAULT '0.0.0.0',
               PRIMARY KEY (`id`),
               KEY `thread_id` (`thread_id`),
               KEY `user_id` (`user_id`)

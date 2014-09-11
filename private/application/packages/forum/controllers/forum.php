@@ -42,9 +42,6 @@ class Forum_Controller extends Base_Controller {
                 continue;
             }
 
-            // Just in case
-            $unread[(int) $root[0]->id] = false;
-
             // Second level
             foreach ($root[1] as $board) {
                 $id = (int) $board[0]->id;
@@ -93,6 +90,37 @@ class Forum_Controller extends Base_Controller {
             'boards'  => $boards,
             'unread'  => $unread,
             'jumpbox' => $this->get_jumpbox()
+        ));
+    }
+
+    /**
+     * Show threads with unread posts
+     *
+     * @return  Response
+     */
+    public function action_new_threads()
+    {
+        if (Auth::is_guest())
+            return Response::error(403);
+
+        $no_access = array();
+
+        foreach ($this->permissions->permissions as $board => $mask) {
+            if (!($mask & PermissionManager::PERM_READ))
+                $no_access[] = $board;
+        }
+
+        $threads = Model\Forum\Thread::get_new_threads($no_access, $this->markers->markers, 0, 30);
+
+        // Setup page display
+        $this->page->set_title('Nieprzeczytane tematy');
+        $this->page->breadcrumb_append('Forum', 'forum');
+        $this->page->breadcrumb_append('Nieprzeczytane tematy', 'forum/new_threads');
+        $this->online('Nieprzeczytane tematy', 'forum/new_threads');
+
+        $this->view = View::make('forum.new_threads', array(
+            'jumpbox'    => $this->get_jumpbox(),
+            'threads'    => $threads
         ));
     }
 

@@ -1,0 +1,94 @@
+<div class="ionic-box">
+	<h2>Temat: {{ thread.title }}</h2>
+	<div class="ionic-toolbar">
+		<a href="board/show/{{ board.slug }}">Powrót do forum</a>
+		{% if can_post %}
+		<a href="thread/reply/{{ thread.id }}">Odpowiedz</a>
+		{% elseif thread.is_closed %}
+		<a>Temat jest zamknięty</a>
+		{% endif %}
+	</div>
+</div>
+{% for post in posts %}
+<div class="ionic-post" id="post-id-{{ post.id }}">
+	<div class="ionic-post-left">
+		{% if post.user_id %}
+		<div class="ionic-post-username"><a href="{{ make('user', post.slug) }}">{{ post.display_name }}</a></div>
+		<div class="ionic-post-status">{% if online.is_online(post.user_id) %}Użytkownik jest online{% endif %}</div>
+		{% if post.avatar %}
+		<div class="ionic-post-avatar">
+			<img src="public/upload/avatars/{{ post.avatar }}" alt="" />
+		</div>
+		{% else %}
+		<div class="ionic-post-avatar">
+			<img src="http://www.gravatar.com/avatar/{{ post.email|md5 }}?s=80" alt="" />
+		</div>
+		{% endif %}
+		<ul class="ionic-list">
+			<li>Grupa: {% if post.group_style %}{{ post.group_style|format(post.group_name) }}{% else %}{{ post.group_name }}{% endif %}</li>
+			<li>Postów: {{ post.posts_count }}</li>
+			<li>Tematów: {{ post.threads_count }}</li>
+			{% if permissions['mod_view_ip'] %}
+			<li>IP: {{ post.ip }}</li>
+			{% endif %}
+		</ul>
+		{% else %}
+		<div class="ionic-post-username"><a>Gość</a></div>
+		{% endif %}
+	</div>
+	<div class="ionic-post-right">
+		<div class="ionic-post-info">
+			<div class="ionic-left">
+			Dodano: {{ post.created_at|relativedate }}; Post <a href="thread/show/{{ thread.slug }}?post={{ post.id }}#post-id-{{ post.id }}">#{{ post.id }}</a>
+			</div>
+			<div class="ionic-right">
+				{# Cytat #}
+				{% if can_post %}
+				<a href="thread/reply/{{ thread.id }}/{{ post.id }}" title="Cytuj"><img src="public/img/icons/comments.png" alt="" /></a>
+				{% endif %}
+				{# Wszyscy użytkownicy oprócz autora mają opcje zgłaszani #}
+				{% if current_user and current_user.id != post.user_id %}
+				<a href="thread/report/{{ post.id }}" title="Zgłoś"><img src="public/img/icons/report.png" alt="" /></a>
+				{% endif %}
+				{# Edycja #}
+				{% if (current_user and current_user.id == post.user_id and permissions['edit_post']) or permissions['mod_edit'] %}
+				<a href="thread/edit/{{ post.id }}" title="Edytuj"><img src="public/img/icons/page_edit.png" alt="" /></a>
+				{% endif %}
+				{% if post.is_op %}
+				{# Usuwanie tematu #}
+				{% if (is_owner and permissions['del_thread']) or permissions['mod_del_thread'] %}
+				<a href="thread/delete/{{ post.id }}" title="Usuń temat"><img src="public/img/icons/delete.png" alt="" /></a>
+				{% endif %}
+				{% else %}
+				{# Usuwanie postu #}
+				{% if (current_user and current_user.id == post.user_id and permissions['del_post']) or permissions['mod_del_post'] %}
+				<a href="thread/delete/{{ post.id }}" title="Usuń post"><img src="public/img/icons/delete.png" alt="" /></a>
+				{% endif %}
+				{% endif %}
+			</div>
+		</div>
+		<div class="ionic-post-content">
+			{{ post.content }}
+			{% if post.updated_at != '0000-00-00 00:00:00' %}
+			<p>Ostatnio zmodyfikowany {{ post.updated_at|relativedate }} przez {{ post.updated_by ? post.updated_by : 'Ukryte' }}</p>
+			{% endif %}
+		</div>
+	</div>
+</div>
+{% endfor %}
+{{ paginator.links() }}
+<div class="ionic-box" style="text-align: right">
+	<select id="forum-jumpbox">
+		<option value="forum">Strona główna</option>
+		{% for id, item in jumpbox %}
+		<option value="{{ item[0] }}"{% if id == board.id %} selected="selected"{% endif %}>{{ item[1] }}</option>
+		{% endfor %}
+	</select>
+</div>
+<script type="text/javascript">
+$(function(){
+	$('#forum-jumpbox').change(function() {
+		window.location.href = IONIC_BASE_URL+$(this).val();
+	});
+});
+</script>
