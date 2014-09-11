@@ -1,14 +1,18 @@
 <div class="ionic-box">
 	<h2>Temat: {{ thread.title }}</h2>
 	<div class="ionic-toolbar">
-		<a href="board/show/{{ board.slug }}">Powrót do forum</a>
 		{% if can_post %}
 		<a href="thread/reply/{{ thread.id }}">Odpowiedz</a>
 		{% elseif thread.is_closed %}
 		<a>Temat jest zamknięty</a>
 		{% endif %}
+		{% if permissions['mod'] %}
+		<a href="thread/mod/{{ thread.id }}">Moderacja</a>
+		{% endif %}
+		<a href="board/show/{{ board.slug }}">Powrót do forum</a>
 	</div>
 </div>
+{% set default_avatar = 'http://www.gravatar.com/avatar/'~('example@gmail.com'|md5)~'?s=80' %}
 {% for post in posts %}
 <div class="ionic-post" id="post-id-{{ post.id }}">
 	<div class="ionic-post-left">
@@ -21,7 +25,7 @@
 		</div>
 		{% else %}
 		<div class="ionic-post-avatar">
-			<img src="http://www.gravatar.com/avatar/{{ post.email|md5 }}?s=80" alt="" />
+			<img src="{{ default_avatar }}" alt="" />
 		</div>
 		{% endif %}
 		<ul class="ionic-list">
@@ -34,6 +38,17 @@
 		</ul>
 		{% else %}
 		<div class="ionic-post-username"><a>Gość</a></div>
+		<div class="ionic-post-avatar">
+			<img src="{{ default_avatar }}" alt="" />
+		</div>
+		<ul class="ionic-list">
+			<li>Grupa: Goście</li>
+			<li>Postów: 0</li>
+			<li>Tematów: 0</li>
+			{% if permissions['mod_view_ip'] %}
+			<li>IP: {{ post.ip }}</li>
+			{% endif %}
+		</ul>
 		{% endif %}
 	</div>
 	<div class="ionic-post-right">
@@ -78,6 +93,17 @@
 {% endfor %}
 {{ paginator.links() }}
 <div class="ionic-box" style="text-align: right">
+	<div class="ionic-toolbar">
+		{% if can_post %}
+		<a href="thread/reply/{{ thread.id }}">Odpowiedz</a>
+		{% elseif thread.is_closed %}
+		<a>Temat jest zamknięty</a>
+		{% endif %}
+		{% if permissions['mod'] %}
+		<a href="thread/mod/{{ thread.id }}">Moderacja</a>
+		{% endif %}
+		<a href="board/show/{{ board.slug }}">Powrót do forum</a>
+	</div>
 	<select id="forum-jumpbox">
 		<option value="forum">Strona główna</option>
 		{% for id, item in jumpbox %}

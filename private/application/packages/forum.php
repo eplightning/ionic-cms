@@ -86,6 +86,13 @@ class Forum_Package extends Package {
      */
     public function init_package()
     {
+        // Report types
+        Event::listen('ionic.reports_list', function() {
+            return array(
+                'forum_post' => 'Post na forum'
+            );
+        });
+
         // Widget names
         Event::listen('ionic.widget_name', function() {
             return array(

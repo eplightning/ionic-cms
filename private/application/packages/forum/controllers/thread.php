@@ -159,6 +159,69 @@ class Thread_Controller extends Base_Controller {
     }
 
     /**
+     * Report post
+     *
+     * @param  string   $comment
+     * @return Response
+     */
+    public function action_report($post)
+    {
+        if (Auth::is_guest() or !ctype_digit($post))
+            return Response::error(500);
+
+        $post = DB::table('forum_posts')->join('forum_threads', 'forum_threads.id', '=', 'forum_posts.thread_id')
+                                        ->where('forum_posts.id', '=', (int) $post)
+                                        ->first(array('forum_posts.id', 'forum_posts.user_id', 'forum_posts.content', 'forum_posts.is_reported',
+                                                      'forum_threads.slug', 'forum_threads.board_id', 'forum_threads.title'));
+
+        if (!$post)
+            return Response::error(404);
+
+        if (!$this->permissions->can((int) $post->board_id, PermissionManager::PERM_READ))
+            return Response::error(403);
+
+        $item_link = 'thread/show/'.$post->slug.'?post='.$post->id.'#post-id-'.$post->id;
+
+        if ($post->user_id == $this->user->id) {
+            $this->notice('Nie możesz zgłosić swojego własnego postu');
+            return Redirect::to($item_link);
+        }
+
+        $report = DB::table('reports')->where('item_id', '=', $post->id)
+                                      ->where('item_type', '=', 'forum_post')
+                                      ->where('user_id', '=', $this->user->id)
+                                      ->first(array('id'));
+
+        if ($report) {
+            $this->notice('Ten post został już przez Ciebie zgłoszony');
+            return Redirect::to($item_link);
+        }
+
+        if (!($status = $this->confirm())) {
+            return;
+        }
+        elseif ($status == 2) {
+            return Redirect::to($item_link);
+        }
+
+        if (!$post->is_reported)
+            DB::table('forum_posts')->where('id', '=', $post->id)->update(array('is_reported' => 1));
+
+        DB::table('reports')->insert(array(
+            'user_id'       => $this->user->id,
+            'title'         => $post->title,
+            'saved_content' => $post->content,
+            'created_at'    => date('Y-m-d H:i:s'),
+            'item_type'     => 'forum_post',
+            'item_id'       => $post->id,
+            'item_link'     => $item_link
+        ));
+
+        $this->notice('Post został zgłoszony pomyślnie');
+        return Redirect::to($item_link);
+    }
+
+    /**
      * Show thread
      *
      * @param   string      $thread
