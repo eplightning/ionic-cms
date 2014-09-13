@@ -342,7 +342,8 @@ function ionic_date($time = null, $format = 'standard', $relative = false)
     if ($relative)
     {
         // Interval
-        $interval = $time->diff(new DateTime('now'), true);
+        $now = new DateTime('now');
+        $interval = $time->diff($now, true);
 
         if ($interval->y > 0)
         {
@@ -376,18 +377,15 @@ function ionic_date($time = null, $format = 'standard', $relative = false)
         }
         elseif ($interval->d > 0)
         {
-            if ($interval->d == 1)
+            $now->setTime(0, 0);
+            $interval = $time->diff($now, true);
+
+            if ($interval->d < 0)
             {
-                return sprintf('wczoraj o %s', $time->format(Config::get('application.date_time')));
+                return 'wczoraj o '.$time->format(Config::get('application.date_time'));
             }
-            elseif ($interval->d < 5)
-            {
-                return sprintf('%d dni temu', $interval->d);
-            }
-            else
-            {
-                return sprintf('%d dni temu', $interval->d);
-            }
+
+            return ($interval->d + 1).' dni temu';
         }
         elseif ($interval->h > 0)
         {
