@@ -139,6 +139,17 @@ class Thread {
     }
 
     /**
+     * Delete thread
+     */
+    public function delete()
+    {
+        if (!$this->id)
+            return;
+
+        DB::table('forum_threads')->where('id', '=', $this->id)->delete();
+    }
+
+    /**
      * Update thread's board
      */
     public function update_board()
@@ -148,6 +159,21 @@ class Thread {
 
         DB::table('forum_threads')->where('id', '=', $this->id)->update(array(
             'board_id' => $this->board_id
+        ));
+    }
+
+    /**
+     * Update last post info
+     */
+    public function update_last()
+    {
+        if (!$this->id)
+            return;
+
+        DB::table('forum_threads')->where('id', '=', $this->id)->update(array(
+            'last_id'      => $this->last_id,
+            'last_date'    => $this->last_date,
+            'last_user_id' => $this->last_user_id
         ));
     }
 
@@ -284,9 +310,9 @@ class Thread {
      *
      * @param   int     $type
      * @param   int     $user_id
-     * @param   array   $posts
+     * @param   array   $users
      */
-    public static function update_user_counters($type = 0, $user_id = null, array $posts = array())
+    public static function update_user_counters($type = 0, $user_id = null, array $users = array())
     {
         // Self update
         if ($user_id === null) {
@@ -297,15 +323,40 @@ class Thread {
         }
 
         // New topic
-        if ($type == self::UPDATE_USER_NEW_THREAD) {
+        if ($type == self::UPDATE_USER_NEW_THREAD and $user_id) {
             DB::table('profiles')->where('user_id', '=', $user_id)->update(array(
                 'posts_count'   => DB::raw('`posts_count` + 1'),
                 'threads_count' => DB::raw('`threads_count` + 1')
             ));
-        } elseif ($type == self::UPDATE_USER_NEW_POST) {
+        } elseif ($type == self::UPDATE_USER_NEW_POST and $user_id) {
             DB::table('profiles')->where('user_id', '=', $user_id)->update(array(
                 'posts_count'   => DB::raw('`posts_count` + 1')
             ));
+        } elseif ($type == self::UPDATE_USER_DEL_POST and $user_id) {
+            DB::table('profiles')->where('posts_count', '>', 0)->where('user_id', '=', $user_id)->update(array(
+                'posts_count'   => DB::raw('`posts_count` - 1')
+            ));
+        } elseif ($type == self::UPDATE_USER_DEL_THREAD) {
+            $prepared = array();
+
+            foreach ($users as $id => $count) {
+                if (!isset($prepared[$count]))
+                    $prepared[$count] = array();
+
+                $prepared[$count][] = $id;
+            }
+
+            foreach ($prepared as $c => $ids)
+            {
+                DB::table('profiles')->where('posts_count', '>=', $c)
+                                     ->where_in('user_id', $ids)
+                                     ->update(array('posts_count' => DB::raw('posts_count - '.$c)));
+            }
+
+            if ($user_id)
+                DB::table('profiles')->where('user_id', '=', $user_id)->where('threads_count', '>', 0)->update(array(
+                    'threads_count' => DB::raw('threads_count - 1')
+                ));
         }
     }
 

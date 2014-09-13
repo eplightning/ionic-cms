@@ -157,6 +157,7 @@ class Forum_Package extends Package {
               `slug` varchar(127) COLLATE utf8_unicode_ci NOT NULL,
               `description` text COLLATE utf8_unicode_ci NOT NULL,
               `external_link` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+              `is_private` tinyint(3) NOT NULL DEFAULT '0',
               `default_permissions` int(10) unsigned NOT NULL DEFAULT '0',
               `guest_permissions` int(10) unsigned NOT NULL DEFAULT '0',
               `posts_count` int(10) unsigned NOT NULL DEFAULT '0',

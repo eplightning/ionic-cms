@@ -1,0 +1,16 @@
+<div class="ionic-block">
+	<div class="ionic-block-title">
+		Usuwanie tematu
+	</div>
+	<form action="{{ current }}" method="post">
+	<div class="ionic-block-content">
+		Czy jesteś pewien ,że chcesz usunąć dany temat? Łącznie z nim zostaną usunięty wszystkie posty, które on zawierał.
+
+		<p>
+		{{ form_token() }}
+		<input type="submit" value="Tak" class="yes" name="yes" style="width: auto" />
+		<input type="submit" value="Anuluj" class="no" name="no" style="width: auto" />
+		</p>
+	</div>
+	</form>
+</div>

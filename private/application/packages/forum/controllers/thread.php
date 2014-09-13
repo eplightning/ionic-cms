@@ -22,6 +22,129 @@ class Thread_Controller extends Base_Controller {
     protected $permissions = null;
 
     /**
+     * Delete post/thread
+     *
+     * @param   string      $post
+     * @return  Response
+     */
+    public function action_delete($post)
+    {
+        if (!ctype_digit($post))
+            return Response::error(500);
+
+        $post = new Model\Forum\Post((int) $post);
+
+        if (Auth::is_guest())
+            return Response::error(403);
+
+        if (!$post->id) {
+            $this->notice('Taki post nie istnieje lub nie masz do niego dostępu');
+            return Redirect::to('forum');
+        }
+
+        $thread = new Model\Forum\Thread($post->thread_id);
+        $is_owner = $this->user->id == $post->user_id;
+
+        if (!$thread->id) {
+            $this->notice('Taki post nie istnieje lub nie masz do niego dostępu');
+            return Redirect::to('forum');
+        }
+
+        $board = DB::table('forum_boards')->where('id', '=', $thread->board_id)->first('*');
+
+        if ($post->is_op and !($this->permissions->can($thread->board_id, PermissionManager::PERM_MOD_DEL_THREAD) or
+              ($this->permissions->can($thread->board_id, PermissionManager::PERM_DEL_THREAD) and $is_owner))) {
+            $this->notice('Taki post nie istnieje lub nie masz do niego dostępu');
+            return Redirect::to('forum');
+        } elseif (!$post->is_op and !($this->permissions->can($thread->board_id, PermissionManager::PERM_MOD_DEL_POST) or
+              ($this->permissions->can($thread->board_id, PermissionManager::PERM_DEL_POST) and $is_owner))) {
+            $this->notice('Taki post nie istnieje lub nie masz do niego dostępu');
+            return Redirect::to('forum');
+        }
+
+        if (!($status = $this->confirm())) {
+            if ($post->is_op)
+                $this->view = View::make('forum.confirm_delete', array('current' => URI::current()));
+
+            return;
+        } elseif ($status == 2) {
+            return Redirect::to('thread/show/'.$thread->slug.'?post='.$post->id.'#post-id-'.$post->id);
+        }
+
+        DB::connection()->pdo->beginTransaction();
+
+        try {
+            if ($post->is_op) {
+                $total_posts = 0;
+                $posts = array();
+                $users_tmp = array();
+
+                foreach (DB::table('forum_posts')->where('thread_id', '=', $thread->id)->get(array('id', 'user_id')) as $p) {
+                    $total_posts--;
+                    $posts[] = $p->id;
+
+                    if ($p->user_id) {
+                        if (!isset($users_tmp[$p->user_id]))
+                            $users_tmp[$p->user_id] = 0;
+
+                        $users_tmp[$p->user_id]++;
+                    }
+                }
+
+                $thread->delete();
+
+                if (!empty($posts)) {
+                    DB::table('forum_posts_index')->where_in('post_id', $posts)->delete();
+                }
+
+                Model\Forum\Thread::update_user_counters(Model\Forum\Thread::UPDATE_USER_DEL_THREAD, $thread->user_id, $users_tmp);
+
+                Model\Forum\Board::update_board_counters($board->left, $board->right, $total_posts, -1);
+                Model\Forum\Board::rebuild_last_post($board->left, $board->right, $thread->id);
+            } else {
+                $post->delete();
+
+                Model\Forum\Thread::update_user_counters(Model\Forum\Thread::UPDATE_USER_DEL_POST, $post->user_id);
+
+                Model\Forum\Thread::refresh_thread_counters($thread->id);
+                Model\Forum\Board::update_board_counters($board->left, $board->right, -1);
+
+                $last_post = DB::table('forum_posts')->where('thread_id', '=', $thread->id)
+                                                     ->order_by('id', 'desc')
+                                                     ->first(array('id', 'created_at', 'user_id'));
+
+                if (!$last_post or $last_post->id != $thread->last_id) {
+                    $thread->last_id      = $last_post ? $last_post->id : 0;
+                    $thread->last_date    = $last_post ? $last_post->created_at : '0000-00-00 00:00:00';
+                    $thread->last_user_id = $last_post ? $last_post->user_id : 0;
+
+                    $thread->update_last();
+
+                    Model\Forum\Board::rebuild_last_post($board->left, $board->right, $thread->id);
+                }
+            }
+        } catch (Exception $e) {
+            DB::connection()->pdo->rollBack();
+
+            $this->notice('Nieznany błąd');
+            return Redirect::to('thread/show/'.$thread->slug.'?post='.$post->id.'#post-id-'.$post->id);
+        }
+
+        DB::connection()->pdo->commit();
+
+        if ($post->is_op) {
+            Model\Log::add('Usunął temat: '.$thread->title, $this->user->id);
+            $this->notice('Temat usunięty pomyślnie');
+            return Redirect::to('board/show/'.$board->slug);
+        } else {
+            Model\Log::add('Usunął post #'.$post->id.' w temacie: '.$thread->title, $this->user->id);
+            $this->notice('Post usunięty pomyślnie');
+        }
+
+        return Redirect::to('thread/show/'.$thread->slug);
+    }
+
+    /**
      * Edit post/thread
      *
      * @param   string      $post
@@ -102,7 +225,6 @@ class Thread_Controller extends Base_Controller {
                     Model\Log::add('Edytował post #'.$post->id.' w temacie: '.$thread->title, $this->user->id);
                 }
             }
-
 
             $this->notice('Post pomyślnie zaaktualizowany');
             return Redirect::to('thread/show/'.$thread->slug.'?post='.$post->id.'#post-id-'.$post->id);
@@ -351,6 +473,8 @@ class Thread_Controller extends Base_Controller {
             }
 
             DB::connection()->pdo->commit();
+
+            ionic_clear_cache('fposts-*');
 
             // Redirect to thread
             return Redirect::to('thread/show/'.$thread->slug.'?page=last');

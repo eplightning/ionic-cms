@@ -1,0 +1,14 @@
+<ul class="ionic-list">
+	{% for t in posts %}
+	<li>
+		<a href="thread/show/{{ t.slug }}?page=last" style="font-weight: bold">{{ t.title }}</a><br />
+		<small>{{ t.last_date|relativedate }} przez
+		{% if t.display_name %}
+		<a href="{{ make('user', t.user_slug) }}">{{ t.display_name }}</a>
+		{% else %}
+		<a>Gość</a>
+		{% endif %}
+		</small>
+	</li>
+	{% endfor %}
+</ul>

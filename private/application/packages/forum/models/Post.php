@@ -140,6 +140,18 @@ class Post {
     }
 
     /**
+     * Delete this post
+     */
+    public function delete()
+    {
+        if (!$this->id)
+            return;
+
+        DB::table('forum_posts')->where('id', '=', $this->id)->delete();
+        DB::table('forum_posts_index')->where('post_id', '=', $this->id)->delete();
+    }
+
+    /**
      * Get content
      *
      * @param   bool    $raw
@@ -168,7 +180,6 @@ class Post {
         $code->RemoveRule('wiki');
         $code->RemoveRule('columns');
         $code->RemoveRule('nextcol');
-        $code->RemoveRule('img');
 
         $this->content = $code->Parse(ionic_censor($input));
         $this->content_clean = strip_tags($this->content);

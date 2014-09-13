@@ -116,6 +116,8 @@ class Board_Controller extends Base_Controller {
 
             DB::connection()->pdo->commit();
 
+            ionic_clear_cache('fposts-*');
+
             // Redirect to thread
             return Redirect::to('thread/show/'.$thread->slug);
         }
