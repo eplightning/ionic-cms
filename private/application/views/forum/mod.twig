@@ -1,0 +1,81 @@
+<div class="ionic-box">
+	<h2>Moderacja tematu: {{ thread.title }}</h2>
+	<div class="ionic-toolbar">
+		<a href="thread/show/{{ thread.slug }}">Powrót do tematu</a>
+	</div>
+</div>
+<div class="tab-view">
+	<ul class="tab-view-top">
+		<li id="tab-view-top-1" class="active"><a>Status</a></li>
+		{% if permissions['mod_move'] %}
+		<li id="tab-view-top-2"><a>Przenieś temat</a></li>
+		{% endif %}
+	</ul>
+	<div class="tab-view-content" id="tab-view-content-1">
+	<form action="thread/mod/{{ thread.id }}/status" method="post">
+		<div class="ionic-form">
+			<div class="ionic-form-legend">Status tematu</div>
+			<div class="ionic-form-elem">
+				<label for="is_closed">Zamknięty:</label>
+				<input type="checkbox" name="is_closed" id="is_closed" class="checkbox"
+				       value="1"{% if thread.is_closed %} checked="checked"{% endif %}{% if not permissions['mod_close'] %} disabled="disabled"{% endif %} />
+			</div>
+			<div class="ionic-form-elem">
+				<label for="is_sticky">Przyklejony:</label>
+				<input type="checkbox" name="is_sticky" id="is_sticky" class="checkbox"
+				       value="1"{% if thread.is_sticky %} checked="checked"{% endif %}{% if not permissions['mod_sticky'] %} disabled="disabled"{% endif %} />
+			</div>
+			{% if permissions['mod_close'] or permissions['mod_sticky'] %}
+			<div class="ionic-form-elem">
+				{{ form_token() }}
+				<input type="submit" name="submit" class="submit" value="Zapisz zmiany" />
+			</div>
+			{% endif %}
+		</div>
+	</form>
+	</div>
+	{% if permissions['mod_move'] %}
+	<div class="tab-view-content" id="tab-view-content-2" style="display: none">
+	<form action="thread/mod/{{ thread.id }}/move" method="post">
+		<div class="ionic-form">
+			<div class="ionic-form-legend">Przeniesienie tematu</div>
+			<div class="ionic-form-elem">
+				<label>Obecne forum:</label>
+				{{ board.title }}
+			</div>
+			<div class="ionic-form-elem">
+				<label for="board_id">Forum docelowe:</label>
+				<select id="board_id" name="board_id">
+					{% for id, item in move_boards %}
+					<option value="{{ id }}">{{ item[1] }}</option>
+					{% endfor %}
+				</select>
+			</div>
+			<div class="ionic-form-elem">
+				{{ form_token() }}
+				<input type="submit" name="submit" class="submit" value="Przenieś" />
+			</div>
+		</div>
+	</form>
+	</div>
+	{% endif %}
+</div>
+<script type="text/javascript">
+$(function() {
+var in_progress = false;
+
+$('.tab-view-top li').click(function() {
+	if ($(this).hasClass('active') || in_progress) return;
+	in_progress = true;
+
+	var active = $('.tab-view-top .active').prop('id').replace('tab-view-top-', '');
+	var number = $(this).prop('id').replace('tab-view-top-', '');
+
+	$('#tab-view-content-'+active).slideUp('fast', function() {
+		$('#tab-view-top-'+active).removeClass('active');
+		$('#tab-view-top-'+number).addClass('active');
+		$('#tab-view-content-'+number).slideDown('fast', function() { in_progress = false });
+	});
+});
+});
+</script>

@@ -1,20 +1,21 @@
 <div class="ionic-box">
-	<h2>Odpowiadanie na temat</h2>
-	<div class="ionic-toolbar">
-		<a href="thread/show/{{ thread.slug }}">Powrót do tematu</a>
-	</div>
-	<form action="{{ action }}" method="post">
+	<h2>Edycja postu</h2>
+	<form action="thread/edit/{{ post.id }}" method="post">
 	<div class="ionic-form">
-		<div class="ionic-form-legend">Szczegóły postu</div>
+		<div class="ionic-form-legend">Szczegóły</div>
+		{% if post.is_op %}
 		<div class="ionic-form-elem">
-			<label>Temat:</label> {{ thread.title }}
+			<label for="title">Tytuł:</label>
+			<input type="text" name="title" id="title" maxlength="127" value="{% if old.title != '' %}{{ old.title|e }}{% else %}{{ thread.title }}{% endif %}" />
 		</div>
+		{% endif %}
 		<div class="ionic-form-elem">
-			<textarea id="bbcode" name="post" style="width: 100%">{{ old.post|e }}</textarea>
+			<textarea id="bbcode" name="post" style="width: 100%">{% if old.post != '' %}{{ old.post|e }}{% else %}{{ post.get_content()|e }}{% endif %}</textarea>
 		</div>
-		{% if not current_user %}
+		{% if can_ninja %}
 		<div class="ionic-form-elem">
-			{{ recaptcha }}
+			<label for="show_update">Informacje o modyfikacji:<br /><small>Odznacz jeśli nie chcesz pokazać informacji o tej edycji</small></label>
+			<input type="checkbox" name="show_update" id="show_update" class="checkbox" value="1" checked="checked" />
 		</div>
 		{% endif %}
 		<div class="ionic-form-elem">

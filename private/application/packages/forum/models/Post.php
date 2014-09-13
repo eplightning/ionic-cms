@@ -188,15 +188,10 @@ class Post {
         }
 
         DB::table('forum_posts')->where('id', '=', $this->id)->update(array(
-            'user_id'     => $this->user_id,
-            'is_op'       => (int) $this->is_op,
-            'is_reported' => (int) $this->is_reported,
-            'created_at'  => $this->created_at,
             'updated_at'  => $this->updated_at,
             'updated_by'  => $this->updated_by,
             'content'     => $this->content,
-            'content_raw' => $this->content_raw,
-            'ip'          => $this->ip
+            'content_raw' => $this->content_raw
         ));
 
         DB::table('forum_posts_index')->where('post_id', '=', $this->id)->update(array(

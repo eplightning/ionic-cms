@@ -22,6 +22,233 @@ class Thread_Controller extends Base_Controller {
     protected $permissions = null;
 
     /**
+     * Edit post/thread
+     *
+     * @param   string      $post
+     * @return  Response
+     */
+    public function action_edit($post)
+    {
+        if (!ctype_digit($post))
+            return Response::error(500);
+
+        $post = new Model\Forum\Post((int) $post);
+
+        if (Auth::is_guest())
+            return Response::error(403);
+
+        if (!$post->id) {
+            $this->notice('Taki post nie istnieje lub nie masz dostępu do jego edycji');
+            return Redirect::to('forum');
+        }
+
+        $thread = new Model\Forum\Thread($post->thread_id);
+        $is_owner = $this->user->id == $post->user_id;
+
+        if (!$thread->id or
+            !($this->permissions->can($thread->board_id, PermissionManager::PERM_MOD_EDIT) or
+              ($this->permissions->can($thread->board_id, PermissionManager::PERM_EDIT_POST) and $is_owner)
+             )
+           ) {
+            $this->notice('Taki post nie istnieje lub nie masz dostępu do jego edycji');
+            return Redirect::to('forum');
+        }
+
+        if (!Request::forged() and Request::method() == 'POST') {
+            $raw_data = array('post' => '', 'title' => '', 'show_update' => '');
+            $raw_data = array_merge($raw_data, Input::only(array('post', 'title', 'show_update')));
+
+            $rules = array(
+                'post' => 'required'
+            );
+
+            if ($post->is_op)
+                $rules['title'] = 'required|max:127';
+
+            $validator = Validator::make($raw_data, $rules);
+
+            if ($validator->fails()) {
+                return Redirect::to('thread/edit/'.$post->id)->with_input('only', array('post', 'title', 'show_update'));
+            }
+
+            DB::connection()->pdo->beginTransaction();
+
+            try {
+                if ($post->is_op) {
+                    $thread->title = HTML::specialchars($raw_data['title']);
+                    $thread->update_title();
+                }
+
+                $post->set_content($raw_data['post']);
+
+                if (Auth::can('admin_root')) {
+                    $post->update($raw_data['show_update'] == '1');
+                } else {
+                    $post->update(true);
+                }
+            } catch (Exception $e) {
+                DB::connection()->pdo->rollBack();
+
+                $this->notice('Nieznany błąd');
+                return Redirect::to('thread/edit/'.$post->id)->with_input('only', array('post', 'title', 'show_update'));
+            }
+
+            DB::connection()->pdo->commit();
+
+            if (!$is_owner or !$this->permissions->can($thread->board_id, PermissionManager::PERM_EDIT_POST)) {
+                if ($post->is_op) {
+                    Model\Log::add('Edytował temat: '.$thread->title, $this->user->id);
+                } else {
+                    Model\Log::add('Edytował post #'.$post->id.' w temacie: '.$thread->title, $this->user->id);
+                }
+            }
+
+
+            $this->notice('Post pomyślnie zaaktualizowany');
+            return Redirect::to('thread/show/'.$thread->slug.'?post='.$post->id.'#post-id-'.$post->id);
+        }
+
+        // Setup page display
+        $this->page->set_title('Edycja postu');
+        $this->page->breadcrumb_append('Forum', 'forum');
+        $this->page->breadcrumb_append($thread->title, 'thread/show/'.$thread->slug);
+        $this->page->breadcrumb_append('Edycja postu', 'thread/edit/'.$post->id);
+        $this->online('Temat: '.$thread->title, 'thread/show/'.$thread->slug);
+
+        // Old data
+        $old_data = array('title' => '', 'post' => '', 'show_update' => '');
+        $old_data = array_merge($old_data, Input::old());
+
+        Asset::add('markitup', 'public/js/jquery.markitup.js', 'jquery');
+        Asset::add('markitup', 'public/js/skins/simple/style.css');
+
+        $this->view = View::make('forum.edit', array(
+            'thread'    => $thread,
+            'post'      => $post,
+            'old'       => $old_data,
+            'can_ninja' => Auth::can('admin_root')
+        ));
+    }
+
+    /**
+     * Moderation tools
+     *
+     * @param   string   $thread
+     * @return  Response
+     */
+    public function action_mod($thread, $operation = '')
+    {
+        if (!ctype_digit($thread))
+            return Response::error(500);
+
+        $thread = new Model\Forum\Thread((int) $thread);
+
+        if (Auth::is_guest() or !$thread->id or !$this->permissions->can($thread->board_id, PermissionManager::PERM_MOD)) {
+            $this->notice('Taki temat nie istnieje lub nie masz dostępu do narzędzi moderatorskich');
+            return Redirect::to('forum');
+        }
+
+        // For ArrayAccess
+        $this->permissions->select_board($thread->board_id);
+
+        $board = DB::table('forum_boards')->where('id', '=', $thread->board_id)->first('*');
+
+        // Operation
+        switch ($operation) {
+        case 'status':
+            if (!$this->permissions->can($thread->board_id, PermissionManager::PERM_MOD_CLOSE) and
+                !$this->permissions->can($thread->board_id, PermissionManager::PERM_MOD_STICKY))
+                return Response::error(403);
+
+            if (Request::method() != 'POST' or Request::forged())
+                return Response::error(500);
+
+            if ($this->permissions->can($thread->board_id, PermissionManager::PERM_MOD_CLOSE))
+                $thread->is_closed = Input::get('is_closed', '0') == '1';
+
+            if ($this->permissions->can($thread->board_id, PermissionManager::PERM_MOD_STICKY))
+                $thread->is_sticky = Input::get('is_sticky', '0') == '1';
+
+            $thread->update_state();
+
+            $this->notice('Temat zaaktualizowany pomyślnie');
+
+            Model\Log::add('Zmienił status tematu: '.$thread->title, $this->user->id);
+            return Redirect::to('thread/mod/'.$thread->id);
+        case 'move':
+            if (!$this->permissions->can($thread->board_id, PermissionManager::PERM_MOD_MOVE))
+                return Response::error(403);
+
+            if (Request::method() != 'POST' or Request::forged() or !Input::has('board_id'))
+                return Response::error(500);
+
+            $move_to = Input::get('board_id');
+
+            if (!ctype_digit($move_to) or $move_to == $thread->board_id)
+                return Response::error(500);
+
+            $move_to = DB::table('forum_boards')->where('id', '=', $move_to)->first(array('id', 'left', 'right', 'depth'));
+
+            if (!$move_to)
+                return Response::error(500);
+
+            if (!$this->permissions->can((int) $move_to->id, PermissionManager::PERM_MOD_MOVE))
+                return Response::error(403);
+
+            DB::connection()->pdo->beginTransaction();
+
+            try {
+                $thread->board_id = (int) $move_to->id;
+                $thread->update_board();
+
+                Model\Forum\Board::update_board_counters($board->left, $board->right, $thread->posts_count * (-1), -1);
+                Model\Forum\Board::update_board_counters($move_to->left, $move_to->right, (int) $thread->posts_count, 1);
+
+                Model\Forum\Board::rebuild_last_post($board->left, $board->right, $thread->id);
+                Model\Forum\Board::rebuild_last_post($move_to->left, $move_to->right);
+            } catch (Exception $e) {
+                // We failed somewhere...
+                DB::connection()->pdo->rollBack();
+
+                $this->notice('Nieznany błąd: '.$e->getMessage());
+                return Redirect::to('thread/mod/'.$thread->id);
+            }
+
+            DB::connection()->pdo->commit();
+
+            $this->notice('Temat przeniesiony pomyślnie');
+
+            Model\Log::add('Przeniósł temat: '.$thread->title, $this->user->id);
+            return Redirect::to('thread/mod/'.$thread->id);
+        }
+
+        // Get boards with move access
+        $boards = Model\Forum\Board::build_jumpbox();
+
+        foreach ($boards as $id => $val) {
+            if ($id == $thread->board_id or !$this->permissions->can($id, PermissionManager::PERM_MOD_MOVE)) {
+                unset($boards[$id]);
+            }
+        }
+
+        // Setup page display
+        $this->page->set_title('Moderacja');
+        $this->page->breadcrumb_append('Forum', 'forum');
+        $this->page->breadcrumb_append($board->title, 'board/show/'.$board->slug);
+        $this->page->breadcrumb_append($thread->title, 'thread/show/'.$thread->slug);
+        $this->page->breadcrumb_append('Moderacja', 'thread/mod/'.$thread->id);
+        $this->online('Temat: '.$thread->title, 'thread/show/'.$thread->slug);
+
+        $this->view = View::make('forum.mod', array(
+            'board'       => $board,
+            'thread'      => $thread,
+            'jumpbox'     => $this->get_jumpbox(),
+            'move_boards' => $boards,
+            'permissions' => $this->permissions
+        ));
+    }
+
+    /**
      * Reply
      *
      * @param   string    $thread

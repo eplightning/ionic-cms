@@ -6,7 +6,7 @@
 		{% elseif thread.is_closed %}
 		<a>Temat jest zamknięty</a>
 		{% endif %}
-		{% if permissions['mod'] %}
+		{% if permissions['mod'] and current_user %}
 		<a href="thread/mod/{{ thread.id }}">Moderacja</a>
 		{% endif %}
 		<a href="board/show/{{ board.slug }}">Powrót do forum</a>
@@ -54,19 +54,20 @@
 	<div class="ionic-post-right">
 		<div class="ionic-post-info">
 			<div class="ionic-left">
-			Dodano: {{ post.created_at|relativedate }}; Post <a href="thread/show/{{ thread.slug }}?post={{ post.id }}#post-id-{{ post.id }}">#{{ post.id }}</a>
+			Dodano: {{ post.created_at|date }}; Post <a href="thread/show/{{ thread.slug }}?post={{ post.id }}#post-id-{{ post.id }}">#{{ post.id }}</a>
 			</div>
 			<div class="ionic-right">
 				{# Cytat #}
 				{% if can_post %}
 				<a href="thread/reply/{{ thread.id }}/{{ post.id }}" title="Cytuj"><img src="public/img/icons/comments.png" alt="" /></a>
 				{% endif %}
+				{% if current_user %}
 				{# Wszyscy użytkownicy oprócz autora mają opcje zgłaszani #}
-				{% if current_user and current_user.id != post.user_id %}
+				{% if current_user.id != post.user_id %}
 				<a href="thread/report/{{ post.id }}" title="Zgłoś"><img src="public/img/icons/report.png" alt="" /></a>
 				{% endif %}
 				{# Edycja #}
-				{% if (current_user and current_user.id == post.user_id and permissions['edit_post']) or permissions['mod_edit'] %}
+				{% if (current_user.id == post.user_id and permissions['edit_post']) or permissions['mod_edit'] %}
 				<a href="thread/edit/{{ post.id }}" title="Edytuj"><img src="public/img/icons/page_edit.png" alt="" /></a>
 				{% endif %}
 				{% if post.is_op %}
@@ -76,8 +77,9 @@
 				{% endif %}
 				{% else %}
 				{# Usuwanie postu #}
-				{% if (current_user and current_user.id == post.user_id and permissions['del_post']) or permissions['mod_del_post'] %}
+				{% if (current_user.id == post.user_id and permissions['del_post']) or permissions['mod_del_post'] %}
 				<a href="thread/delete/{{ post.id }}" title="Usuń post"><img src="public/img/icons/delete.png" alt="" /></a>
+				{% endif %}
 				{% endif %}
 				{% endif %}
 			</div>
@@ -99,7 +101,7 @@
 		{% elseif thread.is_closed %}
 		<a>Temat jest zamknięty</a>
 		{% endif %}
-		{% if permissions['mod'] %}
+		{% if permissions['mod'] and current_user %}
 		<a href="thread/mod/{{ thread.id }}">Moderacja</a>
 		{% endif %}
 		<a href="board/show/{{ board.slug }}">Powrót do forum</a>

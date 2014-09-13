@@ -139,6 +139,46 @@ class Thread {
     }
 
     /**
+     * Update thread's board
+     */
+    public function update_board()
+    {
+        if (!$this->id)
+            return;
+
+        DB::table('forum_threads')->where('id', '=', $this->id)->update(array(
+            'board_id' => $this->board_id
+        ));
+    }
+
+    /**
+     * Update thread state
+     */
+    public function update_state()
+    {
+        if (!$this->id)
+            return;
+
+        DB::table('forum_threads')->where('id', '=', $this->id)->update(array(
+            'is_closed' => (int) $this->is_closed,
+            'is_sticky' => (int) $this->is_sticky
+        ));
+    }
+
+    /**
+     * Update thread title
+     */
+    public function update_title()
+    {
+        if (!$this->id)
+            return;
+
+        DB::table('forum_threads')->where('id', '=', $this->id)->update(array(
+            'title' => $this->title
+        ));
+    }
+
+    /**
      * Get unread threads
      *
      * @param   array   $ignore_board_ids
@@ -205,6 +245,8 @@ class Thread {
 
     /**
      * Update last post
+     *
+     * Call when new post is being created
      *
      * @param   int     $thread_id
      * @param   string  $thread_title

@@ -126,6 +126,53 @@ class Board {
     }
 
     /**
+     * Rebuild last post for specified board and its parents
+     *
+     * Please note this relies on thread cache being actually up to date, so if needed rebuild thread's last post before calling this function
+     *
+     * @param   int $board_left
+     * @param   int $board_right
+     * @param   int $thread_id
+     */
+    public static function rebuild_last_post($board_left, $board_right, $thread_id = null)
+    {
+        $query = DB::table('forum_boards')->where('left', '<=', $board_left)
+                                          ->where('right', '>=', $board_right)
+                                          ->where('depth', '>', 0);
+
+        if ($thread_id)
+            $query->where('last_id', '=', $thread_id);
+
+        // All ancestors + child
+        foreach ($query->get(array('id', 'left', 'right')) as $b) {
+            $last_thread = DB::table('forum_threads')->join('forum_boards', 'forum_boards.id', '=', 'forum_threads.board_id')
+                                                     ->where('forum_boards.left', '>=', $b->left)
+                                                     ->where('forum_boards.right', '<=', $b->right)
+                                                     ->order_by('last_date', 'desc')
+                                                     ->first(array('forum_threads.id', 'forum_threads.title', 'forum_threads.slug', 'forum_threads.last_date',
+                                                                 'forum_threads.last_user_id'));
+
+            if (!$last_thread) {
+                DB::table('forum_boards')->where('id', '=', $b->id)->update(array(
+                    'last_id'      => 0,
+                    'last_title'   => '',
+                    'last_date'    => '0000-00-00 00:00:00',
+                    'last_slug'    => '',
+                    'last_user_id' => 0
+                ));
+            } else {
+                DB::table('forum_boards')->where('id', '=', $b->id)->update(array(
+                    'last_id'      => $last_thread->id,
+                    'last_title'   => $last_thread->title,
+                    'last_date'    => $last_thread->last_date,
+                    'last_slug'    => $last_thread->slug,
+                    'last_user_id' => $last_thread->last_user_id
+                ));
+            }
+        }
+    }
+
+    /**
      * Update board and its parents counters
      *
      * @param   int $left
@@ -150,7 +197,33 @@ class Board {
         }
 
         if (!empty($update)) {
-            DB::table('forum_boards')->where('left', '<=', $left)->where('right', '>=', $right)->update($update);
+            $query = DB::table('forum_boards')->where('left', '<=', $left)->where('right', '>=', $right);
+
+            // to avoid error if something is very wrong
+            if ($posts_change < 0)
+                $query->where('posts_count', '>=', abs($posts_change));
+
+            if ($threads_change < 0)
+                $query->where('threads_count', '>=', abs($threads_change));
+
+            $query->update($update);
         }
+    }
+
+    /**
+     * Update last post after merge
+     *
+     * @param   array   $old_threads
+     * @param   string  $new_thread_id
+     * @param   string  $new_thread_title
+     * @param   string  $new_thread_slug
+     */
+    public static function update_last_post_info(array $old_threads, $new_thread_id, $new_thread_title, $new_thread_slug)
+    {
+        DB::table('forum_boards')->where_in('last_id', $old_threads)->update(array(
+            'last_id'    => $new_thread_id,
+            'last_title' => $new_thread_title,
+            'last_slug'  => $new_thread_slug
+        ));
     }
 }
