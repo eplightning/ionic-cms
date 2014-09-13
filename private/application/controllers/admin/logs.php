@@ -228,6 +228,7 @@ class Admin_Logs_Controller extends Admin_Controller {
 
         $grid->add_filter_perpage(array(20, 30, 50));
         $grid->add_filter_date('created_at', 'Data akcji', 'logs.created_at');
+        $grid->add_filter_search('title', 'Akcja', 'logs.title');
         $grid->add_filter_search('username', 'Nazwa użytkownika', 'users.display_name');
         $grid->add_filter_search('ip', 'Adres IP', 'logs.ip');
 
