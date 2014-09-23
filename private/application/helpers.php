@@ -380,7 +380,7 @@ function ionic_date($time = null, $format = 'standard', $relative = false)
             $now->setTime(0, 0);
             $interval = $time->diff($now, true);
 
-            if ($interval->d < 0)
+            if ($interval->d <= 0)
             {
                 return 'wczoraj o '.$time->format(Config::get('application.date_time'));
             }
