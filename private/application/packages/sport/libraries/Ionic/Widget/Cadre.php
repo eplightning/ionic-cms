@@ -1,6 +1,7 @@
 <?php
 namespace Ionic\Widget;
 
+use DateTime;
 use View;
 use Ionic\Widget;
 use DB;
@@ -99,12 +100,24 @@ class Cadre extends Widget {
             $players = DB::table('players')->where('team_id', '=', $options['team'])->take($options['limit'])->order_by($options['sort'], 'asc')->get('*');
             $grouped = array();
 
+            $now = new DateTime('now');
+
             foreach ($players as $p)
             {
                 if (!isset($grouped[$p->position]))
                     $grouped[$p->position] = array();
 
                 $grouped[$p->position][] = $p;
+
+                if ($p->date != '0000-00-00') {
+                    $date = new DateTime($p->date);
+
+                    $interval = $date->diff($now, true);
+
+                    $p->age = $interval->y;
+                } else {
+                    $p->age = 0;
+                }
             }
 
             $field = $options['sort'];
