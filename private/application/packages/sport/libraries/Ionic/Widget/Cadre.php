@@ -157,6 +157,19 @@ class Cadre extends Widget {
                                                               'red_cards', 'yellow_cards', 'minutes')) as $s) {
                     $stats[$s->player_id] = $s;
                 }
+            } else {
+                // żeby błędów uniknąć
+                foreach ($ids as $v) {
+                    $stats[$v] = array(
+                        'player_id' => $v,
+                        'matches' => 0,
+                        'assists' => 0,
+                        'goals' => 0,
+                        'red_cards' => 0,
+                        'yellow_cards' => 0,
+                        'minutes' => 0
+                    );
+                }
             }
 
             $field = $options['sort'];
