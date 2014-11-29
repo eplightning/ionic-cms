@@ -1,0 +1,16 @@
+{#
+Brak przykładowego szablonu ale, przykład użycia:
+
+niepogrupowane według pozycji
+{% for p in players %}
+    zawodnik
+{% endfor %}
+
+pogrupowane
+{% for pos, list in grouped %}
+    pos to pozycja
+    {% for p in list %}
+	zawodnik
+    {% endfor %}
+{% endfor %}
+#}
