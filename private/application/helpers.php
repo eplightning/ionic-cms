@@ -439,43 +439,53 @@ function ionic_date($time = null, $format = 'standard', $relative = false)
             break;
 
         case 'month':
+        case 'monthfull':
+        case 'monthyear':
+            $append = '';
+
+            if ($format == 'monthfull') {
+                $append = $time->format(' Y; H:i');
+            } elseif ($format == 'monthyear') {
+                $append = $time->format(' Y');
+            }
+
             switch ((int) $time->format('n'))
             {
                 case 1:
-                    return $time->format('j').' stycznia';
+                    return $time->format('j').' stycznia'.$append;
 
                 case 2:
-                    return $time->format('j').' lutego';
+                    return $time->format('j').' lutego'.$append;
 
                 case 3:
-                    return $time->format('j').' marca';
+                    return $time->format('j').' marca'.$append;
 
                 case 4:
-                    return $time->format('j').' kwietnia';
+                    return $time->format('j').' kwietnia'.$append;
 
                 case 5:
-                    return $time->format('j').' maja';
+                    return $time->format('j').' maja'.$append;
 
                 case 6:
-                    return $time->format('j').' czerwca';
+                    return $time->format('j').' czerwca'.$append;
 
                 case 7:
-                    return $time->format('j').' lipca';
+                    return $time->format('j').' lipca'.$append;
 
                 case 8:
-                    return $time->format('j').' sierpnia';
+                    return $time->format('j').' sierpnia'.$append;
 
                 case 9:
-                    return $time->format('j').' września';
+                    return $time->format('j').' września'.$append;
 
                 case 10:
-                    return $time->format('j').' października';
+                    return $time->format('j').' października'.$append;
 
                 case 11:
-                    return $time->format('j').' listopada';
+                    return $time->format('j').' listopada'.$append;
 
                 default:
-                    return $time->format('j').' grudnia';
+                    return $time->format('j').' grudnia'.$append;
             }
     }
 
