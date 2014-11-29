@@ -20,17 +20,26 @@ class Cadre extends Widget {
      */
     public function display_options()
     {
-        $options = array_merge(array('team' => null, 'limit' => 0, 'sort' => 'number', 'template' => 'widgets.cadre'), $this->options);
+        $options = array_merge(array('team' => null, 'competition' => 0, 'limit' => 0, 'sort' => 'number', 'template' => 'widgets.cadre'), $this->options);
+
+        $teams = array();
+        $competitions = array('Nie pobieraj statystyk' => 0);
 
         foreach (DB::table('teams')->get(array('id', 'name')) as $s)
         {
             $teams[$s->id] = $s->name;
         }
 
+        foreach (DB::table('competitions')->get(array('id', 'name')) as $s)
+        {
+            $competitions[$s->id] = $s->name;
+        }
+
         return View::make('admin.widgets.widget_cadre', array(
             'options'      => $options,
             'action'       => URI::current(),
-            'teams'        => $teams
+            'teams'        => $teams,
+            'competitions' => $array
         ));
     }
 
@@ -54,6 +63,21 @@ class Cadre extends Widget {
             return false;
 
         $options['team'] = $c->id;
+
+        // competition
+        $c = Input::get('competition');
+
+        if (!$c) {
+            $options['competition'] = 0;
+        } else {
+            $c = DB::table('competitions')->where('id', '=', (int) $c)->first('id');
+
+            if (!$c) {
+                $options['competition'] = 0;
+            } else {
+                $options['competition'] = $c->id;
+            }
+        }
 
         // limit
         $options['limit'] = (int) Input::get('limit', 0);
@@ -81,7 +105,7 @@ class Cadre extends Widget {
      */
     public function show()
     {
-        $options = array_merge(array('team' => null, 'limit' => 0, 'sort' => 'number', 'template' => 'widgets.cadre'), $this->options);
+        $options = array_merge(array('team' => null, 'competition' => 0, 'limit' => 0, 'sort' => 'number', 'template' => 'widgets.cadre'), $this->options);
 
         if (!$options['team'])
         {
@@ -93,7 +117,7 @@ class Cadre extends Widget {
             return;
         }
 
-        $cadre = 'cadre-'.$options['sort'].'-'.$options['limit'].'-'.$options['team'];
+        $cadre = 'cadre-'.$options['sort'].'-'.$options['limit'].'-'.$options['team'].'-'.$options['competition'];
 
         if (($cadre = Cache::get($cadre)) === null)
         {
@@ -101,6 +125,7 @@ class Cadre extends Widget {
             $grouped = array();
 
             $now = new DateTime('now');
+            $ids = array();
 
             foreach ($players as $p)
             {
@@ -108,6 +133,8 @@ class Cadre extends Widget {
                     $grouped[$p->position] = array();
 
                 $grouped[$p->position][] = $p;
+
+                $ids[] = $p->id;
 
                 if ($p->date != '0000-00-00') {
                     $date = new DateTime($p->date);
@@ -117,6 +144,18 @@ class Cadre extends Widget {
                     $p->age = $interval->y;
                 } else {
                     $p->age = 0;
+                }
+            }
+
+            $stats = array();
+
+            if (!empty($ids) and $options['competition']) {
+                foreach (DB::table('player_stats')->where('competition_id', '=', $options['competition'])
+                                                  ->where('season_id', '=', IoC::resolve('current_season')->id)
+                                                  ->where_in('player_id', $ids)
+                                                  ->get(array('player_id', 'matches', 'assists', 'goals',
+                                                              'red_cards', 'yellow_cards', 'minutes')) as $s) {
+                    $stats[$s->player_id] = $s;
                 }
             }
 
@@ -150,9 +189,9 @@ class Cadre extends Widget {
                 return ($a[0]->$field > $b[0]->$field ? 1 : -1);
             });
 
-            $cadre = View::make($options['template'], array('players' => $players, 'grouped' => $grouped))->render();
+            $cadre = View::make($options['template'], array('players' => $players, 'grouped' => $grouped, 'stats' => $stats))->render();
 
-            Cache::put('cadre-'.$options['sort'].'-'.$options['limit'].'-'.$options['team'], $cadre);
+            Cache::put('cadre-'.$options['sort'].'-'.$options['limit'].'-'.$options['team'].'-'.$options['competition'], $cadre);
         }
 
         return $cadre;
