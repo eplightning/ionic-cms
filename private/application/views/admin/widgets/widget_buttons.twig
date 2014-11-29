@@ -24,8 +24,7 @@
 			<div id="elements">
 				{% for but in options.buttons %}
 				<div class="elem" id="opt-{{ loop.index }}">
-					<img style="vertical-align: text-top; margin: auto 10px" src="public/img/icons/tag.png" alt="" />
-					<input type="text" name="buttons[{{ loop.index }}][title]" value="{{ but.title }}" style="width: 30%" />
+					<img style="vertical-align: text-top; margin: auto 10px" src="public/img/icons/tag.png" alt="" /><input type="text" name="buttons[{{ loop.index }}][title]" value="{{ but.title }}" style="width: 30%" />
 								<input type="text" name="buttons[{{ loop.index }}][link]" value="{{ but.link }}" style="width: 30%" />
 								<input type="text" name="buttons[{{ loop.index }}][image]" value="{{ but.image }}" style="width: 30%" />
 				</div>

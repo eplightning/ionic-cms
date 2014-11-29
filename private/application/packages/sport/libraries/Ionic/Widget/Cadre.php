@@ -23,7 +23,7 @@ class Cadre extends Widget {
         $options = array_merge(array('team' => null, 'competition' => 0, 'limit' => 0, 'sort' => 'number', 'template' => 'widgets.cadre'), $this->options);
 
         $teams = array();
-        $competitions = array('Nie pobieraj statystyk' => 0);
+        $competitions = array(0 => 'Nie pobieraj statystyk');
 
         foreach (DB::table('teams')->get(array('id', 'name')) as $s)
         {
@@ -39,7 +39,7 @@ class Cadre extends Widget {
             'options'      => $options,
             'action'       => URI::current(),
             'teams'        => $teams,
-            'competitions' => $array
+            'competitions' => $competitions
         ));
     }
 
@@ -124,7 +124,7 @@ class Cadre extends Widget {
             $players = DB::table('players')->where('team_id', '=', $options['team'])->take($options['limit'])->order_by($options['sort'], 'asc')->get('*');
             $grouped = array();
 
-            $now = new DateTime('now');
+            $now = new DateTime('today');
             $ids = array();
 
             foreach ($players as $p)

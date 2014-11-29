@@ -100,6 +100,7 @@ class Sport_Package extends \Ionic\Package {
                 'birthdays' => 'Urodziny zaw.',
                 'match' => 'Mecz',
                 'stats' => 'Statystyki',
+                'cadre' => 'Kadra'
             );
         });
 
@@ -225,6 +226,7 @@ class Sport_Package extends \Ionic\Package {
             'Ionic\\BetHandler' => $root.'libraries'.DS.'Ionic'.DS.'BetHandler.php',
             'Ionic\\TableManager' => $root.'libraries'.DS.'Ionic'.DS.'TableManager.php',
             'Ionic\\Calendar\\Sport' => $root.'libraries'.DS.'Ionic'.DS.'Calendar'.DS.'Sport.php',
+            'Ionic\\Widget\\Cadre' => $root.'libraries'.DS.'Ionic'.DS.'Widget'.DS.'Cadre.php',
             'Ionic\\Widget\\Birthdays' => $root.'libraries'.DS.'Ionic'.DS.'Widget'.DS.'Birthdays.php',
             'Ionic\\Widget\\Injuries' => $root.'libraries'.DS.'Ionic'.DS.'Widget'.DS.'Injuries.php',
             'Ionic\\Widget\\Match' => $root.'libraries'.DS.'Ionic'.DS.'Widget'.DS.'Match.php',
