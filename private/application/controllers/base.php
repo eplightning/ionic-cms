@@ -84,7 +84,7 @@ abstract class Base_Controller extends Controller {
             'notifications' => $this->notifications->get_list(),
             'cookie_policy' => Config::get('advanced.cookie_policy', true) and Cookie::get('cookie_accept', null) != 'cookie_accept',
             // Content
-            'content'       => $this->view instanceof View ? $this->view->render() : (string) $this->view
+            'content'       => $this->view instanceof Ionic\View ? $this->view->render() : (string) $this->view
         ));
     }
 

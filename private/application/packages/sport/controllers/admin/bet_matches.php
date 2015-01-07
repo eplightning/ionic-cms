@@ -177,7 +177,7 @@ class Admin_Bet_matches_Controller extends Admin_Controller {
 
         $this->view = View::make('admin.bet_matches.add2');
     }
-    
+
     public function action_autocomplete($id)
     {
         if (!Auth::can('admin_bet_matches'))
@@ -355,7 +355,7 @@ class Admin_Bet_matches_Controller extends Admin_Controller {
 
         $result = $grid->handle_index($id);
 
-        if ($result instanceof View)
+        if ($result instanceof Ionic\View)
         {
             $this->view = $result;
         }
@@ -528,7 +528,7 @@ class Admin_Bet_matches_Controller extends Admin_Controller {
             $grid->add_button('Dodaj mecze', 'admin/bet_matches/add2', 'add-button');
             $grid->add_button('Import', 'admin/bet_matches/import', 'add-button');
         }
-        
+
         if (Auth::can('admin_bet_matches_edit'))
         {
             $grid->add_action('Edytuj', 'admin/bet_matches/edit/%d', 'edit-button');

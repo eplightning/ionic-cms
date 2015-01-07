@@ -98,7 +98,7 @@ class View implements ArrayAccess {
         // asset container before the main view is evaluated.
         foreach ($data as $key => $value)
         {
-            if ($value instanceof View or $value instanceof Response)
+            if ($value instanceof View or $value instanceof \Laravel\Response)
             {
                 $data[$key] = $value->render();
             }

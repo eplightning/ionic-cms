@@ -235,11 +235,11 @@ class Admin_Tables_Controller extends Admin_Controller {
 
         $result = $grid->handle_index($id);
 
-        if ($result instanceof View)
+        if ($result instanceof Ionic\View)
         {
             $this->view = $result;
         }
-        elseif ($result instanceof Response)
+        elseif ($result instanceof Laravel\Response)
         {
             return $result;
         }

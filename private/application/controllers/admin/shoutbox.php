@@ -73,11 +73,11 @@ class Admin_Shoutbox_Controller extends Admin_Controller {
 
         $result = $grid->handle_index($id);
 
-        if ($result instanceof View)
+        if ($result instanceof Ionic\View)
         {
             $this->view = $result;
         }
-        elseif ($result instanceof Response)
+        elseif ($result instanceof Laravel\Response)
         {
             return $result;
         }
@@ -145,7 +145,7 @@ class Admin_Shoutbox_Controller extends Admin_Controller {
         $grid->add_filter_date('created_at', 'Data dodania');
         $grid->add_filter_search('display_name', 'Nazwa użytkownika', 'users.display_name');
         $grid->add_filter_search('ip', 'Adres IP');
-        
+
         $grid->add_related('users', 'users.id', '=', 'shoutbox.user_id', array(), 'left');
 
         return $grid;

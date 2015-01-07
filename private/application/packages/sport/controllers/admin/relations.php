@@ -352,7 +352,7 @@ class Admin_Relations_Controller extends Admin_Controller {
             if (Input::has('assist') and ctype_digit(Input::get('assist')))
             {
                 $assistant = DB::table('relation_players')->where('relation_id', '=', $id->id)->where('id', '=', (int) Input::get('assist'))->first('*');
-            
+
                 if ($assistant)
                 {
                     $data['assist_player'] = $assistant->id;
@@ -539,7 +539,7 @@ class Admin_Relations_Controller extends Admin_Controller {
         $goals = array(0 => array(), 1 => array());
         $changes = array(0 => array(), 1 => array());
         $team_players = array(0 => array(), 1 => array(), 2 => array(), 3 => array());
-        
+
         // Stats
         $player_stats = array();
         $player_minutes = array();
@@ -797,11 +797,11 @@ class Admin_Relations_Controller extends Admin_Controller {
 
         $result = $grid->handle_index($id);
 
-        if ($result instanceof View)
+        if ($result instanceof Ionic\View)
         {
             $this->view = $result;
         }
-        elseif ($result instanceof Response)
+        elseif ($result instanceof Laravel\Response)
         {
             return $result;
         }

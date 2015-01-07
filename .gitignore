@@ -21,3 +21,5 @@ Thumbs.db
 .buildpath
 .project
 .settings
+
+*.kate-swp
