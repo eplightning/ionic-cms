@@ -77,7 +77,7 @@ class File {
      *
      * @param  string  $path
      * @param  string  $target
-     * @return void
+     * @return bool
      */
     public static function move($path, $target)
     {
@@ -89,7 +89,7 @@ class File {
      *
      * @param  string  $path
      * @param  string  $target
-     * @return void
+     * @return bool
      */
     public static function copy($path, $target)
     {

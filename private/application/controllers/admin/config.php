@@ -93,7 +93,7 @@ class Admin_Config_Controller extends Admin_Controller {
                     }
                     elseif ($item['item']->type == 'html')
                     {
-                        if (!Auth::can('admin_root'))
+                        if (!Auth::can('admin_xss'))
                         {
                             require_once path('app').'vendor'.DS.'htmLawed.php';
 

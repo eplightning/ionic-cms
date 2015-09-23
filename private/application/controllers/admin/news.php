@@ -98,26 +98,7 @@ class Admin_News_Controller extends Admin_Controller {
 
                     if (file_exists(path('public').'upload'.DS.'images'.DS.$raw_data['small_image']))
                     {
-                        $prepared_data['small_image'] = strtr($raw_data['small_image'], array(
-                            "\\"   => '/',
-                            "\xEA" => 'ę',
-                            "\xF3" => 'ó',
-                            "\xB9" => 'ą',
-                            "\x9C" => 'ś',
-                            "\xB3" => 'ł',
-                            "\xBF" => 'ż',
-                            "\x9F" => 'ź',
-                            "\xE6" => 'ć',
-                            "\xF1" => 'ń',
-                            "\xCA" => 'Ę',
-                            "\xD3" => 'Ó',
-                            "\xA5" => 'Ą',
-                            "\x8C" => 'Ś',
-                            "\xA3" => 'Ł',
-                            "\xAF" => 'Ż',
-                            "\x8F" => 'Ź',
-                            "\xC6" => 'Ć',
-                            "\xD1" => 'Ń'));
+                        $prepared_data['small_image'] = ionic_filesystem_name_to_utf8($raw_data['small_image']);
                     }
                 }
 
@@ -128,26 +109,7 @@ class Admin_News_Controller extends Admin_Controller {
 
                     if (file_exists(path('public').'upload'.DS.'images'.DS.$raw_data['big_image']))
                     {
-                        $prepared_data['big_image'] = strtr($raw_data['big_image'], array(
-                            "\\"   => '/',
-                            "\xEA" => 'ę',
-                            "\xF3" => 'ó',
-                            "\xB9" => 'ą',
-                            "\x9C" => 'ś',
-                            "\xB3" => 'ł',
-                            "\xBF" => 'ż',
-                            "\x9F" => 'ź',
-                            "\xE6" => 'ć',
-                            "\xF1" => 'ń',
-                            "\xCA" => 'Ę',
-                            "\xD3" => 'Ó',
-                            "\xA5" => 'Ą',
-                            "\x8C" => 'Ś',
-                            "\xA3" => 'Ł',
-                            "\xAF" => 'Ż',
-                            "\x8F" => 'Ź',
-                            "\xC6" => 'Ć',
-                            "\xD1" => 'Ń'));
+                        $prepared_data['big_image'] = ionic_filesystem_name_to_utf8($raw_data['big_image']);
                     }
                 }
 
@@ -232,26 +194,7 @@ class Admin_News_Controller extends Admin_Controller {
                 {
                     $basename = substr($f->getPathname(), ($basedir_length + 1));
 
-                    $images[urlencode($basename)] = HTML::specialchars(strtr($basename, array(
-                                        "\\"   => '/',
-                                        "\xEA" => 'ę',
-                                        "\xF3" => 'ó',
-                                        "\xB9" => 'ą',
-                                        "\x9C" => 'ś',
-                                        "\xB3" => 'ł',
-                                        "\xBF" => 'ż',
-                                        "\x9F" => 'ź',
-                                        "\xE6" => 'ć',
-                                        "\xF1" => 'ń',
-                                        "\xCA" => 'Ę',
-                                        "\xD3" => 'Ó',
-                                        "\xA5" => 'Ą',
-                                        "\x8C" => 'Ś',
-                                        "\xA3" => 'Ł',
-                                        "\xAF" => 'Ż',
-                                        "\x8F" => 'Ź',
-                                        "\xC6" => 'Ć',
-                                        "\xD1" => 'Ń')));
+                    $images[urlencode($basename)] = HTML::specialchars(ionic_filesystem_name_to_utf8($basename));
                 }
             }
         }
@@ -481,26 +424,7 @@ class Admin_News_Controller extends Admin_Controller {
 
                     if (file_exists(path('public').'upload'.DS.'images'.DS.$raw_data['small_image']))
                     {
-                        $prepared_data['small_image'] = strtr($raw_data['small_image'], array(
-                            "\\"   => '/',
-                            "\xEA" => 'ę',
-                            "\xF3" => 'ó',
-                            "\xB9" => 'ą',
-                            "\x9C" => 'ś',
-                            "\xB3" => 'ł',
-                            "\xBF" => 'ż',
-                            "\x9F" => 'ź',
-                            "\xE6" => 'ć',
-                            "\xF1" => 'ń',
-                            "\xCA" => 'Ę',
-                            "\xD3" => 'Ó',
-                            "\xA5" => 'Ą',
-                            "\x8C" => 'Ś',
-                            "\xA3" => 'Ł',
-                            "\xAF" => 'Ż',
-                            "\x8F" => 'Ź',
-                            "\xC6" => 'Ć',
-                            "\xD1" => 'Ń'));
+                        $prepared_data['small_image'] = ionic_filesystem_name_to_utf8($raw_data['small_image']);
                     }
                 }
 
@@ -511,26 +435,7 @@ class Admin_News_Controller extends Admin_Controller {
 
                     if (file_exists(path('public').'upload'.DS.'images'.DS.$raw_data['big_image']))
                     {
-                        $prepared_data['big_image'] = strtr($raw_data['big_image'], array(
-                            "\\"   => '/',
-                            "\xEA" => 'ę',
-                            "\xF3" => 'ó',
-                            "\xB9" => 'ą',
-                            "\x9C" => 'ś',
-                            "\xB3" => 'ł',
-                            "\xBF" => 'ż',
-                            "\x9F" => 'ź',
-                            "\xE6" => 'ć',
-                            "\xF1" => 'ń',
-                            "\xCA" => 'Ę',
-                            "\xD3" => 'Ó',
-                            "\xA5" => 'Ą',
-                            "\x8C" => 'Ś',
-                            "\xA3" => 'Ł',
-                            "\xAF" => 'Ż',
-                            "\x8F" => 'Ź',
-                            "\xC6" => 'Ć',
-                            "\xD1" => 'Ń'));
+                        $prepared_data['big_image'] = ionic_filesystem_name_to_utf8($raw_data['big_image']);
                     }
                 }
 
@@ -666,26 +571,7 @@ class Admin_News_Controller extends Admin_Controller {
                 {
                     $basename = substr($f->getPathname(), ($basedir_length + 1));
 
-                    $images[urlencode($basename)] = HTML::specialchars(strtr($basename, array(
-                                        "\\"   => '/',
-                                        "\xEA" => 'ę',
-                                        "\xF3" => 'ó',
-                                        "\xB9" => 'ą',
-                                        "\x9C" => 'ś',
-                                        "\xB3" => 'ł',
-                                        "\xBF" => 'ż',
-                                        "\x9F" => 'ź',
-                                        "\xE6" => 'ć',
-                                        "\xF1" => 'ń',
-                                        "\xCA" => 'Ę',
-                                        "\xD3" => 'Ó',
-                                        "\xA5" => 'Ą',
-                                        "\x8C" => 'Ś',
-                                        "\xA3" => 'Ł',
-                                        "\xAF" => 'Ż',
-                                        "\x8F" => 'Ź',
-                                        "\xC6" => 'Ć',
-                                        "\xD1" => 'Ń')));
+                    $images[urlencode($basename)] = HTML::specialchars(ionic_filesystem_name_to_utf8($basename));
                 }
             }
         }

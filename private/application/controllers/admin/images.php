@@ -741,6 +741,8 @@ class Admin_Images_Controller extends Admin_Controller {
             return Response::error(500);
         }
 
+        $current_path = 'upload'.DS.'images';
+
         if (Session::has('images-current-path') and is_array(Session::get('images-current-path')))
         {
             foreach (Session::get('images-current-path') as $sub)
@@ -857,30 +859,7 @@ class Admin_Images_Controller extends Admin_Controller {
      */
     protected function prepare_filename($raw)
     {
-        // In case filesystem returns polish stuff in ISO-8859-2 we need to convert it to UTF-8
-        $raw = strtr($raw, array(
-            "\xEA" => 'ę',
-            "\xF3" => 'ó',
-            "\xB9" => 'ą',
-            "\x9C" => 'ś',
-            "\xB3" => 'ł',
-            "\xBF" => 'ż',
-            "\x9F" => 'ź',
-            "\xE6" => 'ć',
-            "\xF1" => 'ń',
-            "\xCA" => 'Ę',
-            "\xD3" => 'Ó',
-            "\xA5" => 'Ą',
-            "\x8C" => 'Ś',
-            "\xA3" => 'Ł',
-            "\xAF" => 'Ż',
-            "\x8F" => 'Ź',
-            "\xC6" => 'Ć',
-            "\xD1" => 'Ń'
-                ));
-
-        // Encode just in case
-        return HTML::specialchars($raw);
+        return HTML::specialchars(ionic_filesystem_name_to_utf8($raw));
     }
 
 }

@@ -55,7 +55,7 @@ class Admin_Controller extends Controller {
             return;
 
         // Style to use
-        $admin_skin = (Cookie::get('ionic-admin-skin') == 'admin_flat.css') ? 'admin_flat.css' : 'admin.css';
+        $admin_skin = (Cookie::get('ionic_admin_skin') == 'admin_flat.css') ? 'admin_flat.css' : 'admin.css';
 
         // Menu
         $menu = Cache::get('admin-menu');

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Cache management
  *
@@ -26,14 +25,7 @@ class Admin_Cache_Controller extends Admin_Controller {
             return Redirect::to('admin/cache/index');
         } //$status == 2
         
-        foreach (new FilesystemIterator(path('storage') . 'cache', FilesystemIterator::SKIP_DOTS) as $f)
-        {
-            // Ignore directories and other non-file things
-            if ($f->isFile())
-            {
-                @unlink($f->getPathname());
-            } //$f->isFile()
-        } //new FilesystemIterator(path('storage') . 'cache', FilesystemIterator::SKIP_DOTS) as $f
+        Cache::forget_multiple('*');
         
         $this->log('Wyczyścił cache');
         $this->notice('Cache usunięte pomyślnie');
@@ -53,9 +45,10 @@ class Admin_Cache_Controller extends Admin_Controller {
             return Response::error(403);
         
         // Directory traversal fix
-        $id = basename($id);
+        if (Config::get('cache.driver') == 'file')
+            $id = basename($id);
         
-        if (!is_file(path('storage') . 'cache' . DS . $id))
+        if (!Cache::has($id))
             return Response::error(404);
         
         if (!($status = $this->confirm()))
@@ -88,45 +81,34 @@ class Admin_Cache_Controller extends Admin_Controller {
         $this->page->breadcrumb_append('Cache', 'admin/cache/index');
         $this->page->set_title('Cache');
         
-        $list = array();
+        $list = Cache::list_all();
         
-        foreach (new FilesystemIterator(path('storage') . 'cache', FilesystemIterator::SKIP_DOTS) as $f)
+        foreach ($list as $k => $v)
         {
-            // Ignore directories and other non-file things
-            if ($f->isFile())
+            switch ($v['cache_name'])
             {
-                // Get expiration from file
-                $expire = (int) substr(file_get_contents($f->getPathname()), 0, 10);
-                
-                switch ($f->getFilename())
-                {
-                    case 'admin-menu':
-                        $name = 'Menu administracji';
-                        break;
-                    
-                    case 'db-config':
-                        $name = 'Konfiguracja';
-                        break;
-                    
-                    case 'widgets':
-                        $name = 'Widżety';
-                        break;
-                    
-                    case 'current-season':
-                        $name = 'Aktualny sezon';
-                        break;
-                    
-                    default:
-                        $name = $f->getFilename();
-                } //$f->getFilename()
-                
-                $list[] = array(
-                    'name' => $name,
-                    'cache_name' => $f->getFilename(),
-                    'expiration' => $expire
-                );
-            } //$f->isFile()
-        } //new FilesystemIterator(path('storage') . 'cache', FilesystemIterator::SKIP_DOTS) as $f
+                case 'admin-menu':
+                    $name = 'Menu administracji';
+                    break;
+
+                case 'db-config':
+                    $name = 'Konfiguracja';
+                    break;
+
+                case 'widgets':
+                    $name = 'Widżety';
+                    break;
+
+                case 'current-season':
+                    $name = 'Aktualny sezon';
+                    break;
+
+                default:
+                    $name = $v['cache_name'];
+            }
+
+            $list[$k]['name'] = $name;
+        }
         
         $this->view = View::make('admin.cache.index', array(
             'list' => $list

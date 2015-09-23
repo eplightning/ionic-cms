@@ -28,17 +28,7 @@ function ionic_censor($message)
  */
 function ionic_clear_cache($file)
 {
-    $results = glob(path('storage').'cache'.DS.$file, GLOB_NOSORT);
-
-    if (!$results)
-    {
-        return;
-    }
-
-    foreach ($results as $f)
-    {
-        @unlink($f);
-    }
+    Cache::forget_multiple($file);
 }
 
 /**
@@ -614,6 +604,37 @@ function ionic_find_slug($title, $id, $table, $max = 127)
     while (DB::table($table)->where('id', '<>', $id)->where('slug', '=', $slug)->first('id'));
 
     return $slug;
+}
+
+/**
+ * Convert from platform specific filename encoding to UTF-8
+ *
+ * @param   $source string
+ * @return  string
+ */
+function ionic_filesystem_name_to_utf8($source)
+{
+    return strtr($source, array(
+        "\\"   => '/',
+        "\xEA" => 'ę',
+        "\xF3" => 'ó',
+        "\xB9" => 'ą',
+        "\x9C" => 'ś',
+        "\xB3" => 'ł',
+        "\xBF" => 'ż',
+        "\x9F" => 'ź',
+        "\xE6" => 'ć',
+        "\xF1" => 'ń',
+        "\xCA" => 'Ę',
+        "\xD3" => 'Ó',
+        "\xA5" => 'Ą',
+        "\x8C" => 'Ś',
+        "\xA3" => 'Ł',
+        "\xAF" => 'Ż',
+        "\x8F" => 'Ź',
+        "\xC6" => 'Ć',
+        "\xD1" => 'Ń'
+    ));
 }
 
 /**

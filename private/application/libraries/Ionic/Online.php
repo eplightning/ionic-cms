@@ -64,4 +64,14 @@ class Online {
         return isset($this->users[(int) $id]) ? true : false;
     }
 
+    /**
+     * Logged users count
+     *
+     * @return int
+     */
+    public function logged()
+    {
+        return $this->anonymous + count($this->users);
+    }
+
 }

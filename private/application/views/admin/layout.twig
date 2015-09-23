@@ -46,7 +46,7 @@ $(document).ready(function() {
 
 	$('#skin-selector').change(function() {
 		$('#skin-selector-css').prop('href', '{{ base() }}/public/css/' + $(this).val());
-		$.cookie('ionic-admin-skin', $(this).val(), { expires: 365, path: '/' });
+		$.cookie('ionic_admin_skin', $(this).val(), { expires: 365, path: '/' });
 	});
 });
 </script>

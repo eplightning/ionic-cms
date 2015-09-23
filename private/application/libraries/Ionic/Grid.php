@@ -934,7 +934,7 @@ class Grid {
             if ($this->checkbox)
                 $colspan++;
 
-            if (\Cookie::get('ionic-admin-skin') == 'admin_flat.css')
+            if (\Cookie::get('ionic_admin_skin') == 'admin_flat.css')
             {
                 $action_width *= 48;
                 $action_width++;
